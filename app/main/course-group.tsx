@@ -9,7 +9,7 @@ export default function CourseGroup() {
             <h2 className={'text-lg font-bold mb-5'}>Course Group</h2>
 
             <div className={'flex justify-center'}>
-                <div className={'w-[calc(100%-200px)] '}>
+                <div className={'w-[calc(100%-100px)] '}>
                     <Carousel
                         opts={{
                             align: "start",
