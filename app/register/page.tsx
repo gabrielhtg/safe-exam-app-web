@@ -48,9 +48,22 @@ export default function LoginPage() {
                 placeholder={"Username"}
               ></Input>
               <Input
+                id={"input-email"}
+                type={"text"}
+                className={"mb-3"}
+                placeholder={"Email"}
+              ></Input>
+              <Input
                 id={"input-password"}
                 type={"password"}
+                className={"mb-3"}
                 placeholder={"Password"}
+              ></Input>
+              <Input
+                id={"input-reenter-password"}
+                type={"password"}
+                className={"mb-3"}
+                placeholder={"Confirm Password"}
               ></Input>
             </CardContent>
 
