@@ -24,7 +24,9 @@ export default function LoginPage() {
 
               <CardFooter className={'gap-x-3 flex-col items-start'}>
                 <div className="flex gap-x-3 w-full">
-                  <Button id="button-login" className="w-full">Login</Button>
+                  <Button id="button-login" className="w-full" asChild={true}>
+                    <Link href={'/main'}>Login</Link>
+                  </Button>
                   <Button asChild={true} id="button-register" className="w-full" variant="secondary">
                     <Link href={'/register'}>Register</Link>
                   </Button>
