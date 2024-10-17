@@ -1,18 +1,9 @@
-import Sidebar from "@/components/custom-component/sidebar";
-import Navbar from "@/components/custom-component/navbar";
+import AdminPanelLayout from "@/components/admin-panel/admin-panel-layout";
 
-export default function DashboardLayout(
-    {
-        children,
-    }: {
-        children: React.ReactNode
-    }
-) {
-    return (
-        <>
-            <Navbar></Navbar>
-            <Sidebar></Sidebar>
-            <section>{children}</section>
-        </>
-    )
+export default async function DashboardLayout({
+                                         children,
+                                     }: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return <AdminPanelLayout>{children}</AdminPanelLayout>;
 }
