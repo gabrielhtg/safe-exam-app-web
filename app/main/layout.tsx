@@ -1,4 +1,5 @@
 import Sidebar from "@/components/custom-component/sidebar";
+import Navbar from "@/components/custom-component/navbar";
 
 export default function DashboardLayout(
     {
@@ -9,6 +10,7 @@ export default function DashboardLayout(
 ) {
     return (
         <>
+            <Navbar></Navbar>
             <Sidebar></Sidebar>
             <section>{children}</section>
         </>
