@@ -12,17 +12,11 @@ import Link from "next/link";
 
 export default function LoginPage() {
   return (
-    <>
-      <div
-        className={
-          "bg-cover bg-center h-screen w-full bg-[url(/assets/images/login-bg.jpg)]"
-        }
-      >
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <>
         <div
-          className={
-            "relative w-full h-screen flex justify-center items-center"
-          }
+            className={
+              "relative w-full h-screen flex justify-center items-center"
+            }
         >
           <Card className={"w-[380px] px-5"}>
             <CardHeader>
@@ -36,15 +30,15 @@ export default function LoginPage() {
 
             <CardContent>
               <Input
-                id={"input-username"}
-                type={"text"}
-                className={"mb-3"}
-                placeholder={"Username"}
+                  id={"input-username"}
+                  type={"text"}
+                  className={"mb-3"}
+                  placeholder={"Username"}
               ></Input>
               <Input
-                id={"input-password"}
-                type={"password"}
-                placeholder={"Password"}
+                  id={"input-password"}
+                  type={"password"}
+                  placeholder={"Password"}
               ></Input>
             </CardContent>
 
@@ -54,25 +48,24 @@ export default function LoginPage() {
                   <Link href={"/main"}>Login</Link>
                 </Button>
                 <Button
-                  asChild={true}
-                  id="button-register"
-                  className="w-full"
-                  variant="secondary"
+                    asChild={true}
+                    id="button-register"
+                    className="w-full"
+                    variant="secondary"
                 >
                   <Link href={"/register"}>Register</Link>
                 </Button>
               </div>
 
               <Link
-                href="/password/reset"
-                className="text-sm text-blue-500 hover:underline text-left mt-3"
+                  href="/password/reset"
+                  className="text-sm text-blue-500 hover:underline text-left mt-3"
               >
                 Lupa kata sandi?
               </Link>
             </CardFooter>
           </Card>
         </div>
-      </div>
-    </>
+      </>
   );
 }

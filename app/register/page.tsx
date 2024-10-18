@@ -13,12 +13,7 @@ import Link from "next/link";
 export default function RegisterPage() {
   return (
     <>
-      <div
-        className={
-          "bg-cover bg-center h-screen w-full bg-[url(/assets/images/login-bg.jpg)]"
-        }
-      >
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+
         <div
           className={
             "relative w-full h-screen flex justify-center items-center"
@@ -84,7 +79,6 @@ export default function RegisterPage() {
             </CardFooter>
           </Card>
         </div>
-      </div>
     </>
   );
 }
