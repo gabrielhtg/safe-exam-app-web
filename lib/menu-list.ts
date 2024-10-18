@@ -59,9 +59,9 @@ export function getMenuList(pathname: string): Group[] {
           ]
         },
         {
-          href: "/categories",
-          label: "Categories",
-          icon: Bookmark
+          href: "/main/exam",
+          label: "Exam",
+          icon: SquarePen
         },
         {
           href: "/tags",

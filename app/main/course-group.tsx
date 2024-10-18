@@ -1,9 +1,17 @@
+'use client'
+
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
 import {Card} from "@/components/ui/card";
 import CourseCard from "@/components/custom-component/course-card";
 import Link from "next/link";
+import Autoplay from "embla-carousel-autoplay";
+import * as React from "react";
 
 export default function CourseGroup() {
+    const plugin = React.useRef(
+        Autoplay({ delay: 2000, stopOnInteraction: true })
+    )
+
     return (
         <>
             <h2 className={'text-lg font-bold mb-5'}>Course Group</h2>
@@ -13,7 +21,16 @@ export default function CourseGroup() {
                     <Carousel
                         opts={{
                             align: "start",
+                            loop: true,
+
                         }}
+                        plugins={[
+                            plugin.current
+                        ]}
+                        onMouseEnter={plugin.current.stop}
+
+                        onMouseLeave={() => plugin.current.play()}
+
                         className="w-full"
                     >
                         <CarouselContent>

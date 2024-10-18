@@ -15,10 +15,10 @@ export default function MainPage() {
 
     return (
         <ContentLayout title="Dashboard">
-                <Card id={'card-utama'} className={'w-full p-10'}>
-                    <CourseGroup/>
-                    <RecentExam/>
-                </Card>
+            <Card id={'card-utama'} className={'w-full p-10'}>
+                <CourseGroup/>
+                <RecentExam/>
+            </Card>
         </ContentLayout>
     )
 }
