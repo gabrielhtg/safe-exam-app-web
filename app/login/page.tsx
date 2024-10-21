@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Card,
   CardContent,
@@ -9,8 +11,32 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+  const router = useRouter();
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post("http://localhost:3001/auth/login", {
+        username: username,
+        password: password,
+      });
+
+      if (response.status === 200) {
+        router.push("/main");
+      }
+    } catch (err: any) {
+      console.log(err);
+      setErrMsg("Login failed. Please check your credentials.");
+    }
+  }
+
   return (
       <>
         <div
@@ -34,18 +60,24 @@ export default function LoginPage() {
                   type={"text"}
                   className={"mb-3"}
                   placeholder={"Username"}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
               ></Input>
               <Input
                   id={"input-password"}
                   type={"password"}
                   placeholder={"Password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
               ></Input>
+
+              {errMsg && <p className="text-red-500 text-sm mt-2">{errMsg}</p>}
             </CardContent>
 
             <CardFooter className={"gap-x-3 flex-col items-start"}>
               <div className="flex gap-x-3 w-full">
-                <Button id="button-login" className="w-full" asChild={true}>
-                  <Link href={"/main"}>Login</Link>
+                <Button onClick={handleLogin} id="button-login" className="w-full">
+                  Login
                 </Button>
                 <Button
                     asChild={true}
