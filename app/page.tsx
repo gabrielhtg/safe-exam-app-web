@@ -39,7 +39,7 @@ export default function LoginPage() {
       })
 
       if (response.status === 200) {
-        localStorage.setItem('token', response.data.access_token)
+        localStorage.setItem('token', response.data.data.access_token)
         router.push('/main')
       }
     } catch (err: any) {
