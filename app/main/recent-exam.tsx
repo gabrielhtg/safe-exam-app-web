@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from 'next/link'
 import {
   Table,
   TableHeader,
@@ -6,7 +6,7 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 
 export default function RecentExam() {
   return (
@@ -79,10 +79,13 @@ export default function RecentExam() {
       </div>
 
       <div className={'w-full text-center mt-5'}>
-        <Link href={'/main/course'} className={'text-blue-500 hover:underline'}>
+        <Link
+          href={'/app/main/course'}
+          className={'text-blue-500 hover:underline'}
+        >
           See More
         </Link>
       </div>
     </>
-  );
+  )
 }
