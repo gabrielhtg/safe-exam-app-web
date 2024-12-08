@@ -23,6 +23,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { CircleX } from 'lucide-react'
+import { useDispatch } from 'react-redux'
+import { apiUrl } from '@/lib/env'
+import { setUser } from '@/lib/_slices/userSlice'
+import { AppDispatch } from '@/lib/store'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -30,16 +34,21 @@ export default function LoginPage() {
   const [errMsg, setErrMsg] = useState('')
   const router = useRouter()
   const [errDialog, setErrDialog] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/auth/login', {
+      const loginResponse = await axios.post(`${apiUrl}/auth/login`, {
         username: username,
         password: password,
       })
 
-      if (response.status === 200) {
-        localStorage.setItem('token', response.data.data.access_token)
+      if (loginResponse.status === 200) {
+        const getUserResponse = await axios.get(`${apiUrl}/users/${username}`)
+
+        dispatch(setUser(getUserResponse.data.data))
+
+        localStorage.setItem('token', loginResponse.data.data.access_token)
         router.push('/main')
       }
     } catch (err: any) {
