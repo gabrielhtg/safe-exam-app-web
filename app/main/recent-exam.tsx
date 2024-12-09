@@ -7,6 +7,8 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Eye } from 'lucide-react'
 
 export default function RecentExam() {
   return (
@@ -23,6 +25,7 @@ export default function RecentExam() {
                 <TableHead>Course</TableHead>
                 <TableHead>Start Time</TableHead>
                 <TableHead>End Time</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -32,6 +35,11 @@ export default function RecentExam() {
                 <TableCell>MPTI</TableCell>
                 <TableCell>Thu Oct 17 2024 13:10:56.772</TableCell>
                 <TableCell>Wed Jun 25 1975 08:30:00.000</TableCell>
+                <TableCell>
+                  <Button>
+                    <Eye />
+                  </Button>
+                </TableCell>
               </TableRow>
 
               <TableRow>
@@ -40,6 +48,11 @@ export default function RecentExam() {
                 <TableCell>MPTI</TableCell>
                 <TableCell>Thu Oct 17 2024 13:10:56.772</TableCell>
                 <TableCell>Wed Jun 25 1975 08:30:00.000</TableCell>
+                <TableCell>
+                  <Button>
+                    <Eye />
+                  </Button>
+                </TableCell>
               </TableRow>
 
               <TableRow>
@@ -48,6 +61,11 @@ export default function RecentExam() {
                 <TableCell>MPTI</TableCell>
                 <TableCell>Thu Oct 17 2024 13:10:56.772</TableCell>
                 <TableCell>Wed Jun 25 1975 08:30:00.000</TableCell>
+                <TableCell>
+                  <Button>
+                    <Eye />
+                  </Button>
+                </TableCell>
               </TableRow>
 
               <TableRow>
@@ -56,6 +74,11 @@ export default function RecentExam() {
                 <TableCell>MPTI</TableCell>
                 <TableCell>Thu Oct 17 2024 13:10:56.772</TableCell>
                 <TableCell>Wed Jun 25 1975 08:30:00.000</TableCell>
+                <TableCell>
+                  <Button>
+                    <Eye />
+                  </Button>
+                </TableCell>
               </TableRow>
 
               <TableRow>
@@ -64,6 +87,11 @@ export default function RecentExam() {
                 <TableCell>MPTI</TableCell>
                 <TableCell>Thu Oct 17 2024 13:10:56.772</TableCell>
                 <TableCell>Wed Jun 25 1975 08:30:00.000</TableCell>
+                <TableCell>
+                  <Button>
+                    <Eye />
+                  </Button>
+                </TableCell>
               </TableRow>
 
               <TableRow>
@@ -72,6 +100,11 @@ export default function RecentExam() {
                 <TableCell>MPTI</TableCell>
                 <TableCell>Thu Oct 17 2024 13:10:56.772</TableCell>
                 <TableCell>Wed Jun 25 1975 08:30:00.000</TableCell>
+                <TableCell>
+                  <Button>
+                    <Eye />
+                  </Button>
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

@@ -30,10 +30,11 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rePassword, setRePassword] = useState('')
+  const router = useRouter()
+
   const [dialogMsg, setDialogMsg] = useState('')
   const [errDialog, setErrDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
-  const router = useRouter()
 
   const handleRegister = async () => {
     try {

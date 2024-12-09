@@ -22,16 +22,37 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useRouter } from 'next/navigation'
 import logoutService from '@/app/_services/logout.service'
-import { useSelector } from 'react-redux'
-import { selectUser } from '@/lib/_slices/userSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectUser, setUser } from '@/lib/_slices/userSlice'
+import { useEffect } from 'react'
+import axios from 'axios'
+import { apiUrl } from '@/lib/env'
 
 export function UserNav() {
   const router = useRouter()
   const user = useSelector(selectUser)
+  const dispatch = useDispatch()
 
   const handleLogout = () => {
     logoutService(router)
   }
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/users/${localStorage.getItem('username')}`
+        )
+
+        dispatch(setUser(response.data.data))
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        router.push('/')
+      }
+    }
+
+    getUserData().then()
+  }, [dispatch])
 
   return (
     <DropdownMenu>
@@ -44,7 +65,11 @@ export function UserNav() {
                 className="relative h-8 w-8 rounded-full"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="#" alt="Avatar" />
+                  <AvatarImage
+                    className={'object-cover'}
+                    src={`${apiUrl}/${user.profile_pict}`}
+                    alt="Avatar"
+                  />
                   <AvatarFallback className="bg-transparent">JD</AvatarFallback>
                 </Avatar>
               </Button>
@@ -66,9 +91,9 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/account" className="flex items-center">
+            <Link href="/main/profile" className="flex items-center">
               <User className="w-4 h-4 mr-3 text-muted-foreground" />
-              Account
+              Profile
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

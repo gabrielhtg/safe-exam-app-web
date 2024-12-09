@@ -47,7 +47,7 @@ export default function LoginPage() {
         const getUserResponse = await axios.get(`${apiUrl}/users/${username}`)
 
         dispatch(setUser(getUserResponse.data.data))
-
+        localStorage.setItem('username', getUserResponse.data.data.username)
         localStorage.setItem('token', loginResponse.data.data.access_token)
         router.push('/main')
       }
