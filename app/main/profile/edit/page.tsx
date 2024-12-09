@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Card } from '@/components/ui/card'
 
-export default function RegisterPage() {
+export default function EditProfilePage() {
   const router = useRouter()
   const currentUser = useSelector(selectUser)
   const [name, setName] = useState(currentUser.name)
@@ -95,7 +95,7 @@ export default function RegisterPage() {
       <Card
         id={'card-utama'}
         className={
-          'flex flex-col items-center justify-center gap-3 md:gap-5 p-5 h-[calc(100vh-180px)] bg-white rounded-lg shadow'
+          'flex flex-col items-center justify-center gap-3 md:gap-5 p-5 h-[calc(100vh-180px)] rounded-lg shadow'
         }
       >
         <Avatar className={'w-24 h-24 md:w-48 md:h-48'}>

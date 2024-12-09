@@ -28,7 +28,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import axios from 'axios'
 
-export default function RegisterPage() {
+export default function ProfilePage() {
   const currentUser = useSelector(selectUser)
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -88,7 +88,7 @@ export default function RegisterPage() {
       <Card
         id={'card-utama'}
         className={
-          'flex flex-col items-center justify-center gap-3 md:gap-5 p-5 h-[calc(100vh-180px)] bg-white rounded-lg shadow'
+          'flex flex-col items-center justify-center gap-3 md:gap-5 p-5 h-[calc(100vh-180px)] rounded-lg shadow'
         }
       >
         <Avatar className={'w-24 h-24 md:w-48 md:h-48'}>
