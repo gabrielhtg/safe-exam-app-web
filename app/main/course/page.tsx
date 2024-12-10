@@ -14,15 +14,12 @@ import {
   CircleX,
   Eye,
   ImagePlus,
+  Inbox,
+  Loader2,
   Pencil,
   Plus,
   Search,
   Trash2,
-  Turtle,
-  Cat,
-  Dog,
-  Rabbit,
-  Fish,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -37,19 +34,71 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { ContentLayout } from '@/components/admin-panel/content-layout'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
+import axios from 'axios'
+import { apiUrl, compressOptions } from '@/lib/env'
+import imageCompression from 'browser-image-compression'
+import { useSelector } from 'react-redux'
+import { selectUser } from '@/lib/_slices/userSlice'
 
 export default function CoursePage() {
   const [dialogMsg, setDialogMsg] = useState('')
   const [errDialog, setErrDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
+  const [isLoadingCreate, setIsLoadingCreate] = useState(false)
 
   const [courseImage, setCourseImage] = useState('')
-  const handleAddCourse = async () => {}
+  const [courseImageFile, setCourseImageFile] = useState<File | undefined>()
+  const [courseTitle, setCourseTitle] = useState('')
+  const [courseDesc, setCourseDesc] = useState('')
+  const currentUsername = useSelector(selectUser).username
+  const [courseList, setCourseList] = useState([])
+
+  const getAllCourse = async () => {
+    const response = await axios.get(`${apiUrl}/course`)
+
+    setCourseList(response.data.data)
+  }
+
+  useEffect(() => {
+    getAllCourse().then()
+  }, [])
+
+  const handleAddCourse = async () => {
+    setIsLoadingCreate(true)
+    const formData = new FormData()
+    formData.append('title', courseTitle)
+    formData.append('description', courseDesc)
+    formData.append('username', currentUsername)
+
+    try {
+      const compressedImage = await imageCompression(
+        courseImageFile!,
+        compressOptions
+      )
+
+      formData.append('course_pict', compressedImage)
+
+      const response = await axios.post(`${apiUrl}/course`, formData)
+
+      if (response.status === 200) {
+        getAllCourse().then()
+        setErrDialog(true)
+        setDialogType(1)
+        setDialogMsg(response.data.message)
+        setIsLoadingCreate(false)
+      }
+    } catch (err: any) {
+      setErrDialog(true)
+      setDialogType(0)
+      setDialogMsg(err.response.data.message)
+      setIsLoadingCreate(false)
+    }
+  }
 
   const getAlertTitle = () => {
     if (dialogType == 1) {
@@ -97,12 +146,23 @@ export default function CoursePage() {
                 <AlertDialogDescription className={'flex flex-col gap-5 mt-3'}>
                   <div className="grid w-full items-center gap-1.5 mt-3">
                     <Label htmlFor="course-title">Course Title</Label>
-                    <Input type="text" id="course-title" />
+                    <Input
+                      type="text"
+                      id="course-title"
+                      onChange={(e) => {
+                        setCourseTitle(e.target.value)
+                      }}
+                    />
                   </div>
 
                   <div className="grid w-full items-center gap-1.5 ">
                     <Label htmlFor="course-desc">Course Description</Label>
-                    <Textarea id="course-desc" />
+                    <Textarea
+                      id="course-desc"
+                      onChange={(e) => {
+                        setCourseDesc(e.target.value)
+                      }}
+                    />
                   </div>
 
                   <div className="grid w-full items-center gap-1.5">
@@ -119,12 +179,21 @@ export default function CoursePage() {
                     ) : (
                       <Image
                         src={courseImage}
+                        width={500}
+                        height={500}
                         alt={'course-image'}
-                        className={'w-full h-48'}
+                        className={'w-full h-48 object-cover'}
                       />
                     )}
 
-                    <Input type="file" id="course-image" />
+                    <Input
+                      type="file"
+                      id="course-image"
+                      onChange={(e) => {
+                        setCourseImage(URL.createObjectURL(e.target.files![0]))
+                        setCourseImageFile(e.target.files![0])
+                      }}
+                    />
                   </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -150,224 +219,43 @@ export default function CoursePage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
-          <Card className={'w-full'}>
-            <CardHeader>
-              <CardTitle>MPTI</CardTitle>
-              <CardDescription>
-                Manajemen Proyek Teknologi Informasi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Image
-                className={'object-cover h-40 rounded-lg'}
-                src={
-                  'http://localhost:3001/profile_pict/profile_pict-1733731398131-397516538.jpg'
-                }
-                width={500}
-                height={500}
-                alt={'bg'}
-              />
-            </CardContent>
-            <CardFooter className={'flex gap-2'}>
-              <Button>
-                <Eye />
-              </Button>
-              <Button>
-                <Pencil />
-              </Button>
-              <Button variant={'destructive'}>
-                <Trash2 />
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className={'w-full'}>
-            <CardHeader>
-              <CardTitle>MPTI</CardTitle>
-              <CardDescription>
-                Manajemen Proyek Teknologi Informasi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Image
-                className={'object-cover h-40 rounded-lg'}
-                src={
-                  'http://localhost:3001/profile_pict/profile_pict-1733731398131-397516538.jpg'
-                }
-                width={500}
-                height={500}
-                alt={'bg'}
-              />
-            </CardContent>
-            <CardFooter className={'flex gap-2'}>
-              <Button>
-                <Eye />
-              </Button>
-              <Button>
-                <Pencil />
-              </Button>
-              <Button variant={'destructive'}>
-                <Trash2 />
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className={'w-full'}>
-            <CardHeader>
-              <CardTitle>MPTI</CardTitle>
-              <CardDescription>
-                Manajemen Proyek Teknologi Informasi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Image
-                className={'object-cover h-40 rounded-lg'}
-                src={
-                  'http://localhost:3001/profile_pict/profile_pict-1733731398131-397516538.jpg'
-                }
-                width={500}
-                height={500}
-                alt={'bg'}
-              />
-            </CardContent>
-            <CardFooter className={'flex gap-2'}>
-              <Button>
-                <Eye />
-              </Button>
-              <Button>
-                <Pencil />
-              </Button>
-              <Button variant={'destructive'}>
-                <Trash2 />
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className={'w-full'}>
-            <CardHeader>
-              <CardTitle>MPTI</CardTitle>
-              <CardDescription>
-                Manajemen Proyek Teknologi Informasi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Image
-                className={'object-cover h-40 rounded-lg'}
-                src={
-                  'http://localhost:3001/profile_pict/profile_pict-1733731398131-397516538.jpg'
-                }
-                width={500}
-                height={500}
-                alt={'bg'}
-              />
-            </CardContent>
-            <CardFooter className={'flex gap-2'}>
-              <Button>
-                <Eye />
-              </Button>
-              <Button>
-                <Pencil />
-              </Button>
-              <Button variant={'destructive'}>
-                <Trash2 />
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className={'w-full'}>
-            <CardHeader>
-              <CardTitle>MPTI</CardTitle>
-              <CardDescription>
-                Manajemen Proyek Teknologi Informasi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Image
-                className={'object-cover h-40 rounded-lg'}
-                src={
-                  'http://localhost:3001/profile_pict/profile_pict-1733731398131-397516538.jpg'
-                }
-                width={500}
-                height={500}
-                alt={'bg'}
-              />
-            </CardContent>
-            <CardFooter className={'flex gap-2'}>
-              <Button>
-                <Eye />
-              </Button>
-              <Button>
-                <Pencil />
-              </Button>
-              <Button variant={'destructive'}>
-                <Trash2 />
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className={'w-full'}>
-            <CardHeader>
-              <CardTitle>MPTI</CardTitle>
-              <CardDescription>
-                Manajemen Proyek Teknologi Informasi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Image
-                className={'object-cover h-40 rounded-lg'}
-                src={
-                  'http://localhost:3001/profile_pict/profile_pict-1733731398131-397516538.jpg'
-                }
-                width={500}
-                height={500}
-                alt={'bg'}
-              />
-            </CardContent>
-            <CardFooter className={'flex gap-2'}>
-              <Button>
-                <Eye />
-              </Button>
-              <Button>
-                <Pencil />
-              </Button>
-              <Button variant={'destructive'}>
-                <Trash2 />
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className={'w-full'}>
-            <CardHeader>
-              <CardTitle>MPTI</CardTitle>
-              <CardDescription>
-                Manajemen Proyek Teknologi Informasi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Image
-                className={'object-cover h-40 rounded-lg'}
-                src={
-                  'http://localhost:3001/profile_pict/profile_pict-1733731398131-397516538.jpg'
-                }
-                width={500}
-                height={500}
-                alt={'bg'}
-              />
-            </CardContent>
-            <CardFooter className={'flex gap-2'}>
-              <Button>
-                <Eye />
-              </Button>
-              <Button>
-                <Pencil />
-              </Button>
-              <Button variant={'destructive'}>
-                <Trash2 />
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+        {courseList.length === 0 ? ( // Gunakan triple equals (===) untuk perbandingan
+          <div className="flex flex-col w-full h-96 justify-center items-center">
+            <Inbox className="w-20 h-20" />
+            There are no courses yet!
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-3 xl:grid-cols-4 gap-4">
+            {courseList.map((course: any, index: number) => (
+              <Card className={'w-full'} key={index}>
+                <CardHeader>
+                  <CardTitle>{course.title}</CardTitle>
+                  <CardDescription>{course.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Image
+                    className={'object-cover h-40 rounded-lg'}
+                    src={`${apiUrl}/${course.image}`}
+                    width={500}
+                    height={500}
+                    alt={'course-image'}
+                  />
+                </CardContent>
+                <CardFooter className={'flex gap-2'}>
+                  <Button>
+                    <Eye />
+                  </Button>
+                  <Button>
+                    <Pencil />
+                  </Button>
+                  <Button variant={'destructive'}>
+                    <Trash2 />
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
       </Card>
 
       <AlertDialog open={errDialog}>
@@ -391,6 +279,23 @@ export default function CoursePage() {
               OK
             </Button>
           </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isLoadingCreate}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle
+              className={'text-center flex flex-col items-center'}
+            >
+              Creating New Course
+            </AlertDialogTitle>
+            <AlertDialogDescription
+              className={'flex w-full justify-center mt-3'}
+            >
+              <Loader2 className="animate-spin w-10 h-10" />
+            </AlertDialogDescription>
+          </AlertDialogHeader>
         </AlertDialogContent>
       </AlertDialog>
     </ContentLayout>

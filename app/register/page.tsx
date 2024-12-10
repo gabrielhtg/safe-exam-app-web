@@ -21,15 +21,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { CircleCheck, CircleX, LogIn } from 'lucide-react'
+import { CircleCheck, CircleX, ImagePlus, LogIn } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function RegisterPage() {
-  const [nama, setNama] = useState('')
+  const [name, setName] = useState('')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rePassword, setRePassword] = useState('')
+  const [profilePict, setProfilePict] = useState('')
+  const [fotoProfil, setFotoProfil] = useState<File | undefined>()
   const router = useRouter()
 
   const [dialogMsg, setDialogMsg] = useState('')
@@ -37,14 +41,20 @@ export default function RegisterPage() {
   const [dialogType, setDialogType] = useState(1)
 
   const handleRegister = async () => {
+    const formData = new FormData()
+    formData.append('name', name)
+    formData.append('username', username)
+    formData.append('email', email)
+    formData.append('password', password)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    formData.append('profile_pict', fotoProfil)
     try {
       if (password == rePassword) {
-        const response = await axios.post('http://localhost:3001/users', {
-          username: username,
-          password: password,
-          email: email,
-          name: nama,
-        })
+        const response = await axios.post(
+          'http://localhost:3001/users',
+          formData
+        )
 
         if (response.status === 200) {
           setDialogType(1)
@@ -90,7 +100,7 @@ export default function RegisterPage() {
       <div
         className={'relative w-full h-screen flex justify-center items-center'}
       >
-        <Card className={'w-[380px] px-5'}>
+        <Card className={'w-full max-w-lg px-5'}>
           <CardHeader>
             <CardTitle className={'text-2xl text-center mb-3'}>
               Safe Exam Register
@@ -101,15 +111,46 @@ export default function RegisterPage() {
           </CardHeader>
 
           <CardContent>
+            <div className={'flex justify-center mb-3'}>
+              {profilePict == '' ? (
+                <Skeleton
+                  className={
+                    'w-48 h-48 rounded-full flex items-center justify-center'
+                  }
+                >
+                  <ImagePlus />
+                </Skeleton>
+              ) : (
+                <Image
+                  src={profilePict}
+                  alt={'foto-profil'}
+                  className={'object-cover rounded-full w-48 h-48'}
+                  width={500}
+                  height={500}
+                />
+              )}
+            </div>
+
+            <Input
+              className={'mb-3'}
+              id="picture"
+              type="file"
+              onChange={(e) => {
+                setProfilePict(URL.createObjectURL(e.target.files![0]))
+                setFotoProfil(e.target.files![0])
+              }}
+            />
+
             <Input
               id={'input-name'}
               type={'text'}
               className={'mb-3'}
               onChange={(e) => {
-                setNama(e.target.value)
+                setName(e.target.value)
               }}
               placeholder={'Name'}
-            ></Input>
+            />
+
             <Input
               id={'input-username'}
               type={'text'}
@@ -118,7 +159,8 @@ export default function RegisterPage() {
               }}
               className={'mb-3'}
               placeholder={'Username'}
-            ></Input>
+            />
+
             <Input
               id={'input-email'}
               type={'email'}
@@ -127,7 +169,8 @@ export default function RegisterPage() {
               }}
               className={'mb-3'}
               placeholder={'Email'}
-            ></Input>
+            />
+
             <Input
               id={'input-password'}
               type={'password'}
@@ -136,22 +179,16 @@ export default function RegisterPage() {
               onChange={(e) => {
                 setPassword(e.target.value)
               }}
-            ></Input>
+            />
+
             <Input
               id={'input-reenter-password'}
               type={'password'}
               onChange={(e) => {
                 setRePassword(e.target.value)
               }}
-              className={'mb-3'}
               placeholder={'Confirm Password'}
-            ></Input>
-
-            {/*<div className="flex justify-center w-full mt-3">*/}
-            {/*  <Button asChild={true} id="button-upload-photo" variant="outline">*/}
-            {/*    <Link href="/register/upload-photo">Upload Photo</Link>*/}
-            {/*  </Button>*/}
-            {/*</div>*/}
+            />
           </CardContent>
 
           <CardFooter className={'gap-x-3 flex-col items-start'}>
