@@ -18,6 +18,11 @@ import {
   Plus,
   Search,
   Trash2,
+  Turtle,
+  Cat,
+  Dog,
+  Rabbit,
+  Fish,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -44,7 +49,6 @@ export default function CoursePage() {
   const [dialogType, setDialogType] = useState(1)
 
   const [courseImage, setCourseImage] = useState('')
-
   const handleAddCourse = async () => {}
 
   const getAlertTitle = () => {

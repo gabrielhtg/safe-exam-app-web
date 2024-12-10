@@ -6,6 +6,7 @@ import {
   SquarePen,
   LayoutGrid,
   LucideIcon,
+  CircleHelp,
 } from 'lucide-react'
 
 type Submenu = {
@@ -53,9 +54,9 @@ export function getMenuList(pathname: string): Group[] {
           icon: SquarePen,
         },
         {
-          href: '/tags',
-          label: 'Tags',
-          icon: Tag,
+          href: '/main/questions',
+          label: 'Question',
+          icon: CircleHelp,
         },
       ],
     },
