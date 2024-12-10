@@ -27,6 +27,7 @@ import { useDispatch } from 'react-redux'
 import { apiUrl } from '@/lib/env'
 import { setUser } from '@/lib/_slices/userSlice'
 import { AppDispatch } from '@/lib/store'
+import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -43,12 +44,17 @@ export default function LoginPage() {
         password: password,
       })
 
+      localStorage.setItem('token', loginResponse.data.data.access_token)
+
       if (loginResponse.status === 200) {
-        const getUserResponse = await axios.get(`${apiUrl}/users/${username}`)
+        const getUserResponse = await axios.get(
+          `${apiUrl}/users/${username}`,
+          getBearerHeader(localStorage.getItem('token')!)
+        )
 
         dispatch(setUser(getUserResponse.data.data))
         localStorage.setItem('username', getUserResponse.data.data.username)
-        localStorage.setItem('token', loginResponse.data.data.access_token)
+
         router.push('/main')
       }
     } catch (err: any) {

@@ -44,6 +44,7 @@ import { apiUrl, compressOptions } from '@/lib/env'
 import imageCompression from 'browser-image-compression'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
+import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 
 export default function CoursePage() {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -59,7 +60,10 @@ export default function CoursePage() {
   const [courseList, setCourseList] = useState([])
 
   const getAllCourse = async () => {
-    const response = await axios.get(`${apiUrl}/course`)
+    const response = await axios.get(
+      `${apiUrl}/course`,
+      getBearerHeader(localStorage.getItem('token')!)
+    )
 
     setCourseList(response.data.data)
   }
@@ -83,7 +87,11 @@ export default function CoursePage() {
 
       formData.append('course_pict', compressedImage)
 
-      const response = await axios.post(`${apiUrl}/course`, formData)
+      const response = await axios.post(
+        `${apiUrl}/course`,
+        formData,
+        getBearerHeader(localStorage.getItem('token')!)
+      )
 
       if (response.status === 200) {
         getAllCourse().then()
@@ -123,15 +131,13 @@ export default function CoursePage() {
   }
 
   return (
-    <ContentLayout title="Profile">
+    <ContentLayout title="Course">
       <Card
         id={'card-utama'}
         className={
           'flex flex-col gap-3 md:gap-5 p-10 min-h-[calc(100vh-180px)] rounded-lg shadow'
         }
       >
-        <h2 className={'text-2xl font-bold mb-3'}>Course</h2>
-
         <div className={'flex'}>
           <AlertDialog>
             <AlertDialogTrigger>

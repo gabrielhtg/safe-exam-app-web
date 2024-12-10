@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Card } from '@/components/ui/card'
+import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 
 export default function EditProfilePage() {
   const router = useRouter()
@@ -41,10 +42,6 @@ export default function EditProfilePage() {
   const [errDialog, setErrDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
 
-  // useEffect(() => {
-  //   console.log(currentUser)
-  // }, [currentUser])
-
   const handleSubmit = async () => {
     const formData = new FormData()
     formData.append('name', name)
@@ -56,7 +53,11 @@ export default function EditProfilePage() {
     formData.append('profile_pict', fotoProfil)
 
     try {
-      const updateResponse = await axios.put(`${apiUrl}/users`, formData)
+      const updateResponse = await axios.put(
+        `${apiUrl}/users`,
+        formData,
+        getBearerHeader(localStorage.getItem('token')!)
+      )
 
       setDialogType(1)
       setErrDialog(true)

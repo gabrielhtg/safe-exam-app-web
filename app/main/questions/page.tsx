@@ -45,14 +45,14 @@ export default function QuestionsPage() {
   }
 
   return (
-    <ContentLayout title="Profile">
+    <ContentLayout title="Questions">
       <Card
         id={'card-utama'}
         className={
           'flex flex-col gap-3 md:gap-5 p-10 min-h-[calc(100vh-180px)] rounded-lg shadow'
         }
       >
-        <h2 className={'text-2xl font-bold mb-3'}>Questions</h2>
+        {/*<h2 className={'text-2xl font-bold mb-3'}>Questions</h2>*/}
       </Card>
 
       <AlertDialog open={errDialog}>

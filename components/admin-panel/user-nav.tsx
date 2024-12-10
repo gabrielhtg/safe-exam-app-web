@@ -41,7 +41,12 @@ export function UserNav() {
     const getUserData = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/users/${localStorage.getItem('username')}`
+          `${apiUrl}/users/${localStorage.getItem('username')}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
         )
 
         dispatch(setUser(response.data.data))

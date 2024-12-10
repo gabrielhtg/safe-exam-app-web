@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { CircleCheck, CircleX, KeyRound, Pencil } from 'lucide-react'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
@@ -27,6 +27,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import axios from 'axios'
+import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 
 export default function ProfilePage() {
   const currentUser = useSelector(selectUser)
@@ -38,18 +39,18 @@ export default function ProfilePage() {
   const [errDialog, setErrDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
 
-  useEffect(() => {
-    console.log(currentUser)
-  }, [currentUser])
-
   const handleChangePassword = async () => {
     try {
-      const response = await axios.patch(`${apiUrl}/users/password`, {
-        old_password: oldPassword,
-        new_password: newPassword,
-        re_new_password: reNewPassword,
-        username: currentUser.username,
-      })
+      const response = await axios.patch(
+        `${apiUrl}/users/password`,
+        {
+          old_password: oldPassword,
+          new_password: newPassword,
+          re_new_password: reNewPassword,
+          username: currentUser.username,
+        },
+        getBearerHeader(localStorage.getItem('token')!)
+      )
 
       setDialogType(1)
       setErrDialog(true)
