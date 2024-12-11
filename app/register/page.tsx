@@ -206,7 +206,7 @@ export default function RegisterPage() {
                 className="w-full"
                 variant="secondary"
               >
-                <Link href={'/login'}>Login</Link>
+                <Link href={'/'}>Login</Link>
               </Button>
             </div>
           </CardFooter>

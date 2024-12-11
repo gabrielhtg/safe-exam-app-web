@@ -45,6 +45,7 @@ import imageCompression from 'browser-image-compression'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
+import Link from 'next/link'
 
 export default function CoursePage() {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -60,12 +61,24 @@ export default function CoursePage() {
   const currentUsername = useSelector(selectUser).username
   const [courseList, setCourseList] = useState([])
   const [loadingTitle, setLoadingTitle] = useState('')
+  const [searchKeywords, setSearchKeywords] = useState('')
 
   const getAllCourse = async () => {
     const response = await axios.get(
       `${apiUrl}/course`,
       getBearerHeader(localStorage.getItem('token')!)
     )
+
+    setCourseList(response.data.data)
+  }
+
+  const searchCourse = async (keywords: string | undefined) => {
+    const response = await axios.get(`${apiUrl}/course`, {
+      headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      params: {
+        search: keywords,
+      },
+    })
 
     setCourseList(response.data.data)
   }
@@ -279,18 +292,39 @@ export default function CoursePage() {
           <Input
             type={'text'}
             className={'max-w-lg'}
+            value={searchKeywords}
             placeholder={'Search here...'}
+            onChange={(e) => {
+              setSearchKeywords(e.target.value)
+            }}
           />
 
-          <Button>
+          <Button
+            onClick={() => {
+              searchCourse(searchKeywords!)
+            }}
+          >
             <Search /> Search
           </Button>
+
+          {searchKeywords !== '' ? (
+            <Button
+              onClick={() => {
+                setSearchKeywords('')
+                searchCourse(undefined)
+              }}
+            >
+              <CircleX /> Clear
+            </Button>
+          ) : (
+            ''
+          )}
         </div>
 
         {courseList.length === 0 ? ( // Gunakan triple equals (===) untuk perbandingan
-          <div className="flex flex-col w-full h-96 justify-center items-center">
+          <div className="flex flex-col w-full h-96 justify-center items-center gap-3">
             <Inbox className="w-20 h-20" />
-            There are no courses yet!
+            There are no courses!
           </div>
         ) : (
           <div className="grid md:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -310,8 +344,10 @@ export default function CoursePage() {
                   />
                 </CardContent>
                 <CardFooter className={'flex gap-2'}>
-                  <Button>
-                    <Eye />
+                  <Button asChild={true}>
+                    <Link href={`/main/course/${course.title}`}>
+                      <Eye />
+                    </Link>
                   </Button>
 
                   {/*Bagian Edit Dialog*/}
@@ -417,7 +453,7 @@ export default function CoursePage() {
                         <AlertDialogDescription
                           className={'flex flex-col gap-5 mt-3'}
                         >
-                          <p>Are you sure to delete ${course.title} course?</p>
+                          <p>Are you sure to delete {course.title} course?</p>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
