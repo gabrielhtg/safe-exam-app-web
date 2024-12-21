@@ -64,10 +64,12 @@ export default function CoursePage() {
   const [searchKeywords, setSearchKeywords] = useState('')
 
   const getAllCourse = async () => {
-    const response = await axios.get(
-      `${apiUrl}/course`,
-      getBearerHeader(localStorage.getItem('token')!)
-    )
+    const response = await axios.get(`${apiUrl}/course`, {
+      params: {
+        uploader: currentUsername,
+      },
+      headers: getBearerHeader(localStorage.getItem('token')!).headers,
+    })
 
     setCourseList(response.data.data)
   }

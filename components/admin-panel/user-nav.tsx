@@ -50,14 +50,14 @@ export function UserNav() {
         )
 
         dispatch(setUser(response.data.data))
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
+        console.log(err)
         router.push('/')
       }
     }
 
     getUserData().then()
-  }, [dispatch])
+  }, [dispatch, router])
 
   return (
     <DropdownMenu>

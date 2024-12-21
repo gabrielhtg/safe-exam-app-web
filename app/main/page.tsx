@@ -24,7 +24,10 @@ export default function MainPage() {
 
   return (
     <ContentLayout title="Dashboard">
-      <Card id={'card-utama'} className={'w-full p-10'}>
+      <Card
+        id={'card-utama'}
+        className={'w-full p-10 min-h-[calc(100vh-180px)]'}
+      >
         <CourseGroup />
         <RecentExam />
       </Card>
