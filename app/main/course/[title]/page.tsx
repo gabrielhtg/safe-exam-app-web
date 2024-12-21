@@ -10,7 +10,6 @@ import {
   CircleX,
   EllipsisVertical,
   Loader2,
-  Pen,
   Plus,
   Search,
   Trash,
