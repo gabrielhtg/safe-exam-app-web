@@ -16,14 +16,14 @@ import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
+  // AlertDialogAction,
+  // AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  // AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { CircleX } from 'lucide-react'
 

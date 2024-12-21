@@ -19,12 +19,12 @@ export default function ResetPasswordPage() {
                     </CardTitle>
 
                     <CardDescription className={'text-center'}>
-                        Enter your email or username and we'll send you a link to get back into your account.
+                        Enter your email or username and we&aposll send you a link to get back into your account.
                     </CardDescription>
                 </CardHeader>
 
                 <CardContent>
-                    <Input id={'input-username-or-email'} placeholder={'Email, Username'}></Input>
+                    <Input id={'input-email'} placeholder={'Email'}></Input>
 
                     <Button className={'w-full mt-5'}>Send Login Link</Button>
                     <Button className={'w-full mt-3'} variant={"secondary"} asChild={true}>
