@@ -73,6 +73,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
+import Link from 'next/link'
 
 export default function ExamPage() {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -480,8 +481,13 @@ export default function ExamPage() {
                             <DropdownMenuItem>
                               <Bolt /> Configure
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <CirclePlus /> Add Question
+                            <DropdownMenuItem asChild={true}>
+                              <Link
+                                className={'flex'}
+                                href={`/main/exam/question/${exam.id}`}
+                              >
+                                <CirclePlus /> Add Question
+                              </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Users /> Manage Access
