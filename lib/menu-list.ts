@@ -2,88 +2,78 @@ import {
   Tag,
   Users,
   Settings,
-  Bookmark,
+  School,
   SquarePen,
   LayoutGrid,
-  LucideIcon
-} from "lucide-react";
+  LucideIcon,
+  CircleHelp,
+} from 'lucide-react'
 
 type Submenu = {
-  href: string;
-  label: string;
-  active?: boolean;
-};
+  href: string
+  label: string
+  active?: boolean
+}
 
 type Menu = {
-  href: string;
-  label: string;
-  active?: boolean;
-  icon: LucideIcon;
-  submenus?: Submenu[];
-};
+  href: string
+  label: string
+  active?: boolean
+  icon: LucideIcon
+  submenus?: Submenu[]
+}
 
 type Group = {
-  groupLabel: string;
-  menus: Menu[];
-};
+  groupLabel: string
+  menus: Menu[]
+}
 
 export function getMenuList(pathname: string): Group[] {
   return [
     {
-      groupLabel: "",
+      groupLabel: '',
       menus: [
         {
-          href: "/main",
-          label: "Dashboard",
+          href: '/main',
+          label: 'Dashboard',
           icon: LayoutGrid,
-          submenus: []
-        }
-      ]
+        },
+      ],
     },
     {
-      groupLabel: "Contents",
+      groupLabel: 'Create',
       menus: [
         {
-          href: "",
-          label: "Posts",
+          href: '/main/course',
+          label: 'Course',
+          icon: School,
+        },
+        {
+          href: '/main/exam',
+          label: 'Exam',
           icon: SquarePen,
-          submenus: [
-            {
-              href: "/posts",
-              label: "All Posts"
-            },
-            {
-              href: "/posts/new",
-              label: "New Post"
-            }
-          ]
         },
         {
-          href: "/main/exam",
-          label: "Exam",
-          icon: SquarePen
+          href: '/main/questions',
+          label: 'Question',
+          icon: CircleHelp,
         },
-        {
-          href: "/tags",
-          label: "Tags",
-          icon: Tag
-        }
-      ]
+      ],
     },
     {
-      groupLabel: "Settings",
+      groupLabel: 'Settings',
       menus: [
         {
-          href: "/users",
-          label: "Users",
-          icon: Users
+          href: '/users',
+          label: 'Users',
+          icon: Users,
         },
         {
-          href: "/account",
-          label: "Account",
-          icon: Settings
-        }
-      ]
-    }
-  ];
+          href: '/account',
+          label: 'Account',
+          icon: Settings,
+        },
+      ],
+    },
+  ]
 }

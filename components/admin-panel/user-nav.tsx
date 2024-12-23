@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { LayoutGrid, LogOut, User } from 'lucide-react'
+import { LogOut, User } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -20,8 +20,45 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useRouter } from 'next/navigation'
+import logoutService from '@/app/_services/logout.service'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectUser, setUser } from '@/lib/_slices/userSlice'
+import { useEffect } from 'react'
+import axios from 'axios'
+import { apiUrl } from '@/lib/env'
 
 export function UserNav() {
+  const router = useRouter()
+  const user = useSelector(selectUser)
+  const dispatch = useDispatch()
+
+  const handleLogout = () => {
+    logoutService(router)
+  }
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/users/${localStorage.getItem('username')}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        )
+
+        dispatch(setUser(response.data.data))
+      } catch (err) {
+        console.log(err)
+        router.push('/')
+      }
+    }
+
+    getUserData().then()
+  }, [dispatch, router])
+
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -33,7 +70,11 @@ export function UserNav() {
                 className="relative h-8 w-8 rounded-full"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="#" alt="Avatar" />
+                  <AvatarImage
+                    className={'object-cover'}
+                    src={`${apiUrl}/${user.profile_pict}`}
+                    alt="Avatar"
+                  />
                   <AvatarFallback className="bg-transparent">JD</AvatarFallback>
                 </Avatar>
               </Button>
@@ -46,33 +87,28 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
+            <p className="text-sm font-medium leading-none">{user.name}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              johndoe@example.com
+              {user.email}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/dashboard" className="flex items-center">
-              <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
-              Dashboard
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/account" className="flex items-center">
+            <Link href="/main/profile" className="flex items-center">
               <User className="w-4 h-4 mr-3 text-muted-foreground" />
-              Account
+              Profile
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" asChild={true}>
-          <Link href={'/'}>
-            <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
-            Sign out
-          </Link>
+        <DropdownMenuItem
+          className="hover:cursor-pointer"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
+          Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
