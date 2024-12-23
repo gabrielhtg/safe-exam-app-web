@@ -251,7 +251,7 @@ export default function CoursePage({ params }: any) {
           )}
 
           <AlertDialog>
-            <AlertDialogTrigger>
+            <AlertDialogTrigger asChild={true}>
               <Button>
                 <Plus />
                 Add Exam
@@ -260,7 +260,8 @@ export default function CoursePage({ params }: any) {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Add Exam</AlertDialogTitle>
-                <AlertDialogDescription className={'flex flex-col gap-5 mt-3'}>
+                <AlertDialogDescription></AlertDialogDescription>
+                <div className={'flex flex-col gap-5 mt-3'}>
                   <div className="grid w-full items-center gap-1.5 mt-3">
                     <Label htmlFor="exam-name">Exam Name</Label>
                     <Input
@@ -323,6 +324,7 @@ export default function CoursePage({ params }: any) {
                           mode="single"
                           selected={examStartDate}
                           onSelect={setExamStartDate}
+                          initialFocus
                         />
                         <div className="p-3 border-t border-border">
                           <TimePickerDemo
@@ -353,11 +355,12 @@ export default function CoursePage({ params }: any) {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
+                      <PopoverContent className="w-auto p-0 z-50">
                         <Calendar
                           mode="single"
                           selected={examEndDate}
                           onSelect={setExamEndDate}
+                          initialFocus
                         />
                         <div className="p-3 border-t border-border">
                           <TimePickerDemo
@@ -368,7 +371,7 @@ export default function CoursePage({ params }: any) {
                       </PopoverContent>
                     </Popover>
                   </div>
-                </AlertDialogDescription>
+                </div>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>

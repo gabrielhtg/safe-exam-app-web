@@ -27,6 +27,7 @@ import { selectUser, setUser } from '@/lib/_slices/userSlice'
 import { useEffect } from 'react'
 import axios from 'axios'
 import { apiUrl } from '@/lib/env'
+import { getUserInitials } from '@/app/_services/getUserInitials.service'
 
 export function UserNav() {
   const router = useRouter()
@@ -70,12 +71,18 @@ export function UserNav() {
                 className="relative h-8 w-8 rounded-full"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    className={'object-cover'}
-                    src={`${apiUrl}/${user.profile_pict}`}
-                    alt="Avatar"
-                  />
-                  <AvatarFallback className="bg-transparent">JD</AvatarFallback>
+                  {user.profile_pict ? (
+                    <AvatarImage
+                      className={'object-cover'}
+                      src={`${apiUrl}/${user.profile_pict}`}
+                      alt="Avatar"
+                    />
+                  ) : (
+                    ''
+                  )}
+                  <AvatarFallback className="bg-transparent">
+                    {getUserInitials(user.name)}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
