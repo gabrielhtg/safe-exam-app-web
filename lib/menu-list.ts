@@ -7,6 +7,7 @@ import {
   LayoutGrid,
   LucideIcon,
   CircleHelp,
+  Landmark,
 } from 'lucide-react'
 
 type Submenu = {
@@ -55,8 +56,8 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: '/main/questions',
-          label: 'Question',
-          icon: CircleHelp,
+          label: 'Question Bank',
+          icon: Landmark,
         },
       ],
     },

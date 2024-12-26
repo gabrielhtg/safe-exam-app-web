@@ -24,6 +24,8 @@ export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname()
   const menuList = getMenuList(pathname)
 
+  // console.log(pathname.split('/'))
+
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
       <nav className="mt-8 w-full">
@@ -59,7 +61,12 @@ export function Menu({ isOpen }: MenuProps) {
                           <TooltipTrigger asChild>
                             <Button
                               variant={
-                                (active === undefined && pathname == href) ||
+                                (active === undefined &&
+                                  href.includes(pathname.split('/')[2]) &&
+                                  href.split('/').length > 1) ||
+                                (active === undefined &&
+                                  pathname === href &&
+                                  href.split('/').length == 2) ||
                                 active
                                   ? 'secondary'
                                   : 'ghost'
@@ -101,7 +108,7 @@ export function Menu({ isOpen }: MenuProps) {
                         label={label}
                         active={
                           active === undefined
-                            ? pathname.startsWith(href)
+                            ? pathname.includes(href)
                             : active
                         }
                         submenus={submenus}

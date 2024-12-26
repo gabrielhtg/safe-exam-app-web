@@ -62,6 +62,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import Link from 'next/link'
 
 export default function CoursePage({ params }: any) {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -415,14 +416,24 @@ export default function CoursePage({ params }: any) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>
-                            <CirclePlay /> Simulate
+                          <DropdownMenuItem asChild>
+                            <Link
+                              className={'flex'}
+                              href={`/main/exam/simulate/${exam.id}`}
+                            >
+                              <CirclePlay /> Simulate
+                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Bolt /> Configure
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <CirclePlus /> Add Question
+                          <DropdownMenuItem asChild>
+                            <Link
+                              className={'flex'}
+                              href={`/main/exam/question/${exam.id}`}
+                            >
+                              <CirclePlus /> Add Question
+                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Users /> Manage Access

@@ -475,11 +475,21 @@ export default function ExamPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem>
-                              <CirclePlay /> Simulate
+                            <DropdownMenuItem asChild>
+                              <Link
+                                className={'flex'}
+                                href={`/main/exam/simulate/${exam.id}`}
+                              >
+                                <CirclePlay /> Simulate
+                              </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Bolt /> Configure
+                            <DropdownMenuItem asChild>
+                              <Link
+                                className={'flex'}
+                                href={`/main/exam/configure/${exam.id}`}
+                              >
+                                <Bolt /> Configure
+                              </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild={true}>
                               <Link
