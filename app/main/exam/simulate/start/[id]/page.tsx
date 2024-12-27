@@ -108,9 +108,9 @@ export default function ExamSimulationStart({ params }: any) {
         // do somthin
       } else {
         console.log(submitData.data.message)
-        // if (submitData.status === 200) {
-        //   router.push(`/main/exam/simulate/${id}`)
-        // }
+        if (submitData.status === 200) {
+          router.push(`/main/exam/simulate/${id}`)
+        }
       }
     } catch (e: any) {
       console.log(e.response.data.message)
