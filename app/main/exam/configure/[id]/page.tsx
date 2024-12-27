@@ -92,6 +92,15 @@ export default function ExamConfigPage({ params }: any) {
     setShuffleOptions(response.data.data.shuffle_options)
     setStartPassword(response.data.data.start_password)
     setEndPassword(response.data.data.end_password)
+
+    const tempDate = new Date()
+    tempDate.setHours(
+      Math.floor(response.data.data.time_limit / 3600),
+      Math.floor((response.data.data.time_limit % 3600) / 60),
+      Math.floor((response.data.data.time_limit % 3600) % 60)
+    )
+
+    setTimeLimit(tempDate)
   }
 
   const handleSaveConfig = async () => {

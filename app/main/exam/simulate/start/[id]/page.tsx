@@ -8,15 +8,6 @@ import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import axios from 'axios'
 import { apiUrl } from '@/lib/env'
 import { Button } from '@/components/ui/button'
-import { CircleCheck, CircleX } from 'lucide-react'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import dynamic from 'next/dynamic'
 import parse from 'html-react-parser'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -24,15 +15,18 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import Link from 'next/link'
 import CountdownTimer from '@/components/custom-component/CountDown'
 import _ from 'lodash'
+import { useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
+import { selectUser } from '@/lib/_slices/userSlice'
+import { RefreshCw, Send } from 'lucide-react'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamSimulationStart({ params }: any) {
   const id = params.id
   const [examData, setExamData] = useState<any>(null)
-  const [dialogMsg, setDialogMsg] = useState('')
-  const [showDialog, setShowDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
+  const userUsername = useSelector(selectUser).username
   const [editorConfig, setEditorConfig] = useState<any>(null)
+  const router = useRouter()
 
   // state untuk exam behaviour
   const [hoursLimit, setHoursLimit] = useState<number>()
@@ -41,49 +35,17 @@ export default function ExamSimulationStart({ params }: any) {
 
   // state untuk question behaviour
   const [selectedAnswers, setSelectedAnswers] = useState<{
-    [key: number]: string
+    [key: number]: any
   }>({})
 
   // state untuk question
   const [questions, setQuestions] = useState<any[]>([])
 
-  const handleValueChange = (questionIndex: number, value: string) => {
+  const handleValueChange = (questionId: number, value: string) => {
     setSelectedAnswers((prev) => ({
       ...prev,
-      [questionIndex]: value,
+      [questionId]: value,
     }))
-
-    console.log(selectedAnswers)
-  }
-
-  const handleClearOption = (questionIndex: number) => {
-    setSelectedAnswers((prev) => {
-      const updatedAnswers = { ...prev }
-      delete updatedAnswers[questionIndex]
-      return updatedAnswers
-    })
-  }
-
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Success
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Failed
-        </>
-      )
-    }
-
-    return ''
   }
 
   const getExamData = async () => {
@@ -126,6 +88,32 @@ export default function ExamSimulationStart({ params }: any) {
       }
     } catch (err: any) {
       console.log(err)
+    }
+  }
+
+  const handleSubmitExam = async () => {
+    try {
+      const submitData = await axios.post(
+        `${apiUrl}/exam/submit`,
+        {
+          username: userUsername,
+          exam: examData,
+          answer: selectedAnswers,
+          questions: questions,
+        },
+        getBearerHeader(localStorage.getItem('token')!)
+      )
+
+      if (examData.enable_review) {
+        // do somthin
+      } else {
+        console.log(submitData.data.message)
+        // if (submitData.status === 200) {
+        //   router.push(`/main/exam/simulate/${id}`)
+        // }
+      }
+    } catch (e: any) {
+      console.log(e.response.data.message)
     }
   }
 
@@ -201,72 +189,140 @@ export default function ExamSimulationStart({ params }: any) {
                 <div>{questionIndex + 1}.</div>
                 <div className={'w-full h-auto'}>
                   {parse(e.content)}
-                  <RadioGroup
-                    value={selectedAnswers[questionIndex] || ''}
-                    onValueChange={(value) =>
-                      handleValueChange(questionIndex, value)
-                    }
-                    className={'flex ms-5 flex-col mt-2'}
-                  >
-                    {e.options.map((item: any, optionIndex: number) => (
-                      <div
-                        key={optionIndex}
-                        className={'flex items-center gap-3'}
-                      >
-                        <div>
-                          {e.type === 'multiple' ? (
-                            <div className={'flex items-center gap-3'}>
-                              <RadioGroupItem value={item.id} />
-                              {String.fromCharCode(97 + optionIndex)}.
-                            </div>
-                          ) : (
-                            ''
-                          )}
-
-                          {e.type === 'check-box' ? (
-                            <div className="flex items-center space-x-2">
-                              <Checkbox disabled={true} id={`${optionIndex}`} />
-                            </div>
-                          ) : (
-                            ''
-                          )}
-                        </div>
-                        <div>
-                          {e.type === 'multiple' ? (
-                            <>{parse(item.option)}</>
-                          ) : (
-                            ''
-                          )}
-
-                          {e.type === 'check-box' ? (
-                            <label
-                              htmlFor={`${optionIndex}`}
-                              className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                              {parse(item.option)}
-                            </label>
-                          ) : (
-                            ''
-                          )}
-                        </div>
-                      </div>
-                    ))}
-
-                    {selectedAnswers[questionIndex] ? (
-                      <div>
-                        <Button
-                          variant={'secondary'}
-                          onClick={() => {
-                            handleClearOption(questionIndex)
+                  {e.type === 'essay' ? (
+                    <>
+                      {editorConfig ? (
+                        <ReactQuill
+                          theme="snow"
+                          className={'mt-3'}
+                          // value={selectedAnswers[e.id]}
+                          onChange={(quillVal) => {
+                            setSelectedAnswers((prev) => ({
+                              ...prev,
+                              [e.id]:
+                                quillVal === '' || quillVal === '<p><br></p>'
+                                  ? ''
+                                  : quillVal,
+                            }))
                           }}
+                          modules={editorConfig.modules}
+                          formats={editorConfig.formats}
+                        />
+                      ) : (
+                        ''
+                      )}
+                    </>
+                  ) : (
+                    <RadioGroup
+                      value={selectedAnswers[e.id] || ''}
+                      onValueChange={(value) => handleValueChange(e.id, value)}
+                      className={'flex ms-5 flex-col mt-2'}
+                    >
+                      {e.options.map((item: any, optionIndex: number) => (
+                        <div
+                          key={optionIndex}
+                          className={'flex items-center gap-3'}
                         >
-                          Clear Option
-                        </Button>
-                      </div>
-                    ) : (
-                      ''
-                    )}
-                  </RadioGroup>
+                          <div>
+                            {e.type === 'multiple' ? (
+                              <div className={'flex items-center gap-3'}>
+                                <RadioGroupItem value={item.id} />
+                                {String.fromCharCode(97 + optionIndex)}.
+                              </div>
+                            ) : (
+                              ''
+                            )}
+
+                            {e.type === 'check-box' ? (
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`${item.id}`}
+                                  checked={(
+                                    selectedAnswers[e.id] || []
+                                  ).includes(item.id)}
+                                  onCheckedChange={(elm: boolean) =>
+                                    setSelectedAnswers((prev: any) => {
+                                      const currentAnswers = prev[e.id] || []
+
+                                      if (elm) {
+                                        // ini ketika nanti user mencoba untuk memilih semua opsi
+                                        // dibatasi bahwa yang bisa dipilih hanya sebesar banyak pilihan yang memungkinkan.
+                                        if (
+                                          currentAnswers.length >=
+                                          e.options.filter(
+                                            (tmp: any) => tmp.isCorrect
+                                          ).length
+                                        ) {
+                                          return prev
+                                        }
+
+                                        return {
+                                          ...prev,
+                                          [e.id]: [...currentAnswers, item.id],
+                                        }
+                                      } else {
+                                        if (prev[e.id].length === 1) {
+                                          const updatedAns = { ...prev }
+                                          delete updatedAns[e.id]
+                                          return updatedAns
+                                        } else {
+                                          return {
+                                            ...prev,
+                                            [e.id]: currentAnswers.filter(
+                                              (id: any) => id !== item.id
+                                            ),
+                                          }
+                                        }
+                                      }
+                                    })
+                                  }
+                                />
+                              </div>
+                            ) : (
+                              ''
+                            )}
+                          </div>
+                          <div>
+                            {e.type === 'multiple' ? (
+                              <>{parse(item.option)}</>
+                            ) : (
+                              ''
+                            )}
+
+                            {e.type === 'check-box' ? (
+                              <label
+                                htmlFor={`${item.id}`}
+                                className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                {parse(item.option)}
+                              </label>
+                            ) : (
+                              ''
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      {selectedAnswers[e.id] && e.type == 'multiple' ? (
+                        <div>
+                          <Button
+                            variant={'secondary'}
+                            onClick={() => {
+                              setSelectedAnswers((prev) => {
+                                const updatedAnswers = { ...prev }
+                                delete updatedAnswers[e.id]
+                                return updatedAnswers
+                              })
+                            }}
+                          >
+                            Clear Option
+                          </Button>
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                    </RadioGroup>
+                  )}
                 </div>
               </div>
             ))}
@@ -288,52 +344,77 @@ export default function ExamSimulationStart({ params }: any) {
                   >
                     <span className={'my-2'}>{index + 1}</span>
                     <div
-                      className={`w-full h-6 rounded-b-lg ${selectedAnswers[index] ? 'bg-muted-foreground' : 'bg-muted'}`}
+                      className={`w-full h-6 rounded-b-lg ${selectedAnswers[e.id] ? 'bg-muted-foreground' : 'bg-muted'}`}
                     ></div>
                   </Link>
                 ))}
               </div>
             </div>
 
-            {hoursLimit ? (
+            {hoursLimit || minutesLimit || secondsLimit ? (
               <CountdownTimer
                 hours={hoursLimit}
                 minutes={minutesLimit}
                 seconds={secondsLimit}
+                onTimeUp={handleSubmitExam}
               />
             ) : (
               ''
             )}
-            <div>
-              <Button>Submit Answer</Button>
+
+            <div className={'flex gap-3'}>
+              <div>
+                <Button
+                  onClick={() => {
+                    handleSubmitExam().then()
+                  }}
+                >
+                  <Send />
+                  Submit Answer
+                </Button>
+              </div>
+
+              <div>
+                <Button
+                  onClick={() => {
+                    getAllQuestions(
+                      examData.shuffle_questions,
+                      examData.shuffle_options
+                    ).then()
+                  }}
+                >
+                  <RefreshCw />
+                  Update Question
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </Card>
 
-      <AlertDialog open={showDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {getAlertTitle()}
-            </AlertDialogTitle>
-            <AlertDialogDescription className={'text-center'}>
-              {dialogMsg}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setShowDialog(false)
-              }}
-            >
-              OK
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/*<AlertDialog open={showDialog}>*/}
+      {/*  <AlertDialogContent>*/}
+      {/*    <AlertDialogHeader>*/}
+      {/*      <AlertDialogTitle*/}
+      {/*        className={'text-center flex flex-col items-center'}*/}
+      {/*      >*/}
+      {/*        {getAlertTitle()}*/}
+      {/*      </AlertDialogTitle>*/}
+      {/*      <AlertDialogDescription className={'text-center'}>*/}
+      {/*        {dialogMsg}*/}
+      {/*      </AlertDialogDescription>*/}
+      {/*    </AlertDialogHeader>*/}
+      {/*    <AlertDialogFooter className={'!justify-center'}>*/}
+      {/*      <Button*/}
+      {/*        onClick={() => {*/}
+      {/*          setShowDialog(false)*/}
+      {/*        }}*/}
+      {/*      >*/}
+      {/*        OK*/}
+      {/*      </Button>*/}
+      {/*    </AlertDialogFooter>*/}
+      {/*  </AlertDialogContent>*/}
+      {/*</AlertDialog>*/}
     </ContentLayout>
   )
 }

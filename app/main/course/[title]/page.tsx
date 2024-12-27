@@ -424,8 +424,13 @@ export default function CoursePage({ params }: any) {
                               <CirclePlay /> Simulate
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Bolt /> Configure
+                          <DropdownMenuItem asChild>
+                            <Link
+                              className={'flex'}
+                              href={`/main/exam/configure/${exam.id}`}
+                            >
+                              <Bolt /> Configure
+                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link

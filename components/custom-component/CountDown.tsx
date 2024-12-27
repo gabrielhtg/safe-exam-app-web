@@ -1,13 +1,25 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 
-const CountdownTimer = ({ hours = 0, minutes = 0, seconds = 0 }) => {
+const CountdownTimer = ({
+  hours = 0,
+  minutes = 0,
+  seconds = 0,
+  onTimeUp,
+}: any) => {
   const [time, setTime] = useState(hours * 3600 + minutes * 60 + seconds)
 
   useEffect(() => {
-    if (time <= 0) return
+    if (time <= 0) {
+      if (onTimeUp) {
+        onTimeUp() // Panggil callback ketika waktu habis
+      }
+      return
+    }
 
     const interval = setInterval(() => {
-      setTime((prevTime) => prevTime - 1)
+      setTime((prevTime: any) => prevTime - 1)
     }, 1000)
 
     return () => clearInterval(interval) // Bersihkan interval saat komponen unmount
