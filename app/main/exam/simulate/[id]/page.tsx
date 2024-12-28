@@ -208,51 +208,57 @@ export default function SimulatePage({ params }: any) {
         )}
 
         <div className={'flex justify-center'}>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>Start Exam</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle className={'mb-5'}>
-                  Enter Start Password
-                </DialogTitle>
-                <DialogDescription className={'text-base text-primary'}>
-                  Enter the password to start the exam. Ask the teacher/exam
-                  supervisor for the password if you haven&#39;t got it.
-                  <Input
-                    value={inputStartPassword}
-                    onChange={(e) => {
-                      setInputStartPassword(e.target.value)
-                    }}
-                    type={'password'}
-                    className={'mt-3'}
-                    autoComplete={'new-password'}
-                  />
-                  <span className={'text-sm text-red-400'}>
-                    {inputStartPasswordValidation}
-                  </span>
-                  <div className={'mt-3 flex gap-3'}>
-                    <Button
-                      onClick={() => {
-                        setInputStartPasswordValidation('')
-                        if (examData.start_password === inputStartPassword) {
-                          router.push(`/main/exam/simulate/start/${id}`)
-                        } else {
-                          setInputStartPasswordValidation(
-                            'Incorrect Start Password'
-                          )
-                        }
+          {examResultData.length >= examData.allowed_attemps ? (
+            ''
+          ) : (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  {examResultData.length > 0 ? 'Start Again' : 'Start Exam'}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className={'mb-5'}>
+                    Enter Start Password
+                  </DialogTitle>
+                  <DialogDescription className={'text-base text-primary'}>
+                    Enter the password to start the exam. Ask the teacher/exam
+                    supervisor for the password if you haven&#39;t got it.
+                    <Input
+                      value={inputStartPassword}
+                      onChange={(e) => {
+                        setInputStartPassword(e.target.value)
                       }}
-                    >
-                      Start
-                    </Button>
-                    <Button variant={'secondary'}>Cancel</Button>
-                  </div>
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+                      type={'password'}
+                      className={'mt-3'}
+                      autoComplete={'new-password'}
+                    />
+                    <span className={'text-sm text-red-400'}>
+                      {inputStartPasswordValidation}
+                    </span>
+                    <div className={'mt-3 flex gap-3'}>
+                      <Button
+                        onClick={() => {
+                          setInputStartPasswordValidation('')
+                          if (examData.start_password === inputStartPassword) {
+                            router.push(`/main/exam/simulate/start/${id}`)
+                          } else {
+                            setInputStartPasswordValidation(
+                              'Incorrect Start Password'
+                            )
+                          }
+                        }}
+                      >
+                        Start
+                      </Button>
+                      <Button variant={'secondary'}>Cancel</Button>
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </Card>
     </ContentLayout>
