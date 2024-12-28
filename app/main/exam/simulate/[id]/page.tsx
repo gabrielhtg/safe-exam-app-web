@@ -88,7 +88,30 @@ export default function SimulatePage({ params }: any) {
       })
 
       setExamResultData(examResultResponse.data.data)
-      console.log(examResultResponse.data.data)
+    } catch (e: any) {
+      console.log(e)
+    }
+  }
+
+  const handleResetAttempt = async () => {
+    try {
+      await axios.delete(`${apiUrl}/exam-result/reset`, {
+        params: {
+          username: currentUsername,
+          exam_id: examData.id,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      const examResultResponse = await axios.get(`${apiUrl}/exam-result`, {
+        params: {
+          username: currentUsername,
+          exam: examData.id,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      setExamResultData(examResultResponse.data.data)
     } catch (e: any) {
       console.log(e)
     }
@@ -123,9 +146,11 @@ export default function SimulatePage({ params }: any) {
             <Table className={'max-w-lg text-base'}>
               <TableBody>
                 <TableRow>
-                  <TableCell className="font-medium">Attemps allowed</TableCell>
+                  <TableCell className="font-medium">
+                    Attempts allowed
+                  </TableCell>
                   <TableCell>:</TableCell>
-                  <TableCell>{examData?.allowed_attemps}</TableCell>
+                  <TableCell>{examData?.allowed_attempts}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">
@@ -155,13 +180,13 @@ export default function SimulatePage({ params }: any) {
           <>
             <hr />
 
-            <h2 className={'font-bold text-2xl'}>Attemp Summary</h2>
+            <h2 className={'font-bold text-2xl'}>Attempt Summary</h2>
 
             <div className={'border rounded-lg'}>
               <Table>
                 <TableHeader>
                   <TableRow className={'divide-x'}>
-                    <TableHead>Attemp</TableHead>
+                    <TableHead>Attempt</TableHead>
                     <TableHead>Submitted At</TableHead>
                     <TableHead>Grade</TableHead>
                     <TableHead>Review</TableHead>
@@ -170,7 +195,7 @@ export default function SimulatePage({ params }: any) {
                 <TableBody>
                   {examResultData?.map((examResult, index: number) => (
                     <TableRow key={index} className={'divide-x'}>
-                      <TableCell>{examResult.attemp}</TableCell>
+                      <TableCell>{examResult.attempt}</TableCell>
                       <TableCell>
                         {format(
                           new Date(examResult.created_at),
@@ -207,8 +232,8 @@ export default function SimulatePage({ params }: any) {
           ''
         )}
 
-        <div className={'flex justify-center'}>
-          {examResultData.length >= examData.allowed_attemps ? (
+        <div className={'flex justify-center gap-3'}>
+          {examResultData?.length >= examData?.allowed_attempts ? (
             ''
           ) : (
             <Dialog>
@@ -258,6 +283,18 @@ export default function SimulatePage({ params }: any) {
                 </DialogHeader>
               </DialogContent>
             </Dialog>
+          )}
+
+          {examResultData.length > 0 ? (
+            <Button
+              onClick={() => {
+                handleResetAttempt().then()
+              }}
+            >
+              Reset Attempts
+            </Button>
+          ) : (
+            ''
           )}
         </div>
       </Card>
