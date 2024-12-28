@@ -8,18 +8,16 @@ import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import axios from 'axios'
 import { apiUrl } from '@/lib/env'
 import { Button } from '@/components/ui/button'
-import { CircleCheck, CircleX } from 'lucide-react'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import parse from 'html-react-parser'
 import { format } from 'date-fns'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import {
   Dialog,
   DialogContent,
@@ -30,73 +28,70 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
+import { selectUser } from '@/lib/_slices/userSlice'
+import Link from 'next/link'
 
 export default function SimulatePage({ params }: any) {
   const id = params.id
   const [examData, setExamData] = useState<any>(null)
-  const [dialogMsg, setDialogMsg] = useState('')
-  const [showDialog, setShowDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [timeLimit, setTimeLimit] = useState('')
   const [inputStartPassword, setInputStartPassword] = useState('')
+  const currentUsername = useSelector(selectUser).username
   const [inputStartPasswordValidation, setInputStartPasswordValidation] =
     useState('')
   const router = useRouter()
-
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Success
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Failed
-        </>
-      )
-    }
-
-    return ''
-  }
+  const [examResultData, setExamResultData] = useState<any[]>([])
 
   const getExamData = async () => {
-    const response = await axios.get(
-      `${apiUrl}/exam/${id}`,
-      getBearerHeader(localStorage.getItem('token')!)
-    )
-
-    setExamData(response.data.data)
-    setStartDate(
-      format(
-        new Date(response.data.data.start_date),
-        'EEEE, dd MMMM yyyy, hh:mm a'
+    try {
+      const response = await axios.get(
+        `${apiUrl}/exam/${id}`,
+        getBearerHeader(localStorage.getItem('token')!)
       )
-    )
-    setEndDate(
-      format(
-        new Date(response.data.data.end_date),
-        'EEEE, dd MMMM yyyy, hh:mm a'
-      )
-    )
-    const tempTimeLimitHours = Math.floor(response.data.data.time_limit / 3600)
-    const tempTimeLimitMinutes = Math.floor(
-      (response.data.data.time_limit % 3600) / 60
-    )
-    const tempTimeLimitSeconds = Math.floor(
-      (response.data.data.time_limit % 3600) % 60
-    )
 
-    setTimeLimit(
-      `${tempTimeLimitHours} hours, ${tempTimeLimitMinutes} minutes, ${tempTimeLimitSeconds} seconds`
-    )
+      setExamData(response.data.data)
+      setStartDate(
+        format(
+          new Date(response.data.data.start_date),
+          'EEEE, dd MMMM yyyy, hh:mm a'
+        )
+      )
+      setEndDate(
+        format(
+          new Date(response.data.data.end_date),
+          'EEEE, dd MMMM yyyy, hh:mm a'
+        )
+      )
+      const tempTimeLimitHours = Math.floor(
+        response.data.data.time_limit / 3600
+      )
+      const tempTimeLimitMinutes = Math.floor(
+        (response.data.data.time_limit % 3600) / 60
+      )
+      const tempTimeLimitSeconds = Math.floor(
+        (response.data.data.time_limit % 3600) % 60
+      )
+
+      setTimeLimit(
+        `${tempTimeLimitHours} hours, ${tempTimeLimitMinutes} minutes, ${tempTimeLimitSeconds} seconds`
+      )
+
+      const examResultResponse = await axios.get(`${apiUrl}/exam-result`, {
+        params: {
+          username: currentUsername,
+          exam: response.data.data.id,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      setExamResultData(examResultResponse.data.data)
+      console.log(examResultResponse.data.data)
+    } catch (e: any) {
+      console.log(e)
+    }
   }
 
   useEffect(() => {
@@ -123,11 +118,7 @@ export default function SimulatePage({ params }: any) {
           {parse(examData ? examData.description : '')}
         </div>
 
-        <hr />
-
-        <div
-          className={'w-full flex justify-center items-center flex-col gap-3'}
-        >
+        <div className={'w-full flex justify-center items-center'}>
           <div className={'border rounded-lg'}>
             <Table className={'max-w-lg text-base'}>
               <TableBody>
@@ -158,80 +149,112 @@ export default function SimulatePage({ params }: any) {
               </TableBody>
             </Table>
           </div>
+        </div>
 
-          <div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>Start Exam</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle className={'mb-5'}>
-                    Enter Start Password
-                  </DialogTitle>
-                  <DialogDescription className={'text-base text-primary'}>
-                    Enter the password to start the exam. Ask the teacher/exam
-                    supervisor for the password if you haven&#39;t got it.
-                    <Input
-                      value={inputStartPassword}
-                      onChange={(e) => {
-                        setInputStartPassword(e.target.value)
+        {examResultData.length > 0 ? (
+          <>
+            <hr />
+
+            <h2 className={'font-bold text-2xl'}>Attemp Summary</h2>
+
+            <div className={'border rounded-lg'}>
+              <Table>
+                <TableHeader>
+                  <TableRow className={'divide-x'}>
+                    <TableHead>Attemp</TableHead>
+                    <TableHead>Submitted At</TableHead>
+                    <TableHead>Grade</TableHead>
+                    <TableHead>Review</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {examResultData?.map((examResult, index: number) => (
+                    <TableRow key={index} className={'divide-x'}>
+                      <TableCell>{examResult.attemp}</TableCell>
+                      <TableCell>
+                        {format(
+                          new Date(examResult.created_at),
+                          'EEEE, dd MMMM yyyy, hh:mm a'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {examResult.total_score} / {examResult.expected_score} (
+                        <span className={'font-bold'}>
+                          {(
+                            (examResult.total_score /
+                              examResult.expected_score) *
+                            100
+                          ).toFixed(2)}
+                          %)
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {examData.enable_review ? (
+                          <Link href={''} className={'text-blue-500'}>
+                            Review
+                          </Link>
+                        ) : (
+                          'Not Allowed'
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        ) : (
+          ''
+        )}
+
+        <div className={'flex justify-center'}>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Start Exam</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className={'mb-5'}>
+                  Enter Start Password
+                </DialogTitle>
+                <DialogDescription className={'text-base text-primary'}>
+                  Enter the password to start the exam. Ask the teacher/exam
+                  supervisor for the password if you haven&#39;t got it.
+                  <Input
+                    value={inputStartPassword}
+                    onChange={(e) => {
+                      setInputStartPassword(e.target.value)
+                    }}
+                    type={'password'}
+                    className={'mt-3'}
+                    autoComplete={'new-password'}
+                  />
+                  <span className={'text-sm text-red-400'}>
+                    {inputStartPasswordValidation}
+                  </span>
+                  <div className={'mt-3 flex gap-3'}>
+                    <Button
+                      onClick={() => {
+                        setInputStartPasswordValidation('')
+                        if (examData.start_password === inputStartPassword) {
+                          router.push(`/main/exam/simulate/start/${id}`)
+                        } else {
+                          setInputStartPasswordValidation(
+                            'Incorrect Start Password'
+                          )
+                        }
                       }}
-                      type={'password'}
-                      className={'mt-3'}
-                      autoComplete={'new-password'}
-                    />
-                    <span className={'text-sm text-red-400'}>
-                      {inputStartPasswordValidation}
-                    </span>
-                    <div className={'mt-3 flex gap-3'}>
-                      <Button
-                        onClick={() => {
-                          setInputStartPasswordValidation('')
-                          if (examData.start_password === inputStartPassword) {
-                            router.push(`/main/exam/simulate/start/${id}`)
-                          } else {
-                            setInputStartPasswordValidation(
-                              'Incorrect Start Password'
-                            )
-                          }
-                        }}
-                      >
-                        Start
-                      </Button>
-                      <Button variant={'secondary'}>Cancel</Button>
-                    </div>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-          </div>
+                    >
+                      Start
+                    </Button>
+                    <Button variant={'secondary'}>Cancel</Button>
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </div>
       </Card>
-
-      <AlertDialog open={showDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {getAlertTitle()}
-            </AlertDialogTitle>
-            <AlertDialogDescription className={'text-center'}>
-              {dialogMsg}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setShowDialog(false)
-              }}
-            >
-              OK
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </ContentLayout>
   )
 }
