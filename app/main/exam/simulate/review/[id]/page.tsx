@@ -31,7 +31,6 @@ export default function ReviewPage({ params }: any) {
     setExamResultData(response.data.data)
     setAnswers(response.data.data.answers)
     setExam(response.data.data.exam)
-    console.log(response.data.data)
   }
 
   useEffect(() => {
@@ -103,9 +102,11 @@ export default function ReviewPage({ params }: any) {
                                 ''
                               )}
                             </div>
-                            <div>
+                            <div
+                              className={option.isCorrect ? 'bg-green-300' : ''}
+                            >
                               {answer.question.type === 'multiple' ? (
-                                <>{parse(option.option)}</>
+                                <div>{parse(option.option)}</div>
                               ) : (
                                 ''
                               )}
@@ -113,7 +114,7 @@ export default function ReviewPage({ params }: any) {
                               {answer.question.type === 'check-box' ? (
                                 <label
                                   htmlFor={`${option.id}`}
-                                  className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  className={`peer-disabled:cursor-not-allowed peer-disabled:opacity-70`}
                                 >
                                   {parse(option.option)}
                                 </label>
@@ -168,6 +169,34 @@ export default function ReviewPage({ params }: any) {
                   100
                 ).toFixed(2)}{' '}
                 / 100.00
+              </div>
+            </div>
+
+            <div className={'border rounded-lg w-full flex flex-col p-5'}>
+              <span className={'font-bold'}>Status</span>
+
+              {(examResultData?.total_score / examResultData?.expected_score) *
+                100 >=
+              exam?.passing_grade ? (
+                <div
+                  className={
+                    'mt-3 text-center w-full text-3xl text-green-500 font-bold'
+                  }
+                >
+                  Passed
+                </div>
+              ) : (
+                <div
+                  className={
+                    'mt-3 text-center w-full text-3xl text-red-400 font-bold'
+                  }
+                >
+                  Not Pass
+                </div>
+              )}
+
+              <div className={'text-center text-muted-foreground mt-2'}>
+                Passing Grade : {exam?.passing_grade}
               </div>
             </div>
 
