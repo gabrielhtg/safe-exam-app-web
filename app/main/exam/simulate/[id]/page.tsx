@@ -215,7 +215,10 @@ export default function SimulatePage({ params }: any) {
                       </TableCell>
                       <TableCell>
                         {examData.enable_review ? (
-                          <Link href={''} className={'text-blue-500'}>
+                          <Link
+                            href={`/main/exam/simulate/review/${examResult.id}`}
+                            className={'text-blue-500'}
+                          >
                             Review
                           </Link>
                         ) : (

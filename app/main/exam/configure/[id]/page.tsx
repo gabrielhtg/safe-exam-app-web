@@ -369,9 +369,8 @@ export default function ExamConfigPage({ params }: any) {
 
                 <div className="flex flex-col gap-3">
                   <span className={'text-sm text-muted-foreground'}>
-                    The &#34;Passing Grade&#34; input allows administrators to
-                    define the minimum score required for participants to pass
-                    the exam.
+                    Time Limit is the time limit given to examinees in carrying
+                    out the exam.
                   </span>
                   <div className="items-center grid grid-cols-2 max-w-sm">
                     <Label>Time Limit</Label>

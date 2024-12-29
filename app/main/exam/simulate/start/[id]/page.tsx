@@ -19,6 +19,14 @@ import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import { RefreshCw, Send } from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamSimulationStart({ params }: any) {
@@ -27,6 +35,7 @@ export default function ExamSimulationStart({ params }: any) {
   const userUsername = useSelector(selectUser).username
   const [editorConfig, setEditorConfig] = useState<any>(null)
   const router = useRouter()
+  const [submitState, setSubmitState] = useState(1)
 
   // state untuk exam behaviour
   const [hoursLimit, setHoursLimit] = useState<number>()
@@ -105,9 +114,10 @@ export default function ExamSimulationStart({ params }: any) {
       )
 
       if (examData.enable_review) {
-        // do somthin
+        if (submitData.status === 200) {
+          router.push(`/main/exam/simulate/review/${submitData.data.data.id}`)
+        }
       } else {
-        console.log(submitData.data.message)
         if (submitData.status === 200) {
           router.push(`/main/exam/simulate/${id}`)
         }
@@ -175,158 +185,217 @@ export default function ExamSimulationStart({ params }: any) {
 
         <div className={'flex gap-5 h-full pb-10'}>
           {/*sebelah kiri*/}
-          <div
-            className={
-              'flex flex-col w-full overflow-y-scroll scroll-smooth border rounded-lg px-5 pb-5'
-            }
-          >
-            {questions.map((e: any, questionIndex) => (
-              <div
-                key={questionIndex}
-                id={`${questionIndex}`}
-                className={'flex gap-3 rounded-lg p-5 pb-0 mr-5'}
-              >
-                <div>{questionIndex + 1}.</div>
-                <div className={'w-full h-auto'}>
-                  {parse(e.content)}
-                  {e.type === 'essay' ? (
-                    <>
-                      {editorConfig ? (
-                        <ReactQuill
-                          theme="snow"
-                          className={'mt-3'}
-                          // value={selectedAnswers[e.id]}
-                          onChange={(quillVal) => {
-                            setSelectedAnswers((prev) => ({
-                              ...prev,
-                              [e.id]:
-                                quillVal === '' || quillVal === '<p><br></p>'
-                                  ? ''
-                                  : quillVal,
-                            }))
-                          }}
-                          modules={editorConfig.modules}
-                          formats={editorConfig.formats}
-                        />
-                      ) : (
-                        ''
-                      )}
-                    </>
-                  ) : (
-                    <RadioGroup
-                      value={selectedAnswers[e.id] || ''}
-                      onValueChange={(value) => handleValueChange(e.id, value)}
-                      className={'flex ms-5 flex-col mt-2'}
-                    >
-                      {e.options.map((item: any, optionIndex: number) => (
-                        <div
-                          key={optionIndex}
-                          className={'flex items-center gap-3'}
-                        >
-                          <div>
-                            {e.type === 'multiple' ? (
-                              <div className={'flex items-center gap-3'}>
-                                <RadioGroupItem value={item.id} />
-                                {String.fromCharCode(97 + optionIndex)}.
-                              </div>
-                            ) : (
-                              ''
-                            )}
+          {submitState === 1 ? (
+            <div
+              className={
+                'flex flex-col w-full overflow-y-scroll scroll-smooth border rounded-lg px-5 pb-5'
+              }
+            >
+              {questions.map((e: any, questionIndex) => (
+                <div
+                  key={questionIndex}
+                  id={`${questionIndex}`}
+                  className={'flex gap-3 rounded-lg p-5 pb-0 mr-5'}
+                >
+                  <div>{questionIndex + 1}.</div>
+                  <div className={'w-full h-auto'}>
+                    {parse(e.content)}
+                    {e.type === 'essay' ? (
+                      <>
+                        {editorConfig ? (
+                          <ReactQuill
+                            theme="snow"
+                            className={'mt-3'}
+                            // value={selectedAnswers[e.id]}
+                            onChange={(quillVal) => {
+                              setSelectedAnswers((prev) => ({
+                                ...prev,
+                                [e.id]:
+                                  quillVal === '' || quillVal === '<p><br></p>'
+                                    ? ''
+                                    : quillVal,
+                              }))
+                            }}
+                            modules={editorConfig.modules}
+                            formats={editorConfig.formats}
+                          />
+                        ) : (
+                          ''
+                        )}
+                      </>
+                    ) : (
+                      <RadioGroup
+                        value={selectedAnswers[e.id] || ''}
+                        onValueChange={(value) =>
+                          handleValueChange(e.id, value)
+                        }
+                        className={'flex ms-5 flex-col mt-2'}
+                      >
+                        {e.options.map((item: any, optionIndex: number) => (
+                          <div
+                            key={optionIndex}
+                            className={'flex items-center gap-3'}
+                          >
+                            <div>
+                              {e.type === 'multiple' ? (
+                                <div className={'flex items-center gap-3'}>
+                                  <RadioGroupItem value={item.id} />
+                                  {String.fromCharCode(97 + optionIndex)}.
+                                </div>
+                              ) : (
+                                ''
+                              )}
 
-                            {e.type === 'check-box' ? (
-                              <div className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`${item.id}`}
-                                  checked={(
-                                    selectedAnswers[e.id] || []
-                                  ).includes(item.id)}
-                                  onCheckedChange={(elm: boolean) =>
-                                    setSelectedAnswers((prev: any) => {
-                                      const currentAnswers = prev[e.id] || []
+                              {e.type === 'check-box' ? (
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`${item.id}`}
+                                    checked={(
+                                      selectedAnswers[e.id] || []
+                                    ).includes(item.id)}
+                                    onCheckedChange={(elm: boolean) =>
+                                      setSelectedAnswers((prev: any) => {
+                                        const currentAnswers = prev[e.id] || []
 
-                                      if (elm) {
-                                        // ini ketika nanti user mencoba untuk memilih semua opsi
-                                        // dibatasi bahwa yang bisa dipilih hanya sebesar banyak pilihan yang memungkinkan.
-                                        if (
-                                          currentAnswers.length >=
-                                          e.options.filter(
-                                            (tmp: any) => tmp.isCorrect
-                                          ).length
-                                        ) {
-                                          return prev
-                                        }
+                                        if (elm) {
+                                          // ini ketika nanti user mencoba untuk memilih semua opsi
+                                          // dibatasi bahwa yang bisa dipilih hanya sebesar banyak pilihan yang memungkinkan.
+                                          if (
+                                            currentAnswers.length >=
+                                            e.options.filter(
+                                              (tmp: any) => tmp.isCorrect
+                                            ).length
+                                          ) {
+                                            return prev
+                                          }
 
-                                        return {
-                                          ...prev,
-                                          [e.id]: [...currentAnswers, item.id],
-                                        }
-                                      } else {
-                                        if (prev[e.id].length === 1) {
-                                          const updatedAns = { ...prev }
-                                          delete updatedAns[e.id]
-                                          return updatedAns
-                                        } else {
                                           return {
                                             ...prev,
-                                            [e.id]: currentAnswers.filter(
-                                              (id: any) => id !== item.id
-                                            ),
+                                            [e.id]: [
+                                              ...currentAnswers,
+                                              item.id,
+                                            ],
+                                          }
+                                        } else {
+                                          if (prev[e.id].length === 1) {
+                                            const updatedAns = { ...prev }
+                                            delete updatedAns[e.id]
+                                            return updatedAns
+                                          } else {
+                                            return {
+                                              ...prev,
+                                              [e.id]: currentAnswers.filter(
+                                                (id: any) => id !== item.id
+                                              ),
+                                            }
                                           }
                                         }
-                                      }
-                                    })
-                                  }
-                                />
-                              </div>
-                            ) : (
-                              ''
-                            )}
+                                      })
+                                    }
+                                  />
+                                </div>
+                              ) : (
+                                ''
+                              )}
+                            </div>
+                            <div>
+                              {e.type === 'multiple' ? (
+                                <>{parse(item.option)}</>
+                              ) : (
+                                ''
+                              )}
+
+                              {e.type === 'check-box' ? (
+                                <label
+                                  htmlFor={`${item.id}`}
+                                  className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                  {parse(item.option)}
+                                </label>
+                              ) : (
+                                ''
+                              )}
+                            </div>
                           </div>
+                        ))}
+
+                        {selectedAnswers[e.id] && e.type == 'multiple' ? (
                           <div>
-                            {e.type === 'multiple' ? (
-                              <>{parse(item.option)}</>
-                            ) : (
-                              ''
-                            )}
-
-                            {e.type === 'check-box' ? (
-                              <label
-                                htmlFor={`${item.id}`}
-                                className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                              >
-                                {parse(item.option)}
-                              </label>
-                            ) : (
-                              ''
-                            )}
+                            <Button
+                              variant={'secondary'}
+                              onClick={() => {
+                                setSelectedAnswers((prev) => {
+                                  const updatedAnswers = { ...prev }
+                                  delete updatedAnswers[e.id]
+                                  return updatedAnswers
+                                })
+                              }}
+                            >
+                              Clear Option
+                            </Button>
                           </div>
-                        </div>
-                      ))}
-
-                      {selectedAnswers[e.id] && e.type == 'multiple' ? (
-                        <div>
-                          <Button
-                            variant={'secondary'}
-                            onClick={() => {
-                              setSelectedAnswers((prev) => {
-                                const updatedAnswers = { ...prev }
-                                delete updatedAnswers[e.id]
-                                return updatedAnswers
-                              })
-                            }}
-                          >
-                            Clear Option
-                          </Button>
-                        </div>
-                      ) : (
-                        ''
-                      )}
-                    </RadioGroup>
-                  )}
+                        ) : (
+                          ''
+                        )}
+                      </RadioGroup>
+                    )}
+                  </div>
                 </div>
+              ))}
+            </div>
+          ) : (
+            ''
+          )}
+
+          {submitState === 2 ? (
+            <div
+              className={
+                'flex flex-col w-full overflow-y-scroll scroll-smooth border rounded-lg px-5 pb-5 justify-center items-center'
+              }
+            >
+              <div className={'w-full max-w-xl border rounded-lg'}>
+                <Table>
+                  <TableHeader>
+                    <TableRow className={'divide-x'}>
+                      <TableHead className={'text-center'}>
+                        Question Number
+                      </TableHead>
+                      <TableHead className={'text-center'}>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {questions.map((question, index) => (
+                      <TableRow key={index} className={'divide-x'}>
+                        <TableCell className={'text-center'}>
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className={'text-center'}>
+                          {selectedAnswers[question.id] ? (
+                            <span className={'text-green-500 font-bold'}>
+                              Answered
+                            </span>
+                          ) : (
+                            <span className={'text-red-500'}>Not Answered</span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
-            ))}
-          </div>
+
+              <Button
+                className={'mt-5'}
+                onClick={() => {
+                  setSubmitState(1)
+                }}
+              >
+                Back To Question
+              </Button>
+            </div>
+          ) : (
+            ''
+          )}
 
           {/*sebelah kanan*/}
           <div className={'max-w-xs w-full flex flex-col gap-5'}>
@@ -366,11 +435,16 @@ export default function ExamSimulationStart({ params }: any) {
               <div>
                 <Button
                   onClick={() => {
-                    handleSubmitExam().then()
+                    if (submitState === 2) {
+                      handleSubmitExam().then()
+                    } else {
+                      setSubmitState(submitState + 1)
+                    }
                   }}
                 >
                   <Send />
-                  Submit Answer
+                  {submitState === 1 ? 'Submit' : ''}
+                  {submitState === 2 ? 'Submit & Finish' : ''}
                 </Button>
               </div>
 
