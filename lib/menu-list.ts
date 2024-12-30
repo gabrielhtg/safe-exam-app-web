@@ -1,12 +1,10 @@
 import {
-  Tag,
   Users,
   Settings,
   School,
   SquarePen,
   LayoutGrid,
   LucideIcon,
-  CircleHelp,
   Landmark,
 } from 'lucide-react'
 
@@ -70,7 +68,7 @@ export function getMenuList(pathname: string): Group[] {
           icon: Users,
         },
         {
-          href: '/account',
+          href: '/main/profile',
           label: 'Account',
           icon: Settings,
         },
