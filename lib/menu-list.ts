@@ -70,7 +70,7 @@ export function getMenuList(pathname: string): Group[] {
           icon: Users,
         },
         {
-          href: '/account',
+          href: '/main/profile',
           label: 'Account',
           icon: Settings,
         },
