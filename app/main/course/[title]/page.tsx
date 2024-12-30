@@ -63,6 +63,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function CoursePage({ params }: any) {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -77,6 +78,7 @@ export default function CoursePage({ params }: any) {
   const [examStartRePassword, setExamStartRePassword] = useState('')
   const [examDescription] = useState('')
   const [exams, setExams] = useState([])
+  const router = useRouter()
 
   const [searchKeywords, setSearchKeywords] = useState('')
   const currentUsername = useSelector(selectUser).username
@@ -183,6 +185,21 @@ export default function CoursePage({ params }: any) {
       setDialogType(0)
       setDialogMsg('Start Password Not Same')
       setIsLoadingCreate(false)
+    }
+  }
+
+  const handleDownloadExamFile = async (examId: number) => {
+    try {
+      const response = await axios.get(`${apiUrl}/exam/generate-file`, {
+        params: {
+          id: examId,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      router.push(`${apiUrl}/${response.data.data}`)
+    } catch (err: any) {
+      console.log(err)
     }
   }
 
@@ -458,7 +475,11 @@ export default function CoursePage({ params }: any) {
                           <DropdownMenuItem>
                             <Users /> Manage Access
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleDownloadExamFile(exam.id).then()
+                            }}
+                          >
                             <FileLock2 /> Generate Exam File
                           </DropdownMenuItem>
                           <DropdownMenuItem
