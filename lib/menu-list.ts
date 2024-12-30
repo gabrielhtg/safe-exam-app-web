@@ -1,5 +1,4 @@
 import {
-  Users,
   Settings,
   School,
   SquarePen,
@@ -27,7 +26,8 @@ type Group = {
   menus: Menu[]
 }
 
-export function getMenuList(pathname: string): Group[] {
+// export function getMenuList(pathname: string): Group[] {
+export function getMenuList(): Group[] {
   return [
     {
       groupLabel: '',
@@ -62,11 +62,11 @@ export function getMenuList(pathname: string): Group[] {
     {
       groupLabel: 'Settings',
       menus: [
-        {
-          href: '/users',
-          label: 'Users',
-          icon: Users,
-        },
+        // {
+        //   href: '/users',
+        //   label: 'Users',
+        //   icon: Users,
+        // },
         {
           href: '/main/profile',
           label: 'Account',

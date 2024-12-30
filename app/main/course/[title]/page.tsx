@@ -100,6 +100,15 @@ export default function CoursePage({ params }: any) {
     }
   }
 
+  const handleCopy = async (text: string) => {
+    try {
+      console.log(navigator.clipboard)
+      await navigator.clipboard.writeText(text)
+    } catch (e: any) {
+      console.log(e)
+    }
+  }
+
   const getAllExams = async (courseTitle: string) => {
     try {
       const response = await axios.get(`${apiUrl}/exam`, {
@@ -383,12 +392,13 @@ export default function CoursePage({ params }: any) {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        <div className={'border rounded-lg w-full'}>
+        <div className={'border rounded-lg w-full overflow-scroll'}>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className={'divide-x'}>
                 <TableHead>Name</TableHead>
-                <TableHead>Course</TableHead>
+                <TableHead>Start Password</TableHead>
+                <TableHead>Close Password</TableHead>
                 <TableHead>Start Time</TableHead>
                 <TableHead>End Time</TableHead>
                 <TableHead>Action</TableHead>
@@ -403,9 +413,14 @@ export default function CoursePage({ params }: any) {
                 </TableRow>
               ) : (
                 exams.map((exam: any, index: number) => (
-                  <TableRow key={index}>
+                  <TableRow key={index} className={'divide-x'}>
                     <TableCell>{exam.title}</TableCell>
-                    <TableCell>{exam.course_title}</TableCell>
+                    <TableCell>
+                      {exam.start_password ? exam.start_password : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {exam.end_password ? exam.end_password : '-'}
+                    </TableCell>
                     <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                     <TableCell>{formatExamDate(exam.end_date)}</TableCell>
                     <TableCell className={'flex gap-1'}>
@@ -446,11 +461,19 @@ export default function CoursePage({ params }: any) {
                           <DropdownMenuItem>
                             <FileLock2 /> Generate Exam File
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleCopy(exam.start_password).then()
+                            }}
+                          >
                             <Copy /> Copy Entry Password
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Copy /> Copy Submit Password
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleCopy(exam.end_password).then()
+                            }}
+                          >
+                            <Copy /> Copy Close Password
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className={'text-red-500'}

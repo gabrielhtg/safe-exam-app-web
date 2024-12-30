@@ -16,7 +16,6 @@ import {
   EllipsisVertical,
   FileLock2,
   Loader2,
-  Pen,
   Plus,
   Search,
   Trash,
@@ -208,6 +207,15 @@ export default function ExamPage() {
     }
   }
 
+  const handleCopy = async (text: string) => {
+    try {
+      console.log(navigator.clipboard)
+      await navigator.clipboard.writeText(text)
+    } catch (e: any) {
+      console.log(e)
+    }
+  }
+
   useEffect(() => {
     getExam().then()
     getCourses().then()
@@ -251,7 +259,7 @@ export default function ExamPage() {
             )}
 
             <AlertDialog>
-              <AlertDialogTrigger>
+              <AlertDialogTrigger asChild>
                 <Button>
                   <Plus />
                   Add Exam
@@ -445,7 +453,7 @@ export default function ExamPage() {
           <div className={'border rounded-lg w-full mt-7'}>
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className={'divide-x'}>
                   <TableHead>Name</TableHead>
                   <TableHead>Course</TableHead>
                   <TableHead>Start Time</TableHead>
@@ -462,14 +470,14 @@ export default function ExamPage() {
                   </TableRow>
                 ) : (
                   exams.map((exam: any, index: number) => (
-                    <TableRow key={index}>
+                    <TableRow key={index} className={'divide-x'}>
                       <TableCell>{exam.title}</TableCell>
                       <TableCell>{exam.course_title}</TableCell>
                       <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                       <TableCell>{formatExamDate(exam.end_date)}</TableCell>
                       <TableCell className={'flex gap-1'}>
                         <DropdownMenu>
-                          <DropdownMenuTrigger>
+                          <DropdownMenuTrigger asChild>
                             <Button variant={'secondary'}>
                               <EllipsisVertical />
                             </Button>
@@ -505,16 +513,24 @@ export default function ExamPage() {
                             <DropdownMenuItem>
                               <FileLock2 /> Generate Exam File
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                handleCopy(exam.start_password).then()
+                              }}
+                            >
                               <Copy /> Copy Entry Password
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Copy /> Copy Submit Password
+                            <DropdownMenuItem
+                              onClick={() => {
+                                handleCopy(exam.end_password).then()
+                              }}
+                            >
+                              <Copy /> Copy Close Password
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className={'text-red-500'}
                               onClick={() => {
-                                handleDeleteExam(exam.id)
+                                handleDeleteExam(exam.id).then()
                               }}
                             >
                               <Trash /> Delete
