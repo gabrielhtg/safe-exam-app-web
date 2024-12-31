@@ -26,8 +26,8 @@ type Group = {
   menus: Menu[]
 }
 
-// export function getMenuList(pathname: string): Group[] {
-export function getMenuList(): Group[] {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getMenuList(pathname: string): Group[] {
   return [
     {
       groupLabel: '',
