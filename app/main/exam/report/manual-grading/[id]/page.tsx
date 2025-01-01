@@ -186,7 +186,7 @@ export default function ProctoringLog({ params }: any) {
         ) : (
           <p className="text-center mt-5">No essay answers found.</p>
         )}
-        <Button className='mt-5' onClick={updateGradingStatus}>
+        <Button className='mt-5' onClick={() => updateGradingStatus()}>
           <ArrowLeft /> Save
         </Button>
       </Card>
