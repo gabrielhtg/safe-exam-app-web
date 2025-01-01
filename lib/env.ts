@@ -1,4 +1,4 @@
-export const apiUrl = 'http://localhost:3001'
+export const apiUrl = 'https://thesis-be.getsuyoubi-monday.site'
 
 export const compressOptions = {
   maxSizeMB: 1,
