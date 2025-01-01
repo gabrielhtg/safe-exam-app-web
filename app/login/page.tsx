@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useState } from 'react'
 import axios from 'axios'
+import { apiUrl } from '@/lib/env'
 import { useRouter } from 'next/navigation'
 import {
   AlertDialog,
@@ -36,7 +37,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/auth/login', {
+      const response = await axios.post(`${apiUrl}/auth/login`, {
         username: username,
         password: password,
       })

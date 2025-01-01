@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import axios from 'axios'
+import { apiUrl } from '@/lib/env'
 import { useState } from 'react'
 import {
   AlertDialog,
@@ -52,7 +53,7 @@ export default function RegisterPage() {
     try {
       if (password == rePassword) {
         const response = await axios.post(
-          'http://localhost:3001/users',
+          `${apiUrl}/users/`,
           formData
         )
 

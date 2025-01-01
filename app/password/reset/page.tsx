@@ -19,7 +19,7 @@ export default function ResetPasswordPage() {
                     </CardTitle>
 
                     <CardDescription className={'text-center'}>
-                        Enter your email or username and we&aposll send you a link to get back into your account.
+                        Enter your email and we&aposll send you a link to get back into your account.
                     </CardDescription>
                 </CardHeader>
 
