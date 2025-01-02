@@ -1,16 +1,16 @@
-import Link from "next/link";
-import { MenuIcon, PanelsTopLeft } from "lucide-react";
+import Link from 'next/link'
+import { MenuIcon } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
-import { Menu } from "@/components/admin-panel/menu";
+import { Button } from '@/components/ui/button'
+import { Menu } from '@/components/admin-panel/menu'
 import {
   Sheet,
   SheetHeader,
   SheetContent,
   SheetTrigger,
-  SheetTitle
-} from "@/components/ui/sheet";
-import Image from "next/image";
+  SheetTitle,
+} from '@/components/ui/sheet'
+import Image from 'next/image'
 
 export function SheetMenu() {
   return (
@@ -29,13 +29,19 @@ export function SheetMenu() {
           >
             <Link href="/main" className="flex items-center gap-2">
               {/*<PanelsTopLeft className="w-6 h-6 mr-1" />*/}
-              <Image className={'w-[35px] h-[35px]'} src={'/assets/images/logo/app-logo.png'} alt={'logo'} width={'50'} height={'50'}/>
-              <SheetTitle className="font-bold text-lg">Exam Guard</SheetTitle>
+              <Image
+                className={'w-[35px] h-[35px]'}
+                src={'/assets/images/logo/app-logo.png'}
+                alt={'logo'}
+                width={'50'}
+                height={'50'}
+              />
+              <SheetTitle className="font-bold text-lg">HonesTest</SheetTitle>
             </Link>
           </Button>
         </SheetHeader>
         <Menu isOpen />
       </SheetContent>
     </Sheet>
-  );
+  )
 }

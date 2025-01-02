@@ -59,7 +59,7 @@ export default function LoginPage() {
         <Card className={'w-[380px] px-5'}>
           <CardHeader>
             <CardTitle className={'text-2xl text-center mb-3'}>
-              Safe Exam Login
+              HonesTest Login
             </CardTitle>
             <CardDescription className={'text-center'}>
               Created by TA-12 IF 21
@@ -140,4 +140,3 @@ export default function LoginPage() {
     </>
   )
 }
-
