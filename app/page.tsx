@@ -77,7 +77,7 @@ export default function LoginPage() {
         <Card className={'w-[380px] px-5'} onKeyDown={handleKeyDown}>
           <CardHeader>
             <CardTitle className={'text-2xl text-center mb-3'}>
-              Safe Exam Login
+              HonestTest Login
             </CardTitle>
             <CardDescription className={'text-center'}>
               Created by TA-12 IF 21
