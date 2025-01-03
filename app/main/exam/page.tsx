@@ -131,6 +131,21 @@ export default function ExamPage() {
     }
   }
 
+  const handleDownloadExamFile = async (examId: number) => {
+    try {
+      const response = await axios.get(`${apiUrl}/exam/generate-file`, {
+        params: {
+          id: examId,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      window.location.href = `${apiUrl}/${response.data.data}`
+    } catch (err: any) {
+      console.log(err)
+    }
+  }
+
   const getCourses = async () => {
     try {
       const getResponse = await axios.get(`${apiUrl}/course`, {
@@ -510,7 +525,11 @@ export default function ExamPage() {
                             <DropdownMenuItem>
                               <Users /> Manage Access
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                handleDownloadExamFile(exam.id).then()
+                              }}
+                            >
                               <FileLock2 /> Generate Exam File
                             </DropdownMenuItem>
                             <DropdownMenuItem

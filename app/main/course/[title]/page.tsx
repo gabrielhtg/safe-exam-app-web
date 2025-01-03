@@ -197,7 +197,7 @@ export default function CoursePage({ params }: any) {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
-      router.push(`${apiUrl}/${response.data.data}`)
+      window.location.href = `${apiUrl}/${response.data.data}`
     } catch (err: any) {
       console.log(err)
     }
