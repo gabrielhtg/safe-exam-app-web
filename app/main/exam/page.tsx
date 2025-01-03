@@ -515,17 +515,24 @@ export default function ExamPage() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
+                                handleCopy(exam.config_password).then()
+                              }}
+                            >
+                              <Copy /> Copy Configuration Password
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
                                 handleCopy(exam.start_password).then()
                               }}
                             >
-                              <Copy /> Copy Entry Password
+                              <Copy /> Copy Start Exam Password
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
                                 handleCopy(exam.end_password).then()
                               }}
                             >
-                              <Copy /> Copy Close Password
+                              <Copy /> Copy Close Exam Password
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className={'text-red-500'}
