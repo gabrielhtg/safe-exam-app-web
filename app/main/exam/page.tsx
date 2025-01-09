@@ -140,9 +140,13 @@ export default function ExamPage() {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
-      window.location.href = `${apiUrl}/${response.data.data}`
+      if (response.status == 200) {
+        window.location.href = `${apiUrl}/${response.data.data}`
+      }
     } catch (err: any) {
-      console.log(err)
+      setDialogOpen(true)
+      setDialogMsg(err.response.data.message)
+      setDialogType(0)
     }
   }
 

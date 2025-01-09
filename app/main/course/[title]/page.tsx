@@ -63,7 +63,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 export default function CoursePage({ params }: any) {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -78,7 +77,6 @@ export default function CoursePage({ params }: any) {
   const [examStartRePassword, setExamStartRePassword] = useState('')
   const [examDescription] = useState('')
   const [exams, setExams] = useState([])
-  const router = useRouter()
 
   const [searchKeywords, setSearchKeywords] = useState('')
   const currentUsername = useSelector(selectUser).username
@@ -197,9 +195,13 @@ export default function CoursePage({ params }: any) {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
-      window.location.href = `${apiUrl}/${response.data.data}`
+      if (response.status == 200) {
+        window.location.href = `${apiUrl}/${response.data.data}`
+      }
     } catch (err: any) {
-      console.log(err)
+      setDialogOpen(true)
+      setDialogMsg(err.response.data.message)
+      setDialogType(0)
     }
   }
 
