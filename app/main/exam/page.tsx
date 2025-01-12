@@ -84,7 +84,6 @@ export default function ExamPage() {
   const [examStartDate, setExamStartDate] = useState<Date>()
   const [examEndDate, setExamEndDate] = useState<Date>()
   const [examStartPassword, setExamStartPassword] = useState('')
-  const [examStartRePassword, setExamStartRePassword] = useState('')
   const [examDescription] = useState('')
   const [exams, setExams] = useState([])
   const [courses, setcourses] = useState<any[]>([])
@@ -166,41 +165,34 @@ export default function ExamPage() {
   }
 
   const handleAddExam = async () => {
-    if (examStartPassword === examStartRePassword) {
-      const submitData = {
-        title: examName,
-        start_password: examStartPassword,
-        start_date: examStartDate,
-        end_date: examEndDate,
-        course_title: courseInputValue,
-        created_by: currentUsername,
-        description: examDescription,
-      }
+    const submitData = {
+      title: examName,
+      start_password: examStartPassword,
+      start_date: examStartDate,
+      end_date: examEndDate,
+      course_title: courseInputValue,
+      created_by: currentUsername,
+      description: examDescription,
+    }
 
-      try {
-        const response = await axios.post(
-          `${apiUrl}/exam`,
-          submitData,
-          getBearerHeader(localStorage.getItem('token')!)
-        )
+    try {
+      const response = await axios.post(
+        `${apiUrl}/exam`,
+        submitData,
+        getBearerHeader(localStorage.getItem('token')!)
+      )
 
-        if (response.status === 200) {
-          setDialogOpen(true)
-          setDialogType(1)
-          setDialogMsg(response.data.message)
-          setIsLoadingCreate(false)
-          getExam().then()
-        }
-      } catch (err: any) {
+      if (response.status === 200) {
         setDialogOpen(true)
-        setDialogType(0)
-        setDialogMsg(err.response.data.message)
+        setDialogType(1)
+        setDialogMsg(response.data.message)
         setIsLoadingCreate(false)
+        getExam().then()
       }
-    } else {
+    } catch (err: any) {
       setDialogOpen(true)
       setDialogType(0)
-      setDialogMsg('Start Password Not Same')
+      setDialogMsg(err.response.data.message)
       setIsLoadingCreate(false)
     }
   }
@@ -307,25 +299,11 @@ export default function ExamPage() {
                         Start Password
                       </Label>
                       <Input
-                        type={'password'}
+                        type={'text'}
                         placeholder={'Type here...'}
                         id="exam-start-password"
                         onChange={(e) => {
                           setExamStartPassword(e.target.value)
-                        }}
-                      />
-                    </div>
-
-                    <div className="grid w-full items-center gap-1.5 ">
-                      <Label htmlFor="exam-start-reenter-password">
-                        Re-Enter Start Password
-                      </Label>
-                      <Input
-                        type={'password'}
-                        placeholder={'Type here...'}
-                        id="exam-start-reenter-password"
-                        onChange={(e) => {
-                          setExamStartRePassword(e.target.value)
                         }}
                       />
                     </div>
@@ -491,7 +469,7 @@ export default function ExamPage() {
                   exams.map((exam: any, index: number) => (
                     <TableRow key={index} className={'divide-x'}>
                       <TableCell>{exam.title}</TableCell>
-                      <TableCell>{exam.course_title}</TableCell>
+                      <TableCell>{exam.course.title}</TableCell>
                       <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                       <TableCell>{formatExamDate(exam.end_date)}</TableCell>
                       <TableCell className={'flex gap-1'}>

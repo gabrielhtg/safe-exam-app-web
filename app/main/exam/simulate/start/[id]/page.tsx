@@ -27,7 +27,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Question } from '@/app/main/questions/page'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamSimulationStart({ params }: any) {
@@ -37,7 +36,7 @@ export default function ExamSimulationStart({ params }: any) {
   const [editorConfig, setEditorConfig] = useState<any>(null)
   const router = useRouter()
   const [submitState, setSubmitState] = useState(1)
-  const [selectedQuestion, setSelectedQuestion] = useState<any>()
+  // const [selectedQuestion, setSelectedQuestion] = useState<any>()
 
   // state untuk exam behaviour
   const [hoursLimit, setHoursLimit] = useState<number>()
@@ -467,30 +466,6 @@ export default function ExamSimulationStart({ params }: any) {
           </div>
         </div>
       </Card>
-
-      {/*<AlertDialog open={showDialog}>*/}
-      {/*  <AlertDialogContent>*/}
-      {/*    <AlertDialogHeader>*/}
-      {/*      <AlertDialogTitle*/}
-      {/*        className={'text-center flex flex-col items-center'}*/}
-      {/*      >*/}
-      {/*        {getAlertTitle()}*/}
-      {/*      </AlertDialogTitle>*/}
-      {/*      <AlertDialogDescription className={'text-center'}>*/}
-      {/*        {dialogMsg}*/}
-      {/*      </AlertDialogDescription>*/}
-      {/*    </AlertDialogHeader>*/}
-      {/*    <AlertDialogFooter className={'!justify-center'}>*/}
-      {/*      <Button*/}
-      {/*        onClick={() => {*/}
-      {/*          setShowDialog(false)*/}
-      {/*        }}*/}
-      {/*      >*/}
-      {/*        OK*/}
-      {/*      </Button>*/}
-      {/*    </AlertDialogFooter>*/}
-      {/*  </AlertDialogContent>*/}
-      {/*</AlertDialog>*/}
     </ContentLayout>
   )
 }

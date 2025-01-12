@@ -56,7 +56,6 @@ export default function CoursePage() {
   const [courseImage, setCourseImage] = useState('')
   const [courseImageFile, setCourseImageFile] = useState<File | undefined>()
   const [courseTitle, setCourseTitle] = useState('')
-  const [courseTitleOld, setCourseTitleOld] = useState('')
   const [courseDesc, setCourseDesc] = useState('')
   const currentUsername = useSelector(selectUser).username
   const [courseList, setCourseList] = useState([])
@@ -117,12 +116,14 @@ export default function CoursePage() {
     formData.append('username', currentUsername)
 
     try {
-      const compressedImage = await imageCompression(
-        courseImageFile!,
-        compressOptions
-      )
+      if (courseImageFile) {
+        const compressedImage = await imageCompression(
+          courseImageFile!,
+          compressOptions
+        )
 
-      formData.append('course_pict', compressedImage)
+        formData.append('course_pict', compressedImage)
+      }
 
       const response = await axios.post(
         `${apiUrl}/course`,
@@ -143,6 +144,9 @@ export default function CoursePage() {
       setDialogMsg(err.response.data.message)
       setIsLoadingCreate(false)
     }
+
+    setCourseImage('')
+    setCourseImageFile(undefined)
   }
 
   const getAlertTitle = () => {
@@ -167,14 +171,14 @@ export default function CoursePage() {
     return ''
   }
 
-  const handleEditCourse = async () => {
+  const handleEditCourse = async (id: string) => {
     setIsLoadingCreate(true)
     setLoadingTitle('Updating Course')
     const formData = new FormData()
     formData.append('title', courseTitle)
     formData.append('description', courseDesc)
     formData.append('username', currentUsername)
-    formData.append('old_title', courseTitleOld)
+    formData.append('id', id)
 
     try {
       if (courseImageFile) {
@@ -205,6 +209,9 @@ export default function CoursePage() {
       setDialogMsg(err.response.data.message)
       setIsLoadingCreate(false)
     }
+
+    setCourseImage('')
+    setCourseImageFile(undefined)
   }
 
   return (
@@ -347,7 +354,7 @@ export default function CoursePage() {
                 </CardContent>
                 <CardFooter className={'flex gap-2'}>
                   <Button asChild={true}>
-                    <Link href={`/main/course/${course.title}`}>
+                    <Link href={`/main/course/${course.id}`}>
                       <Eye />
                     </Link>
                   </Button>
@@ -359,7 +366,6 @@ export default function CoursePage() {
                         setCourseTitle(course.title)
                         setCourseDesc(course.description)
                         setCourseImage(`${apiUrl}/${course.image}`)
-                        setCourseTitleOld(course.title)
                       }}
                     >
                       <Button>
@@ -435,7 +441,11 @@ export default function CoursePage() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleEditCourse}>
+                        <AlertDialogAction
+                          onClick={() => {
+                            handleEditCourse(`${course.id}`).then()
+                          }}
+                        >
                           Save
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -463,7 +473,7 @@ export default function CoursePage() {
                         <Button
                           variant={'destructive'}
                           onClick={() => {
-                            handleRemoveCourse(course.title)
+                            handleRemoveCourse(course.id).then()
                           }}
                         >
                           Delete

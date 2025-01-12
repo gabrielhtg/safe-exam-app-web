@@ -2,7 +2,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -13,7 +12,7 @@ import Link from 'next/link'
 
 export default function CourseCard(props: any) {
   return (
-    <Link href={`/main/course/${props.props.title}`}>
+    <Link href={`/main/course/${props.props.id}`}>
       <Card className={'w-full hover:border-blue-500'}>
         <CardHeader>
           <CardTitle>{props.props.title}</CardTitle>

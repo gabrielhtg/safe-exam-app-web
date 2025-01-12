@@ -31,6 +31,14 @@ import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import Link from 'next/link'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 export default function SimulatePage({ params }: any) {
   const id = params.id
@@ -40,10 +48,13 @@ export default function SimulatePage({ params }: any) {
   const [timeLimit, setTimeLimit] = useState('')
   const [inputStartPassword, setInputStartPassword] = useState('')
   const currentUsername = useSelector(selectUser).username
+  const [showNoQuestionDialog, setShowNoQuestionDialog] = useState(false)
   const [inputStartPasswordValidation, setInputStartPasswordValidation] =
     useState('')
-  const router = useRouter()
   const [examResultData, setExamResultData] = useState<any[]>([])
+  const [question, setQuestion] = useState<any>(null)
+  const [showTimeLimitDialog, setShowTimeLimitDialog] = useState<boolean>(false)
+  const router = useRouter()
 
   const getExamData = async () => {
     try {
@@ -88,6 +99,18 @@ export default function SimulatePage({ params }: any) {
       })
 
       setExamResultData(examResultResponse.data.data)
+
+      const getQuestionResponse = await axios.get(
+        `${apiUrl}/question${response.data.data.shuffle_questions ? '/shuffled' : ''}`,
+        {
+          params: {
+            exam: id,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
+
+      setQuestion(getQuestionResponse.data.data)
     } catch (e: any) {
       console.log(e)
     }
@@ -128,7 +151,7 @@ export default function SimulatePage({ params }: any) {
         className={'w-full p-10 min-h-[calc(100vh-180px)] gap-5 flex flex-col'}
       >
         <h1 className={'font-bold text-3xl'}>
-          Course : {examData ? examData.course_title : ''}
+          Course : {examData ? examData.course.title : ''}
         </h1>
 
         <hr />
@@ -269,12 +292,25 @@ export default function SimulatePage({ params }: any) {
                       <Button
                         onClick={() => {
                           setInputStartPasswordValidation('')
-                          if (examData.start_password === inputStartPassword) {
-                            router.push(`/main/exam/simulate/start/${id}`)
+                          if (question.length > 0) {
+                            if (
+                              examData.time_limit === 0 ||
+                              examData.time_limit === null
+                            ) {
+                              setShowTimeLimitDialog(true)
+                            } else {
+                              if (
+                                examData.start_password === inputStartPassword
+                              ) {
+                                router.push(`/main/exam/simulate/start/${id}`)
+                              } else {
+                                setInputStartPasswordValidation(
+                                  'Incorrect Start Password'
+                                )
+                              }
+                            }
                           } else {
-                            setInputStartPasswordValidation(
-                              'Incorrect Start Password'
-                            )
+                            setShowNoQuestionDialog(true)
                           }
                         }}
                       >
@@ -301,6 +337,56 @@ export default function SimulatePage({ params }: any) {
           )}
         </div>
       </Card>
+
+      <AlertDialog open={showNoQuestionDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle
+              className={'text-center flex flex-col items-center'}
+            >
+              Failed to Start
+            </AlertDialogTitle>
+            <AlertDialogDescription className={'text-center'}>
+              No question added to this exam!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className={'!justify-center'}>
+            <Button
+              onClick={() => {
+                setShowNoQuestionDialog(false)
+                router.push(`/main/exam/question/${examData.id}`)
+              }}
+            >
+              OK
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showTimeLimitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle
+              className={'text-center flex flex-col items-center'}
+            >
+              Failed to Start
+            </AlertDialogTitle>
+            <AlertDialogDescription className={'text-center'}>
+              Set time limit first!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className={'!justify-center'}>
+            <Button
+              onClick={() => {
+                setShowTimeLimitDialog(false)
+                router.push(`/main/exam/configure/${examData.id}`)
+              }}
+            >
+              OK
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ContentLayout>
   )
 }

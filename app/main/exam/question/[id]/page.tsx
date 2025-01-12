@@ -56,7 +56,6 @@ export default function ExamQuestionPage({ params }: any) {
   // const [loadingTitle, setLoadingTitle] = useState('')
   const [showDialog, setShowDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
-  const [loadingModal, setLoadingModal] = useState(false)
   const [isOptionCorrect, setIsOptionCorrect] = useState<boolean>(false)
   const [showCorrectSwitch, setShowCorrectSwitch] = useState(true)
 
@@ -126,7 +125,6 @@ export default function ExamQuestionPage({ params }: any) {
 
   const handleSaveQuestion = async () => {
     if (tempContent === '' && questionType !== 'essay') {
-      setLoadingModal(false)
       getAllQuestions().then()
       setShowDialog(true)
       setDialogType(0)
@@ -135,7 +133,6 @@ export default function ExamQuestionPage({ params }: any) {
     }
 
     if (value === '' && questionType === 'essay') {
-      setLoadingModal(false)
       getAllQuestions().then()
       setShowDialog(true)
       setDialogType(0)
@@ -151,7 +148,7 @@ export default function ExamQuestionPage({ params }: any) {
           type: questionType,
           options: tempOptions,
           remarks: remarks,
-          course: examData.course_title,
+          course: examData.course_id,
           created_by: currentUsername,
           exam_id: id,
         },
@@ -163,7 +160,6 @@ export default function ExamQuestionPage({ params }: any) {
         setShowDialog(true)
         setDialogType(1)
         setDialogMsg(saveResponse.data.message)
-        setLoadingModal(false)
       }
     } catch (err: any) {
       console.log(err)
