@@ -11,14 +11,25 @@ import React from 'react'
 import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Image as ImageLucide } from 'lucide-react'
+import TextTruncate from 'react-text-truncate'
 
 export default function CourseCard(props: any) {
   return (
-    <Link href={`/main/course/${props.props.id}`}>
-      <Card className={'w-full hover:border-blue-500'}>
+    <Link href={`/main/course/${props.props.id}`} className={'h-full'}>
+      <Card className={'w-full hover:border-blue-500 h-full'}>
         <CardHeader>
           <CardTitle>{props.props.title}</CardTitle>
-          <CardDescription>{props.props.description}</CardDescription>
+          <CardDescription>
+            <TextTruncate
+              line={1}
+              element="span"
+              truncateText="…"
+              text={props.props.description}
+              textTruncateChild={
+                <Link href={`/main/course/${props.props.id}`}>See More</Link>
+              }
+            />
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {props.props.image ? (

@@ -47,6 +47,7 @@ import imageCompression from 'browser-image-compression'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import TextTruncate from 'react-text-truncate'
 
 export default function CoursePage() {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -61,6 +62,7 @@ export default function CoursePage() {
   const [courseDesc, setCourseDesc] = useState('')
   const [courseTitleErr, setCourseTitleErr] = useState('')
   const [courseDescErr, setCourseDescErr] = useState('')
+  const [courseImageErr, setCourseImageErr] = useState('')
   const [courseList, setCourseList] = useState([])
   const [loadingTitle, setLoadingTitle] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
@@ -220,6 +222,8 @@ export default function CoursePage() {
 
     setCourseImage('')
     setCourseImageFile(undefined)
+    setCourseTitle('')
+    setCourseDesc('')
   }
 
   return (
@@ -297,15 +301,44 @@ export default function CoursePage() {
                       id="course-image"
                       accept="image/jpeg, image/png"
                       onChange={(e) => {
-                        setCourseImage(URL.createObjectURL(e.target.files![0]))
-                        setCourseImageFile(e.target.files![0])
+                        setCourseImageErr('')
+                        const file = e.target.files?.[0] // Ambil file pertama yang diunggah
+                        if (file) {
+                          if (
+                            file.type === 'image/jpeg' ||
+                            file.type === 'image/png'
+                          ) {
+                            setCourseImage(URL.createObjectURL(file))
+                            setCourseImageFile(file)
+                          } else {
+                            setCourseImageErr(
+                              'Only JPEG or PNG files are allowed!'
+                            )
+                            e.target.value = '' // Reset input file
+                          }
+                        }
                       }}
                     />
+                    <span className={'text-sm text-red-500'}>
+                      {courseImageErr}
+                    </span>
                   </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel
+                  onClick={() => {
+                    setCourseDesc('')
+                    setCourseTitleErr('')
+                    setCourseDescErr('')
+                    setCourseImageErr('')
+                    setCourseTitle('')
+                    setCourseImage('')
+                    setCourseImageFile(undefined)
+                  }}
+                >
+                  Cancel
+                </AlertDialogCancel>
                 <Button
                   onClick={() => {
                     if (courseTitle === '') {
@@ -372,7 +405,17 @@ export default function CoursePage() {
               <Card className={'w-full'} key={index}>
                 <CardHeader>
                   <CardTitle>{course.title}</CardTitle>
-                  <CardDescription>{course.description}</CardDescription>
+                  <CardDescription>
+                    <TextTruncate
+                      line={1}
+                      element="span"
+                      truncateText="…"
+                      text={course.description}
+                      textTruncateChild={
+                        <Link href={`/main/course/${course.id}`}>See More</Link>
+                      }
+                    />
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {course.image ? (
@@ -429,6 +472,9 @@ export default function CoursePage() {
                                 setCourseTitle(e.target.value)
                               }}
                             />
+                            <span className={'text-sm text-red-500'}>
+                              {courseTitleErr}
+                            </span>
                           </div>
 
                           <div className="grid w-full items-center gap-1.5 ">
@@ -442,6 +488,9 @@ export default function CoursePage() {
                                 setCourseDesc(e.target.value)
                               }}
                             />
+                            <span className={'text-sm text-red-500'}>
+                              {courseDescErr}
+                            </span>
                           </div>
 
                           <div className="grid w-full items-center gap-1.5">
@@ -476,18 +525,44 @@ export default function CoursePage() {
                                 setCourseImageFile(e.target.files![0])
                               }}
                             />
+
+                            <span className={'text-sm text-red-500'}>
+                              {courseImageErr}
+                            </span>
                           </div>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
+                        <AlertDialogCancel
                           onClick={() => {
-                            handleEditCourse(`${course.id}`).then()
+                            setCourseDesc('')
+                            setCourseTitleErr('')
+                            setCourseDescErr('')
+                            setCourseImageErr('')
+                            setCourseTitle('')
+                            setCourseImage('')
+                            setCourseImageFile(undefined)
+                          }}
+                        >
+                          Cancel
+                        </AlertDialogCancel>
+                        <Button
+                          onClick={() => {
+                            if (courseTitle === '') {
+                              setCourseTitleErr('Cannot be blank!')
+                            }
+
+                            if (courseDesc === '') {
+                              setCourseDescErr('Cannot be blank!')
+                            }
+
+                            if (courseTitle !== '' && courseDesc !== '') {
+                              handleEditCourse(`${course.id}`).then()
+                            }
                           }}
                         >
                           Save
-                        </AlertDialogAction>
+                        </Button>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>

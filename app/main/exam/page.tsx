@@ -88,8 +88,9 @@ export default function ExamPage() {
   const [examDescription] = useState('')
   const [exams, setExams] = useState([])
   const [courses, setcourses] = useState<any[]>([])
-  const [popoverOpen, setPopoverOpen] = React.useState(false)
-  const [courseInputValue, setCourseInputValue] = React.useState('')
+  const [popoverOpen, setPopoverOpen] = useState(false)
+  const [courseInputValue, setCourseInputValue] = useState('')
+  const [selectedCourseId, setSelectedCourseId] = useState('')
   const router = useRouter()
 
   const [searchKeywords, setSearchKeywords] = useState('')
@@ -172,7 +173,7 @@ export default function ExamPage() {
       start_password: examStartPassword,
       start_date: examStartDate,
       end_date: examEndDate,
-      course_title: courseInputValue,
+      course_id: selectedCourseId,
       created_by: currentUsername,
       description: examDescription,
     }
@@ -340,13 +341,18 @@ export default function ExamPage() {
                               <CommandGroup>
                                 {courses.map((course: any) => (
                                   <CommandItem
-                                    key={course.title}
+                                    key={course.id}
                                     value={course.title}
                                     onSelect={(currentValue) => {
                                       setCourseInputValue(
                                         currentValue === courseInputValue
                                           ? ''
                                           : currentValue
+                                      )
+                                      setSelectedCourseId(
+                                        currentValue === courseInputValue
+                                          ? ''
+                                          : course.id
                                       )
                                       setPopoverOpen(false)
                                     }}

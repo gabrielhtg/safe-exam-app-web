@@ -74,8 +74,8 @@ export default function CourseGroup() {
                     key={index}
                     className="md:basis-1/2 lg:basis-1/3"
                   >
-                    <div className="p-1">
-                      <Card>
+                    <div className="p-1 h-full">
+                      <Card className={'h-full'}>
                         <CourseCard props={course}></CourseCard>
                       </Card>
                     </div>
