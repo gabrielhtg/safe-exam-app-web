@@ -9,8 +9,6 @@ import Image from 'next/image'
 import { apiUrl } from '@/lib/env'
 import React from 'react'
 import Link from 'next/link'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Image as ImageLucide } from 'lucide-react'
 import TextTruncate from 'react-text-truncate'
 
 export default function CourseCard(props: any) {
@@ -41,13 +39,13 @@ export default function CourseCard(props: any) {
               alt={'course-image'}
             />
           ) : (
-            <div
-              className={
-                'w-full h-40 flex items-center justify-center bg-muted rounded-lg'
-              }
-            >
-              <ImageLucide />
-            </div>
+            <Image
+              className={'object-cover h-40 rounded-lg'}
+              src={'https://picsum.photos/960/540'}
+              width={500}
+              height={500}
+              alt={'course-image'}
+            />
           )}
         </CardContent>
       </Card>

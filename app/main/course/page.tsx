@@ -21,7 +21,6 @@ import {
   Search,
   Trash2,
   UserCog,
-  Image as ImageLucide,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -427,13 +426,13 @@ export default function CoursePage() {
                       alt={'course-image'}
                     />
                   ) : (
-                    <div
-                      className={
-                        'w-full h-40 flex items-center justify-center bg-muted rounded-lg'
-                      }
-                    >
-                      <ImageLucide />
-                    </div>
+                    <Image
+                      className={'object-cover h-40 rounded-lg'}
+                      src={'https://picsum.photos/960/540'}
+                      width={500}
+                      height={500}
+                      alt={'course-image'}
+                    />
                   )}
                 </CardContent>
                 <CardFooter className={'flex gap-2'}>
