@@ -399,7 +399,7 @@ export default function CoursePage() {
             There are no courses!
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
             {courseList.map((course: any, index: number) => (
               <Card className={'w-full'} key={index}>
                 <CardHeader>
@@ -426,13 +426,17 @@ export default function CoursePage() {
                       alt={'course-image'}
                     />
                   ) : (
-                    <Image
-                      className={'object-cover h-40 rounded-lg'}
-                      src={'https://picsum.photos/960/540'}
-                      width={500}
-                      height={500}
-                      alt={'course-image'}
-                    />
+                    <div
+                      className={
+                        'w-full h-40 flex items-center justify-center bg-muted rounded-lg'
+                      }
+                    >
+                      <span
+                        className={'font-bold text-muted-foreground text-2xl'}
+                      >
+                        {course.title}
+                      </span>
+                    </div>
                   )}
                 </CardContent>
                 <CardFooter className={'flex gap-2'}>
@@ -497,7 +501,8 @@ export default function CoursePage() {
                           <div className="grid w-full items-center gap-1.5">
                             <Label htmlFor="course-image">Course Image</Label>
 
-                            {course.image == null ? (
+                            {course.image == null &&
+                            courseImageFile === undefined ? (
                               <Skeleton
                                 className={
                                   'w-full h-48 flex items-center justify-center'

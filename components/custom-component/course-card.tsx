@@ -39,13 +39,15 @@ export default function CourseCard(props: any) {
               alt={'course-image'}
             />
           ) : (
-            <Image
-              className={'object-cover h-40 rounded-lg'}
-              src={'https://picsum.photos/960/540'}
-              width={500}
-              height={500}
-              alt={'course-image'}
-            />
+            <div
+              className={
+                'w-full h-40 flex items-center justify-center bg-muted rounded-lg'
+              }
+            >
+              <span className={'font-bold text-muted-foreground text-2xl'}>
+                {props.props.title}
+              </span>
+            </div>
           )}
         </CardContent>
       </Card>
