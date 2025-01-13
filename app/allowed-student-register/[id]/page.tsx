@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Toaster } from '@/components/ui/sonner'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -15,6 +15,19 @@ export default function AllowedUserRegisterPage({ params }: any) {
   const [enrollKey, setEnrollKey] = useState('')
   const [enrollFile, setEnrollFile] = useState<File | undefined>()
   const [enrollKeyErr, setEnrollKeyErr] = useState('')
+  const [courseData, setCourseData] = useState<any>()
+
+  const getCourse = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/course/${courseId}`, {
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      setCourseData(response.data.data)
+    } catch (e: any) {
+      console.log(e)
+    }
+  }
 
   const handleEnroll = async () => {
     if (!enrollFile) {
@@ -56,11 +69,15 @@ export default function AllowedUserRegisterPage({ params }: any) {
     reader.readAsText(enrollFile)
   }
 
+  useEffect(() => {
+    getCourse().then()
+  }, [])
+
   return (
     <div className={'w-full h-screen flex items-center justify-center'}>
       <div className={'border rounded-lg w-96 py-10 px-5 gap-5 flex flex-col'}>
         <h3 className={'font-semibold text-2xl text-center'}>
-          Enroll to Course
+          Enroll to {courseData?.title} Course
         </h3>
 
         <div className="grid w-full max-w-sm items-center gap-1.5">
