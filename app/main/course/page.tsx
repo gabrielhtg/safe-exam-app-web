@@ -427,11 +427,13 @@ export default function CoursePage() {
                       alt={'course-image'}
                     />
                   ) : (
-                    <Skeleton
-                      className={'w-full h-40 flex items-center justify-center'}
+                    <div
+                      className={
+                        'w-full h-40 flex items-center justify-center bg-muted rounded-lg'
+                      }
                     >
                       <ImageLucide />
-                    </Skeleton>
+                    </div>
                   )}
                 </CardContent>
                 <CardFooter className={'flex gap-2'}>

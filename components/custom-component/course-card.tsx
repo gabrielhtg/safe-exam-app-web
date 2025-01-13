@@ -41,11 +41,13 @@ export default function CourseCard(props: any) {
               alt={'course-image'}
             />
           ) : (
-            <Skeleton
-              className={'w-full h-40 flex items-center justify-center'}
+            <div
+              className={
+                'w-full h-40 flex items-center justify-center bg-muted rounded-lg'
+              }
             >
               <ImageLucide />
-            </Skeleton>
+            </div>
           )}
         </CardContent>
       </Card>
