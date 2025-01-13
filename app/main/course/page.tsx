@@ -20,6 +20,7 @@ import {
   Plus,
   Search,
   Trash2,
+  UserCog,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -46,6 +47,7 @@ import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function CoursePage() {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -61,6 +63,8 @@ export default function CoursePage() {
   const [courseList, setCourseList] = useState([])
   const [loadingTitle, setLoadingTitle] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
+
+  const router = useRouter()
 
   const getAllCourse = async () => {
     const response = await axios.get(`${apiUrl}/course`, {
@@ -279,6 +283,7 @@ export default function CoursePage() {
                     <Input
                       type="file"
                       id="course-image"
+                      accept="image/jpeg, image/png"
                       onChange={(e) => {
                         setCourseImage(URL.createObjectURL(e.target.files![0]))
                         setCourseImageFile(e.target.files![0])
@@ -336,7 +341,7 @@ export default function CoursePage() {
             There are no courses!
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {courseList.map((course: any, index: number) => (
               <Card className={'w-full'} key={index}>
                 <CardHeader>
@@ -429,6 +434,7 @@ export default function CoursePage() {
                             <Input
                               type="file"
                               id="course-image"
+                              accept="image/jpeg, image/png"
                               onChange={(e) => {
                                 setCourseImage(
                                   URL.createObjectURL(e.target.files![0])
@@ -451,6 +457,14 @@ export default function CoursePage() {
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
+
+                  <Button
+                    onClick={() => {
+                      router.push(`/main/course/manage-access/${course.id}`)
+                    }}
+                  >
+                    <UserCog />
+                  </Button>
 
                   {/*Bagian Delete Dialog*/}
                   <AlertDialog>

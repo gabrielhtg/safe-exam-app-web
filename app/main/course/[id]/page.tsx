@@ -16,7 +16,6 @@ import {
   Copy,
   FileLock2,
   CirclePlus,
-  Users,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -64,7 +63,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
 
-export default function CoursePage({ params }: any) {
+export default function CourseDetail({ params }: any) {
   const [dialogMsg, setDialogMsg] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState(1)
@@ -451,9 +450,6 @@ export default function CoursePage({ params }: any) {
                             >
                               <CirclePlus /> Add Question
                             </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Users /> Manage Access
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {

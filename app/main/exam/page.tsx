@@ -73,6 +73,7 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function ExamPage() {
   const [dialogMsg, setDialogMsg] = useState('')
@@ -89,6 +90,7 @@ export default function ExamPage() {
   const [courses, setcourses] = useState<any[]>([])
   const [popoverOpen, setPopoverOpen] = React.useState(false)
   const [courseInputValue, setCourseInputValue] = React.useState('')
+  const router = useRouter()
 
   const [searchKeywords, setSearchKeywords] = useState('')
   const currentUsername = useSelector(selectUser).username
@@ -504,7 +506,13 @@ export default function ExamPage() {
                                 <CirclePlus /> Add Question
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                router.push(
+                                  `/main/exam/manage-access/${exam.id}`
+                                )
+                              }}
+                            >
                               <Users /> Manage Access
                             </DropdownMenuItem>
                             <DropdownMenuItem

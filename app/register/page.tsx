@@ -52,10 +52,7 @@ export default function RegisterPage() {
     formData.append('profile_pict', fotoProfil)
     try {
       if (password == rePassword) {
-        const response = await axios.post(
-          `${apiUrl}/users/`,
-          formData
-        )
+        const response = await axios.post(`${apiUrl}/users/`, formData)
 
         if (response.status === 200) {
           setDialogType(1)
@@ -136,6 +133,7 @@ export default function RegisterPage() {
               className={'mb-3'}
               id="picture"
               type="file"
+              accept="image/jpeg, image/png"
               onChange={(e) => {
                 setProfilePict(URL.createObjectURL(e.target.files![0]))
                 setFotoProfil(e.target.files![0])
@@ -227,15 +225,25 @@ export default function RegisterPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setErrDialog(false)
-                router.push('/')
-              }}
-            >
-              <LogIn />
-              Login Now
-            </Button>
+            {dialogType === 1 ? (
+              <Button
+                onClick={() => {
+                  setErrDialog(false)
+                  router.push('/')
+                }}
+              >
+                <LogIn />
+                Login Now
+              </Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  setErrDialog(false)
+                }}
+              >
+                OK
+              </Button>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
