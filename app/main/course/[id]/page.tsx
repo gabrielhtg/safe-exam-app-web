@@ -368,7 +368,6 @@ export default function CourseDetail({ params }: any) {
                   onClick={() => {
                     setExamName('')
                     setExamNameErr('')
-                    setExamStartPassword('')
                     setExamStartDateErr('')
                     setExamStartDate(undefined)
                     setExamEndDateErr('')

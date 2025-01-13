@@ -22,7 +22,6 @@ import {
 import { Input } from '@/components/ui/input'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -89,6 +88,12 @@ export default function ExamPage() {
 
   const [searchKeywords, setSearchKeywords] = useState('')
   const currentUsername = useSelector(selectUser).username
+
+  // error message holder
+  const [examNameErr, setExamNameErr] = useState('')
+  const [examStartDateErr, setExamStartDateErr] = useState('')
+  const [examEndDateErr, setExamEndDateErr] = useState('')
+  const [courseErr, setCourseErr] = useState('')
 
   const getExam = async () => {
     try {
@@ -161,6 +166,14 @@ export default function ExamPage() {
     } catch (err: any) {
       toast.error(err.response.data.message)
     }
+
+    setExamName('')
+    setExamNameErr('')
+    setExamStartDateErr('')
+    setExamStartDate(undefined)
+    setExamEndDateErr('')
+    setExamEndDate(undefined)
+    setCourseErr('')
   }
 
   const handleDeleteExam = async (id: number) => {
@@ -255,6 +268,9 @@ export default function ExamPage() {
                           setExamName(e.target.value)
                         }}
                       />
+                      <span className={'text-red-500 text-sm'}>
+                        {examNameErr}
+                      </span>
                     </div>
 
                     {/*<div className="grid w-full items-center gap-1.5 ">*/}
@@ -333,6 +349,9 @@ export default function ExamPage() {
                           </Command>
                         </PopoverContent>
                       </Popover>
+                      <span className={'text-red-500 text-sm'}>
+                        {courseErr}
+                      </span>
                     </div>
 
                     <div className="grid w-full items-center gap-1.5 ">
@@ -368,6 +387,9 @@ export default function ExamPage() {
                           </div>
                         </PopoverContent>
                       </Popover>
+                      <span className={'text-red-500 text-sm'}>
+                        {examStartDateErr}
+                      </span>
                     </div>
 
                     <div className="grid w-full items-center gap-1.5 ">
@@ -403,14 +425,68 @@ export default function ExamPage() {
                           </div>
                         </PopoverContent>
                       </Popover>
+                      <span className={'text-red-500 text-sm'}>
+                        {examEndDateErr}
+                      </span>
                     </div>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleAddExam}>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setExamName('')
+                      setExamNameErr('')
+                      setExamStartDateErr('')
+                      setExamStartDate(undefined)
+                      setExamEndDateErr('')
+                      setExamEndDate(undefined)
+                      setCourseErr('')
+                    }}
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <Button
+                    onClick={() => {
+                      setExamNameErr('')
+                      setExamStartDateErr('')
+                      setExamEndDateErr('')
+                      setCourseErr('')
+
+                      if (examName === '') {
+                        setExamNameErr('Cannot be blank!')
+                        return
+                      }
+
+                      if (examStartDate === undefined) {
+                        setExamStartDateErr('Cannot be blank!')
+                        return
+                      }
+
+                      if (selectedCourseId === '') {
+                        setCourseErr('Cannot be blank!')
+                        return
+                      }
+
+                      if (examEndDateErr === undefined) {
+                        setExamEndDateErr('Cannot be blank!')
+                        return
+                      }
+
+                      if (examStartDate.getTime() > examEndDate!.getTime()) {
+                        setExamStartDateErr(
+                          'The start date cannot be earlier than the end date.'
+                        )
+                        setExamEndDateErr(
+                          'The end date cannot be later than the start date.'
+                        )
+                        return
+                      }
+
+                      handleAddExam().then()
+                    }}
+                  >
                     Add
-                  </AlertDialogAction>
+                  </Button>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
