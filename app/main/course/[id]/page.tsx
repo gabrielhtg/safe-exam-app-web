@@ -5,11 +5,9 @@ import { Button } from '@/components/ui/button'
 import {
   Bolt,
   CalendarIcon,
-  CircleCheck,
   CirclePlay,
   CircleX,
   EllipsisVertical,
-  Loader2,
   Plus,
   Search,
   Trash,
@@ -19,7 +17,6 @@ import {
 } from 'lucide-react'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -62,19 +59,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 export default function CourseDetail({ params }: any) {
-  const [dialogMsg, setDialogMsg] = useState('')
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
-  const [isLoadingCreate, setIsLoadingCreate] = useState(false)
-  const [loadingTitle] = useState('')
   const [examName, setExamName] = useState('')
   const [examStartDate, setExamStartDate] = useState<Date>()
   const [examEndDate, setExamEndDate] = useState<Date>()
   const [examStartPassword, setExamStartPassword] = useState('')
   const [examDescription] = useState('')
   const [exams, setExams] = useState([])
+  const [showAddExamDialog, setShowAddExamDialog] = useState(false)
 
   const [searchKeywords, setSearchKeywords] = useState('')
   const currentUsername = useSelector(selectUser).username
@@ -83,6 +77,11 @@ export default function CourseDetail({ params }: any) {
     image: '',
     description: '',
   })
+
+  // error message holder
+  const [examNameErr, setExamNameErr] = useState('')
+  const [examStartDateErr, setExamStartDateErr] = useState('')
+  const [examEndDateErr, setExamEndDateErr] = useState('')
 
   const getCourse = async () => {
     try {
@@ -130,17 +129,11 @@ export default function CourseDetail({ params }: any) {
       })
 
       if (deleteResponse.status === 200) {
-        setDialogOpen(true)
-        setDialogType(1)
-        setDialogMsg(deleteResponse.data.message)
-        setIsLoadingCreate(false)
+        toast.success(deleteResponse.data.message)
         getAllExams(course.title).then()
       }
     } catch (err: any) {
-      setDialogOpen(true)
-      setDialogType(0)
-      setDialogMsg(err.response.message)
-      setIsLoadingCreate(false)
+      toast.error(err.response.message)
     }
   }
 
@@ -163,18 +156,21 @@ export default function CourseDetail({ params }: any) {
       )
 
       if (response.status === 200) {
-        setDialogOpen(true)
-        setDialogType(1)
-        setDialogMsg(response.data.message)
-        setIsLoadingCreate(false)
+        toast.success(response.data.message)
         getAllExams(course.title).then()
       }
     } catch (err: any) {
-      setDialogOpen(true)
-      setDialogType(0)
-      setDialogMsg(err.response.data.message)
-      setIsLoadingCreate(false)
+      toast.error(err.response.data.message)
     }
+
+    setExamName('')
+    setExamNameErr('')
+    setExamStartPassword('')
+    setExamStartDateErr('')
+    setExamStartDate(undefined)
+    setExamEndDateErr('')
+    setExamEndDate(undefined)
+    setShowAddExamDialog(false)
   }
 
   const handleDownloadExamFile = async (examId: number) => {
@@ -190,37 +186,13 @@ export default function CourseDetail({ params }: any) {
         window.location.href = `${apiUrl}/${response.data.data}`
       }
     } catch (err: any) {
-      setDialogOpen(true)
-      setDialogMsg(err.response.data.message)
-      setDialogType(0)
+      toast.error(err.response.data.message)
     }
   }
 
   useEffect(() => {
     getCourse().then()
   }, [])
-
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Success
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Failed
-        </>
-      )
-    }
-
-    return ''
-  }
 
   return (
     <ContentLayout title="Course">
@@ -270,7 +242,10 @@ export default function CourseDetail({ params }: any) {
             ''
           )}
 
-          <AlertDialog>
+          <AlertDialog
+            open={showAddExamDialog}
+            onOpenChange={setShowAddExamDialog}
+          >
             <AlertDialogTrigger asChild={true}>
               <Button>
                 <Plus />
@@ -292,19 +267,22 @@ export default function CourseDetail({ params }: any) {
                         setExamName(e.target.value)
                       }}
                     />
+                    <span className={'text-red-500 text-sm'}>
+                      {examNameErr}
+                    </span>
                   </div>
 
-                  <div className="grid w-full items-center gap-1.5 ">
-                    <Label htmlFor="exam-start-password">Start Password</Label>
-                    <Input
-                      type={'text'}
-                      placeholder={'Type here...'}
-                      id="exam-start-password"
-                      onChange={(e) => {
-                        setExamStartPassword(e.target.value)
-                      }}
-                    />
-                  </div>
+                  {/*<div className="grid w-full items-center gap-1.5 ">*/}
+                  {/*  <Label htmlFor="exam-start-password">Start Password</Label>*/}
+                  {/*  <Input*/}
+                  {/*    type={'text'}*/}
+                  {/*    placeholder={'Type here...'}*/}
+                  {/*    id="exam-start-password"*/}
+                  {/*    onChange={(e) => {*/}
+                  {/*      setExamStartPassword(e.target.value)*/}
+                  {/*    }}*/}
+                  {/*  />*/}
+                  {/*</div>*/}
 
                   <div className="grid w-full items-center gap-1.5 ">
                     <Label>Exam Start Date</Label>
@@ -340,6 +318,9 @@ export default function CourseDetail({ params }: any) {
                         </div>
                       </PopoverContent>
                     </Popover>
+                    <span className={'text-red-500 text-sm'}>
+                      {examStartDateErr}
+                    </span>
                   </div>
 
                   <div className="grid w-full items-center gap-1.5 ">
@@ -376,14 +357,62 @@ export default function CourseDetail({ params }: any) {
                         </div>
                       </PopoverContent>
                     </Popover>
+                    <span className={'text-red-500 text-sm'}>
+                      {examEndDateErr}
+                    </span>
                   </div>
                 </div>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleAddExam}>
+                <AlertDialogCancel
+                  onClick={() => {
+                    setExamName('')
+                    setExamNameErr('')
+                    setExamStartPassword('')
+                    setExamStartDateErr('')
+                    setExamStartDate(undefined)
+                    setExamEndDateErr('')
+                    setExamEndDate(undefined)
+                  }}
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <Button
+                  onClick={() => {
+                    setExamNameErr('')
+                    setExamStartDateErr('')
+                    setExamEndDateErr('')
+
+                    if (examName === '') {
+                      setExamNameErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (examStartDate === undefined) {
+                      setExamStartDateErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (examEndDateErr === undefined) {
+                      setExamEndDateErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (examStartDate.getTime() > examEndDate!.getTime()) {
+                      setExamStartDateErr(
+                        'The start date cannot be earlier than the end date.'
+                      )
+                      setExamEndDateErr(
+                        'The end date cannot be later than the start date.'
+                      )
+                      return
+                    }
+
+                    handleAddExam().then()
+                  }}
+                >
                   Add
-                </AlertDialogAction>
+                </Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -497,47 +526,6 @@ export default function CourseDetail({ params }: any) {
           </Table>
         </div>
       </Card>
-
-      <AlertDialog open={dialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {getAlertTitle()}
-            </AlertDialogTitle>
-            <AlertDialogDescription className={'text-center'}>
-              {dialogMsg}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setDialogOpen(false)
-              }}
-            >
-              OK
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={isLoadingCreate}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {loadingTitle}
-            </AlertDialogTitle>
-            <AlertDialogDescription
-              className={'flex w-full justify-center mt-3'}
-            >
-              <Loader2 className="animate-spin w-10 h-10" />
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-        </AlertDialogContent>
-      </AlertDialog>
     </ContentLayout>
   )
 }

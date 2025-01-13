@@ -100,7 +100,12 @@ export default function EditProfilePage() {
         }
       >
         <Avatar className={'w-24 h-24 md:w-48 md:h-48'}>
-          <AvatarImage className={'object-cover'} src={profilePict} />
+          {currentUser.profile_pict ? (
+            <AvatarImage className={'object-cover'} src={profilePict} />
+          ) : (
+            ''
+          )}
+
           <AvatarFallback>{getUserInitials(name)}</AvatarFallback>
         </Avatar>
 

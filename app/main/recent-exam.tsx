@@ -19,7 +19,6 @@ import {
   FileLock2,
   Plus,
   Trash,
-  Users,
 } from 'lucide-react'
 import { formatExamDate } from '@/app/_services/format-exam-date'
 import {
@@ -42,7 +41,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { useRouter } from 'next/navigation'
 
 export default function RecentExam() {
   const [exams, setExams] = useState([])
@@ -50,7 +48,6 @@ export default function RecentExam() {
   const [dialogMsg, setDialogMsg] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState(1)
-  const router = useRouter()
 
   const handleDeleteExam = async (id: number) => {
     try {
@@ -206,13 +203,6 @@ export default function RecentExam() {
                           >
                             <CirclePlus /> Add Question
                           </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            router.push(`/main/exam/manage-access/${exam.id}`)
-                          }}
-                        >
-                          <Users /> Manage Access
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {

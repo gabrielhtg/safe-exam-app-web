@@ -17,7 +17,7 @@ import axios from 'axios'
 import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { Label } from '@/components/ui/label'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import { formatExamDate } from '@/app/_services/format-exam-date'
 
 export default function ManageAccess({ params }: any) {
@@ -202,8 +202,6 @@ export default function ManageAccess({ params }: any) {
           </Table>
         </div>
       </Card>
-
-      <Toaster />
     </ContentLayout>
   )
 }

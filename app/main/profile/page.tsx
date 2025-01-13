@@ -80,8 +80,6 @@ export default function ProfilePage() {
         </>
       )
     }
-
-    return ''
   }
 
   return (
@@ -93,10 +91,15 @@ export default function ProfilePage() {
         }
       >
         <Avatar className={'w-24 h-24 md:w-48 md:h-48'}>
-          <AvatarImage
-            className={'object-cover'}
-            src={`${apiUrl}/${currentUser.profile_pict}`}
-          />
+          {currentUser.profile_pict ? (
+            <AvatarImage
+              className={'object-cover'}
+              src={`${apiUrl}/${currentUser.profile_pict}`}
+            />
+          ) : (
+            ''
+          )}
+
           <AvatarFallback>{getUserInitials(currentUser.name)}</AvatarFallback>
         </Avatar>
 
@@ -120,6 +123,10 @@ export default function ProfilePage() {
                 <TableCell>
                   {formatProfileDate(currentUser.created_at)}
                 </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className={'font-bold'}>Role</TableCell>
+                <TableCell>{currentUser.role}</TableCell>
               </TableRow>
             </TableBody>
           </Table>

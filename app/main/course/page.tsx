@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-  CircleCheck,
   CircleX,
   Eye,
   ImagePlus,
@@ -47,13 +46,11 @@ import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import TextTruncate from 'react-text-truncate'
+import { toast } from 'sonner'
 
 export default function CoursePage() {
-  const [dialogMsg, setDialogMsg] = useState('')
-  const [errDialog, setErrDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
-  const [isLoadingCreate, setIsLoadingCreate] = useState(false)
   const [addDialog, setAddDialog] = useState(false)
+  const [isLoadingCreate, setIsLoadingCreate] = useState(false)
 
   const [courseImage, setCourseImage] = useState('')
   const [courseImageFile, setCourseImageFile] = useState<File | undefined>()
@@ -101,14 +98,10 @@ export default function CoursePage() {
         getBearerHeader(localStorage.getItem('token')!)
       )
 
-      setErrDialog(true)
-      setDialogType(1)
-      setDialogMsg(removeResponse.data.message)
+      toast.success(removeResponse.data.message)
       getAllCourse().then()
     } catch (err: any) {
-      setErrDialog(true)
-      setDialogType(0)
-      setDialogMsg(err.response.data.message)
+      toast.error(err.response.data.message)
       getAllCourse().then()
     }
   }
@@ -139,15 +132,11 @@ export default function CoursePage() {
 
       if (response.status === 200) {
         getAllCourse().then()
-        setErrDialog(true)
-        setDialogType(1)
-        setDialogMsg(response.data.message)
+        toast.success(response.data.message)
         setIsLoadingCreate(false)
       }
     } catch (err: any) {
-      setErrDialog(true)
-      setDialogType(0)
-      setDialogMsg(err.response.data.message)
+      toast.error(err.response.data.message)
       setIsLoadingCreate(false)
     }
 
@@ -156,28 +145,6 @@ export default function CoursePage() {
     setAddDialog(false)
     setCourseTitle('')
     setCourseDesc('')
-  }
-
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Success
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Failed
-        </>
-      )
-    }
-
-    return ''
   }
 
   const handleEditCourse = async (id: string) => {
@@ -207,15 +174,11 @@ export default function CoursePage() {
 
       if (response.status === 200) {
         getAllCourse().then()
-        setErrDialog(true)
-        setDialogType(1)
-        setDialogMsg(response.data.message)
+        toast.success(response.data.message)
         setIsLoadingCreate(false)
       }
     } catch (err: any) {
-      setErrDialog(true)
-      setDialogType(0)
-      setDialogMsg(err.response.data.message)
+      toast.error(err.response.data.message)
       setIsLoadingCreate(false)
     }
 
@@ -615,30 +578,6 @@ export default function CoursePage() {
           </div>
         )}
       </Card>
-
-      <AlertDialog open={errDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {getAlertTitle()}
-            </AlertDialogTitle>
-            <AlertDialogDescription className={'text-center'}>
-              {dialogMsg}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setErrDialog(false)
-              }}
-            >
-              OK
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <AlertDialog open={isLoadingCreate}>
         <AlertDialogContent>

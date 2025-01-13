@@ -37,6 +37,10 @@ export default function LoginPage() {
   const [errDialog, setErrDialog] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
 
+  // err section
+  const [usernameErr, setUsernameErr] = useState('')
+  const [passwordErr, setPasswordErr] = useState('')
+
   const handleLogin = async () => {
     try {
       const loginResponse = await axios.post(`${apiUrl}/auth/login`, {
@@ -85,27 +89,48 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent>
-            <Input
-              id={'input-username'}
-              type={'text'}
-              className={'mb-3'}
-              placeholder={'Username'}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            ></Input>
-            <Input
-              id={'input-password'}
-              type={'password'}
-              placeholder={'Password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            ></Input>
+            <div className={'flex flex-col mb-3'}>
+              <Input
+                id={'input-username'}
+                type={'text'}
+                placeholder={'Username'}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <span className={'text-red-500 text-sm'}>{usernameErr}</span>
+            </div>
+
+            <div className={'flex flex-col'}>
+              <Input
+                id={'input-password'}
+                type={'password'}
+                placeholder={'Password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <span className={'text-red-500 text-sm'}>{passwordErr}</span>
+            </div>
           </CardContent>
 
           <CardFooter className={'gap-x-3 flex-col items-start'}>
             <div className="flex gap-x-3 w-full">
               <Button
-                onClick={handleLogin}
+                onClick={() => {
+                  setUsernameErr('')
+                  setPasswordErr('')
+
+                  if (username === '') {
+                    setUsernameErr('Cannot be blank.')
+                    return
+                  }
+
+                  if (password === '') {
+                    setPasswordErr('Cannot be blank.')
+                    return
+                  }
+
+                  handleLogin().then()
+                }}
                 id="button-login"
                 className="w-full"
               >

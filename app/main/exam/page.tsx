@@ -8,14 +8,12 @@ import {
   CalendarIcon,
   Check,
   ChevronsUpDown,
-  CircleCheck,
   CirclePlay,
   CirclePlus,
   CircleX,
   Copy,
   EllipsisVertical,
   FileLock2,
-  Loader2,
   Plus,
   Search,
   Trash,
@@ -74,17 +72,12 @@ import {
 } from '@/components/ui/command'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 export default function ExamPage() {
-  const [dialogMsg, setDialogMsg] = useState('')
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
-  const [isLoadingCreate, setIsLoadingCreate] = useState(false)
-  const [loadingTitle] = useState('')
   const [examName, setExamName] = useState('')
   const [examStartDate, setExamStartDate] = useState<Date>()
   const [examEndDate, setExamEndDate] = useState<Date>()
-  const [examStartPassword, setExamStartPassword] = useState('')
   const [examDescription] = useState('')
   const [exams, setExams] = useState([])
   const [courses, setcourses] = useState<any[]>([])
@@ -92,31 +85,10 @@ export default function ExamPage() {
   const [courseInputValue, setCourseInputValue] = useState('')
   const [selectedCourseId, setSelectedCourseId] = useState('')
   const router = useRouter()
+  const [showAddExamDialog, setShowAddExamDialog] = useState(false)
 
   const [searchKeywords, setSearchKeywords] = useState('')
   const currentUsername = useSelector(selectUser).username
-
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Success
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Failed
-        </>
-      )
-    }
-
-    return ''
-  }
 
   const getExam = async () => {
     try {
@@ -129,7 +101,7 @@ export default function ExamPage() {
 
       setExams(response.data.data)
     } catch (err: any) {
-      console.log(err)
+      toast.error(err.response.message)
     }
   }
 
@@ -146,9 +118,7 @@ export default function ExamPage() {
         window.location.href = `${apiUrl}/${response.data.data}`
       }
     } catch (err: any) {
-      setDialogOpen(true)
-      setDialogMsg(err.response.data.message)
-      setDialogType(0)
+      toast.error(err.response.data.message)
     }
   }
 
@@ -170,7 +140,6 @@ export default function ExamPage() {
   const handleAddExam = async () => {
     const submitData = {
       title: examName,
-      start_password: examStartPassword,
       start_date: examStartDate,
       end_date: examEndDate,
       course_id: selectedCourseId,
@@ -186,17 +155,11 @@ export default function ExamPage() {
       )
 
       if (response.status === 200) {
-        setDialogOpen(true)
-        setDialogType(1)
-        setDialogMsg(response.data.message)
-        setIsLoadingCreate(false)
+        toast.success(response.data.message)
         getExam().then()
       }
     } catch (err: any) {
-      setDialogOpen(true)
-      setDialogType(0)
-      setDialogMsg(err.response.data.message)
-      setIsLoadingCreate(false)
+      toast.error(err.response.data.message)
     }
   }
 
@@ -207,17 +170,11 @@ export default function ExamPage() {
       })
 
       if (deleteResponse.status === 200) {
-        setDialogOpen(true)
-        setDialogType(1)
-        setDialogMsg(deleteResponse.data.message)
-        setIsLoadingCreate(false)
+        toast.success(deleteResponse.data.message)
         getExam().then()
       }
     } catch (err: any) {
-      setDialogOpen(true)
-      setDialogType(0)
-      setDialogMsg(err.response.message)
-      setIsLoadingCreate(false)
+      toast.error(err.response.message)
     }
   }
 
@@ -272,7 +229,10 @@ export default function ExamPage() {
               ''
             )}
 
-            <AlertDialog>
+            <AlertDialog
+              open={showAddExamDialog}
+              onOpenChange={setShowAddExamDialog}
+            >
               <AlertDialogTrigger asChild>
                 <Button>
                   <Plus />
@@ -297,19 +257,19 @@ export default function ExamPage() {
                       />
                     </div>
 
-                    <div className="grid w-full items-center gap-1.5 ">
-                      <Label htmlFor="exam-start-password">
-                        Start Password
-                      </Label>
-                      <Input
-                        type={'text'}
-                        placeholder={'Type here...'}
-                        id="exam-start-password"
-                        onChange={(e) => {
-                          setExamStartPassword(e.target.value)
-                        }}
-                      />
-                    </div>
+                    {/*<div className="grid w-full items-center gap-1.5 ">*/}
+                    {/*  <Label htmlFor="exam-start-password">*/}
+                    {/*    Start Password*/}
+                    {/*  </Label>*/}
+                    {/*  <Input*/}
+                    {/*    type={'text'}*/}
+                    {/*    placeholder={'Type here...'}*/}
+                    {/*    id="exam-start-password"*/}
+                    {/*    onChange={(e) => {*/}
+                    {/*      setExamStartPassword(e.target.value)*/}
+                    {/*    }}*/}
+                    {/*  />*/}
+                    {/*</div>*/}
 
                     <div className="grid w-full items-center gap-1.5 ">
                       <Label>Course</Label>
@@ -567,47 +527,6 @@ export default function ExamPage() {
             </Table>
           </div>
         </Card>
-
-        <AlertDialog open={dialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle
-                className={'text-center flex flex-col items-center'}
-              >
-                {getAlertTitle()}
-              </AlertDialogTitle>
-              <AlertDialogDescription className={'text-center'}>
-                {dialogMsg}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className={'!justify-center'}>
-              <Button
-                onClick={() => {
-                  setDialogOpen(false)
-                }}
-              >
-                OK
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        <AlertDialog open={isLoadingCreate}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle
-                className={'text-center flex flex-col items-center'}
-              >
-                {loadingTitle}
-              </AlertDialogTitle>
-              <AlertDialogDescription
-                className={'flex w-full justify-center mt-3'}
-              >
-                <Loader2 className="animate-spin w-10 h-10" />
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-          </AlertDialogContent>
-        </AlertDialog>
       </ContentLayout>
     </>
   )
