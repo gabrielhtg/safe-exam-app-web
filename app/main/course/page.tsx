@@ -21,6 +21,7 @@ import {
   Search,
   Trash2,
   UserCog,
+  Image as ImageLucide,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -43,8 +44,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import axios from 'axios'
 import { apiUrl, compressOptions } from '@/lib/env'
 import imageCompression from 'browser-image-compression'
-import { useSelector } from 'react-redux'
-import { selectUser } from '@/lib/_slices/userSlice'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -54,12 +53,14 @@ export default function CoursePage() {
   const [errDialog, setErrDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
   const [isLoadingCreate, setIsLoadingCreate] = useState(false)
+  const [addDialog, setAddDialog] = useState(false)
 
   const [courseImage, setCourseImage] = useState('')
   const [courseImageFile, setCourseImageFile] = useState<File | undefined>()
   const [courseTitle, setCourseTitle] = useState('')
   const [courseDesc, setCourseDesc] = useState('')
-  const currentUsername = useSelector(selectUser).username
+  const [courseTitleErr, setCourseTitleErr] = useState('')
+  const [courseDescErr, setCourseDescErr] = useState('')
   const [courseList, setCourseList] = useState([])
   const [loadingTitle, setLoadingTitle] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
@@ -69,7 +70,7 @@ export default function CoursePage() {
   const getAllCourse = async () => {
     const response = await axios.get(`${apiUrl}/course`, {
       params: {
-        uploader: currentUsername,
+        uploader: localStorage.getItem('username'),
       },
       headers: getBearerHeader(localStorage.getItem('token')!).headers,
     })
@@ -117,7 +118,7 @@ export default function CoursePage() {
     const formData = new FormData()
     formData.append('title', courseTitle)
     formData.append('description', courseDesc)
-    formData.append('username', currentUsername)
+    formData.append('username', localStorage.getItem('username')!)
 
     try {
       if (courseImageFile) {
@@ -151,6 +152,9 @@ export default function CoursePage() {
 
     setCourseImage('')
     setCourseImageFile(undefined)
+    setAddDialog(false)
+    setCourseTitle('')
+    setCourseDesc('')
   }
 
   const getAlertTitle = () => {
@@ -181,7 +185,7 @@ export default function CoursePage() {
     const formData = new FormData()
     formData.append('title', courseTitle)
     formData.append('description', courseDesc)
-    formData.append('username', currentUsername)
+    formData.append('username', localStorage.getItem('username')!)
     formData.append('id', id)
 
     try {
@@ -227,7 +231,7 @@ export default function CoursePage() {
         }
       >
         <div className={'flex'}>
-          <AlertDialog>
+          <AlertDialog open={addDialog} onOpenChange={setAddDialog}>
             <AlertDialogTrigger>
               <Button>
                 <Plus />
@@ -243,20 +247,28 @@ export default function CoursePage() {
                     <Input
                       type="text"
                       id="course-title"
+                      value={courseTitle}
                       onChange={(e) => {
                         setCourseTitle(e.target.value)
                       }}
                     />
+                    <span className={'text-sm text-red-500'}>
+                      {courseTitleErr}
+                    </span>
                   </div>
 
                   <div className="grid w-full items-center gap-1.5 ">
                     <Label htmlFor="course-desc">Course Description</Label>
                     <Textarea
+                      value={courseDesc}
                       id="course-desc"
                       onChange={(e) => {
                         setCourseDesc(e.target.value)
                       }}
                     />
+                    <span className={'text-sm text-red-500'}>
+                      {courseDescErr}
+                    </span>
                   </div>
 
                   <div className="grid w-full items-center gap-1.5">
@@ -294,9 +306,23 @@ export default function CoursePage() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleAddCourse}>
+                <Button
+                  onClick={() => {
+                    if (courseTitle === '') {
+                      setCourseTitleErr('Cannot be blank!')
+                    }
+
+                    if (courseDesc === '') {
+                      setCourseDescErr('Cannot be blank!')
+                    }
+
+                    if (courseTitle !== '' && courseDesc !== '') {
+                      handleAddCourse().then()
+                    }
+                  }}
+                >
                   Save
-                </AlertDialogAction>
+                </Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -349,13 +375,21 @@ export default function CoursePage() {
                   <CardDescription>{course.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Image
-                    className={'object-cover h-40 rounded-lg'}
-                    src={`${apiUrl}/${course.image}`}
-                    width={500}
-                    height={500}
-                    alt={'course-image'}
-                  />
+                  {course.image ? (
+                    <Image
+                      className={'object-cover h-40 rounded-lg'}
+                      src={`${apiUrl}/${course.image}`}
+                      width={500}
+                      height={500}
+                      alt={'course-image'}
+                    />
+                  ) : (
+                    <Skeleton
+                      className={'w-full h-40 flex items-center justify-center'}
+                    >
+                      <ImageLucide />
+                    </Skeleton>
+                  )}
                 </CardContent>
                 <CardFooter className={'flex gap-2'}>
                   <Button asChild={true}>
@@ -484,14 +518,13 @@ export default function CoursePage() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <Button
-                          variant={'destructive'}
+                        <AlertDialogAction
                           onClick={() => {
                             handleRemoveCourse(course.id).then()
                           }}
                         >
                           Delete
-                        </Button>
+                        </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
