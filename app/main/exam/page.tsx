@@ -17,7 +17,6 @@ import {
   Plus,
   Search,
   Trash,
-  Users,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
@@ -70,8 +69,15 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export default function ExamPage() {
   const [examName, setExamName] = useState('')
@@ -83,11 +89,13 @@ export default function ExamPage() {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [courseInputValue, setCourseInputValue] = useState('')
   const [selectedCourseId, setSelectedCourseId] = useState('')
-  const router = useRouter()
   const [showAddExamDialog, setShowAddExamDialog] = useState(false)
 
   const [searchKeywords, setSearchKeywords] = useState('')
   const currentUsername = useSelector(selectUser).username
+
+  const [deleteExamDialog, setDeleteExamDialog] = useState(false)
+  const [selectedDelete, setSelectedDelete] = useState()
 
   // error message holder
   const [examNameErr, setExamNameErr] = useState('')
@@ -517,7 +525,7 @@ export default function ExamPage() {
                       <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                       <TableCell>{formatExamDate(exam.end_date)}</TableCell>
                       <TableCell className={'flex gap-1'}>
-                        <DropdownMenu>
+                        <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <Button variant={'secondary'}>
                               <EllipsisVertical />
@@ -550,15 +558,6 @@ export default function ExamPage() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
-                                router.push(
-                                  `/main/exam/manage-access/${exam.id}`
-                                )
-                              }}
-                            >
-                              <Users /> Manage Access
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
                                 handleDownloadExamFile(exam.id).then()
                               }}
                             >
@@ -588,7 +587,8 @@ export default function ExamPage() {
                             <DropdownMenuItem
                               className={'text-red-500'}
                               onClick={() => {
-                                handleDeleteExam(exam.id).then()
+                                setDeleteExamDialog(true)
+                                setSelectedDelete(exam.id)
                               }}
                             >
                               <Trash /> Delete
@@ -603,6 +603,37 @@ export default function ExamPage() {
             </Table>
           </div>
         </Card>
+
+        <Dialog open={deleteExamDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you absolutely sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete your
+                exam and remove your data from our servers.
+              </DialogDescription>
+              <DialogFooter>
+                <Button
+                  variant={'secondary'}
+                  onClick={() => {
+                    setDeleteExamDialog(false)
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleDeleteExam(selectedDelete!).then()
+                    setSelectedDelete(undefined)
+                    setDeleteExamDialog(false)
+                  }}
+                >
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </ContentLayout>
     </>
   )

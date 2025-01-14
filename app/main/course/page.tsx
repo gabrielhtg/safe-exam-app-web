@@ -47,6 +47,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import TextTruncate from 'react-text-truncate'
 import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export default function CoursePage() {
   const [addDialog, setAddDialog] = useState(false)
@@ -579,22 +586,18 @@ export default function CoursePage() {
         )}
       </Card>
 
-      <AlertDialog open={isLoadingCreate}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
+      <Dialog open={isLoadingCreate}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className={'text-center flex flex-col items-center'}>
               {loadingTitle}
-            </AlertDialogTitle>
-            <AlertDialogDescription
-              className={'flex w-full justify-center mt-3'}
-            >
+            </DialogTitle>
+            <DialogDescription className={'flex w-full justify-center mt-3'}>
               <Loader2 className="animate-spin w-10 h-10" />
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-        </AlertDialogContent>
-      </AlertDialog>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </ContentLayout>
   )
 }

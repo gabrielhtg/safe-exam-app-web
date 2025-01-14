@@ -60,6 +60,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export default function CourseDetail({ params }: any) {
   const [examName, setExamName] = useState('')
@@ -77,6 +85,9 @@ export default function CourseDetail({ params }: any) {
     image: '',
     description: '',
   })
+
+  const [deleteExamDialog, setDeleteExamDialog] = useState(false)
+  const [selectedDelete, setSelectedDelete] = useState()
 
   // error message holder
   const [examNameErr, setExamNameErr] = useState('')
@@ -448,7 +459,7 @@ export default function CourseDetail({ params }: any) {
                     <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                     <TableCell>{formatExamDate(exam.end_date)}</TableCell>
                     <TableCell className={'flex gap-1'}>
-                      <DropdownMenu>
+                      <DropdownMenu modal={false}>
                         <DropdownMenuTrigger>
                           <Button variant={'secondary'}>
                             <EllipsisVertical />
@@ -510,7 +521,8 @@ export default function CourseDetail({ params }: any) {
                           <DropdownMenuItem
                             className={'text-red-500'}
                             onClick={() => {
-                              handleDeleteExam(exam.id)
+                              setSelectedDelete(exam.id)
+                              setDeleteExamDialog(true)
                             }}
                           >
                             <Trash /> Delete
@@ -525,6 +537,37 @@ export default function CourseDetail({ params }: any) {
           </Table>
         </div>
       </Card>
+
+      <Dialog open={deleteExamDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete your
+              exam and remove your data from our servers.
+            </DialogDescription>
+            <DialogFooter>
+              <Button
+                variant={'secondary'}
+                onClick={() => {
+                  setDeleteExamDialog(false)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  handleDeleteExam(selectedDelete!).then()
+                  setSelectedDelete(undefined)
+                  setDeleteExamDialog(false)
+                }}
+              >
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </ContentLayout>
   )
 }

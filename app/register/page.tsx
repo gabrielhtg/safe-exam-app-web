@@ -12,13 +12,14 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
+import { apiUrl, compressOptions } from '@/lib/env'
 import { useState } from 'react'
 import { ImagePlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast, Toaster } from 'sonner'
+import imageCompression from 'browser-image-compression'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -43,9 +44,16 @@ export default function RegisterPage() {
     formData.append('username', username)
     formData.append('email', email)
     formData.append('password', password)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    formData.append('profile_pict', fotoProfil)
+    if (fotoProfil) {
+      const compressedImage = await imageCompression(
+        fotoProfil!,
+        compressOptions
+      )
+      formData.append('profile_pict', compressedImage)
+    } else {
+      formData.append('profile_pict', fotoProfil!)
+    }
+
     try {
       if (password == rePassword) {
         const response = await axios.post(`${apiUrl}/users/`, formData)
