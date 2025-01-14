@@ -17,6 +17,7 @@ import {
   Loader2,
   Pencil,
   Plus,
+  RefreshCcw,
   Search,
   Trash2,
   UserCog,
@@ -203,7 +204,40 @@ export default function CoursePage() {
           'flex flex-col gap-3 md:gap-5 p-10 min-h-[calc(100vh-180px)] rounded-lg shadow'
         }
       >
-        <div className={'flex'}>
+        <h1 className={'font-semibold text-3xl'}>Course List</h1>
+
+        <div className={'flex gap-3'}>
+          <Input
+            type={'text'}
+            className={'max-w-lg'}
+            value={searchKeywords}
+            placeholder={'Search here...'}
+            onChange={(e) => {
+              setSearchKeywords(e.target.value)
+            }}
+          />
+
+          <Button
+            onClick={() => {
+              searchCourse(searchKeywords!)
+            }}
+          >
+            <Search /> Search
+          </Button>
+
+          {searchKeywords !== '' ? (
+            <Button
+              onClick={() => {
+                setSearchKeywords('')
+                searchCourse(undefined)
+              }}
+            >
+              <CircleX /> Clear
+            </Button>
+          ) : (
+            ''
+          )}
+
           <AlertDialog open={addDialog} onOpenChange={setAddDialog}>
             <AlertDialogTrigger>
               <Button>
@@ -328,39 +362,15 @@ export default function CoursePage() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-        </div>
-
-        <div className={'flex gap-3'}>
-          <Input
-            type={'text'}
-            className={'max-w-lg'}
-            value={searchKeywords}
-            placeholder={'Search here...'}
-            onChange={(e) => {
-              setSearchKeywords(e.target.value)
-            }}
-          />
 
           <Button
             onClick={() => {
-              searchCourse(searchKeywords!)
+              getAllCourse().then()
+              toast.success('Course refreshed!')
             }}
           >
-            <Search /> Search
+            <RefreshCcw /> Refresh
           </Button>
-
-          {searchKeywords !== '' ? (
-            <Button
-              onClick={() => {
-                setSearchKeywords('')
-                searchCourse(undefined)
-              }}
-            >
-              <CircleX /> Clear
-            </Button>
-          ) : (
-            ''
-          )}
         </div>
 
         {courseList.length === 0 ? ( // Gunakan triple equals (===) untuk perbandingan

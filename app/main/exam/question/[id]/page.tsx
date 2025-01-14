@@ -39,6 +39,8 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
+import { toast } from 'sonner'
+import Link from 'next/link'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamQuestionPage({ params }: any) {
@@ -126,17 +128,19 @@ export default function ExamQuestionPage({ params }: any) {
   const handleSaveQuestion = async () => {
     if (tempContent === '' && questionType !== 'essay') {
       getAllQuestions().then()
-      setShowDialog(true)
-      setDialogType(0)
-      setDialogMsg('Questions cannot be empty!')
+      // setShowDialog(true)
+      // setDialogType(0)
+      // setDialogMsg('')
+      toast.error('Questions cannot be empty!')
       return
     }
 
     if (value === '' && questionType === 'essay') {
       getAllQuestions().then()
-      setShowDialog(true)
-      setDialogType(0)
-      setDialogMsg('Questions cannot be empty!')
+      // setShowDialog(true)
+      // setDialogType(0)
+      // setDialogMsg('Questions cannot be empty!')
+      toast.error('Questions cannot be empty!')
       return
     }
 
@@ -157,12 +161,10 @@ export default function ExamQuestionPage({ params }: any) {
 
       if (saveResponse.status === 200) {
         getAllQuestions().then()
-        setShowDialog(true)
-        setDialogType(1)
-        setDialogMsg(saveResponse.data.message)
+        toast.success(saveResponse.data.message)
       }
     } catch (err: any) {
-      console.log(err)
+      toast.success(err.response.message)
     }
   }
 
@@ -364,34 +366,48 @@ export default function ExamQuestionPage({ params }: any) {
                       {tempContent === '' ? (
                         <>
                           {questionType !== 'essay' ? (
-                            <Button
-                              onClick={() => {
-                                if (value !== '' && value !== '<p><br></p>') {
-                                  setTempContent(value)
-                                  setValue('')
-                                } else {
-                                  setDialogType(0)
-                                  setDialogMsg("Question can't be empty.")
-                                  setShowDialog(true)
-                                }
-                              }}
-                            >
-                              Add Option
-                            </Button>
+                            <div className={'flex gap-3'}>
+                              <Button
+                                onClick={() => {
+                                  if (value !== '' && value !== '<p><br></p>') {
+                                    setTempContent(value)
+                                    setValue('')
+                                  } else {
+                                    setDialogType(0)
+                                    setDialogMsg("Question can't be empty.")
+                                    setShowDialog(true)
+                                  }
+                                }}
+                              >
+                                Add Option
+                              </Button>
+                              <Button variant={'outline'} asChild>
+                                <Link href={'/main/exam'}>
+                                  Done Add Question
+                                </Link>
+                              </Button>
+                            </div>
                           ) : (
-                            <Button
-                              onClick={() => {
-                                handleSaveQuestion()
-                                setValue('')
-                                setRemarks(1)
-                                setTempContent('')
-                                setTempOptions([])
-                                setIsOptionCorrect(false)
-                                setShowCorrectSwitch(true)
-                              }}
-                            >
-                              Save Question
-                            </Button>
+                            <div className={'flex gap-3'}>
+                              <Button
+                                onClick={() => {
+                                  handleSaveQuestion()
+                                  setValue('')
+                                  setRemarks(1)
+                                  setTempContent('')
+                                  setTempOptions([])
+                                  setIsOptionCorrect(false)
+                                  setShowCorrectSwitch(true)
+                                }}
+                              >
+                                Save Question
+                              </Button>
+                              <Button variant={'outline'} asChild>
+                                <Link href={'/main/exam'}>
+                                  Done Add Question
+                                </Link>
+                              </Button>
+                            </div>
                           )}
                         </>
                       ) : (

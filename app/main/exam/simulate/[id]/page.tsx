@@ -86,9 +86,16 @@ export default function SimulatePage({ params }: any) {
         (response.data.data.time_limit % 3600) % 60
       )
 
-      setTimeLimit(
-        `${tempTimeLimitHours} hours, ${tempTimeLimitMinutes} minutes, ${tempTimeLimitSeconds} seconds`
-      )
+      if (
+        response.data.data.time_limit === 0 ||
+        response.data.data.time_limit === null
+      ) {
+        setTimeLimit('Not set')
+      } else {
+        setTimeLimit(
+          `${tempTimeLimitHours} hours, ${tempTimeLimitMinutes} minutes, ${tempTimeLimitSeconds} seconds`
+        )
+      }
 
       const examResultResponse = await axios.get(`${apiUrl}/exam-result`, {
         params: {
