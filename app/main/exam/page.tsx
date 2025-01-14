@@ -15,6 +15,7 @@ import {
   EllipsisVertical,
   FileLock2,
   Plus,
+  RefreshCcw,
   Search,
   Trash,
 } from 'lucide-react'
@@ -184,6 +185,21 @@ export default function ExamPage() {
     setCourseErr('')
   }
 
+  const searchExam = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/exam`, {
+        params: {
+          search: searchKeywords,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      setExams(response.data.data)
+    } catch (e: any) {
+      toast.error(e.response.message)
+    }
+  }
+
   const handleDeleteExam = async (id: number) => {
     try {
       const deleteResponse = await axios.delete(`${apiUrl}/exam/${id}`, {
@@ -233,7 +249,11 @@ export default function ExamPage() {
               }}
             />
 
-            <Button>
+            <Button
+              onClick={() => {
+                searchExam().then()
+              }}
+            >
               <Search /> Search
             </Button>
 
@@ -241,7 +261,7 @@ export default function ExamPage() {
               <Button
                 onClick={() => {
                   setSearchKeywords('')
-                  // searchCourse(undefined)
+                  getExam().then()
                 }}
               >
                 <CircleX /> Clear
@@ -491,6 +511,7 @@ export default function ExamPage() {
                       }
 
                       handleAddExam().then()
+                      setShowAddExamDialog(false)
                     }}
                   >
                     Add
@@ -498,6 +519,15 @@ export default function ExamPage() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+
+            <Button
+              onClick={() => {
+                getExam().then()
+                toast.success('Refreshed')
+              }}
+            >
+              <RefreshCcw /> Refresh
+            </Button>
           </div>
           <div className={'border rounded-lg w-full mt-7'}>
             <Table>

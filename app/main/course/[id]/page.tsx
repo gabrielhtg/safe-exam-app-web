@@ -14,6 +14,7 @@ import {
   Copy,
   FileLock2,
   CirclePlus,
+  RefreshCcw,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -201,6 +202,21 @@ export default function CourseDetail({ params }: any) {
     }
   }
 
+  const searchExam = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/exam`, {
+        params: {
+          search: searchKeywords,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      setExams(response.data.data)
+    } catch (e: any) {
+      toast.error(e.response.message)
+    }
+  }
+
   useEffect(() => {
     getCourse().then()
   }, [])
@@ -233,9 +249,9 @@ export default function CourseDetail({ params }: any) {
           />
 
           <Button
-          // onClick={() => {
-          //   searchCourse(searchKeywords!)
-          // }}
+            onClick={() => {
+              searchExam().then()
+            }}
           >
             <Search /> Search
           </Button>
@@ -244,7 +260,7 @@ export default function CourseDetail({ params }: any) {
             <Button
               onClick={() => {
                 setSearchKeywords('')
-                // searchCourse(undefined)
+                getAllExams(course.id).then()
               }}
             >
               <CircleX /> Clear
@@ -426,6 +442,15 @@ export default function CourseDetail({ params }: any) {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          <Button
+            onClick={() => {
+              getAllExams(course.id).then()
+              toast.success('Refreshed')
+            }}
+          >
+            <RefreshCcw /> Refresh
+          </Button>
         </div>
         <div className={'border rounded-lg w-full overflow-scroll'}>
           <Table>
