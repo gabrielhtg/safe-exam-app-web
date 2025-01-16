@@ -39,6 +39,7 @@ import {
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
+import { toast } from 'sonner'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamConfigPage({ params }: any) {
@@ -174,51 +175,55 @@ export default function ExamConfigPage({ params }: any) {
   }
 
   useEffect(() => {
-    const loadQuill = async () => {
-      const { Quill } = (await import('react-quill')).default
-      const QuillResizeImage = (await import('quill-resize-image')).default
+    try {
+      const loadQuill = async () => {
+        const { Quill } = (await import('react-quill')).default
+        const QuillResizeImage = (await import('quill-resize-image')).default
 
-      Quill.register('modules/resize', QuillResizeImage)
+        Quill.register('modules/resize', QuillResizeImage)
 
-      setEditorConfig({
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, 3, 4, false] }],
-            [{ font: [] }],
-            [{ size: [] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-            [{ color: [] }, { background: [] }],
-            [{ align: [] }],
-            [
-              { list: 'ordered' },
-              { list: 'bullet' },
-              { indent: '-1' },
-              { indent: '+1' },
+        setEditorConfig({
+          modules: {
+            toolbar: [
+              [{ header: [1, 2, 3, 4, false] }],
+              [{ font: [] }],
+              [{ size: [] }],
+              ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+              [{ color: [] }, { background: [] }],
+              [{ align: [] }],
+              [
+                { list: 'ordered' },
+                { list: 'bullet' },
+                { indent: '-1' },
+                { indent: '+1' },
+              ],
+              ['link', 'image', 'video'],
+              ['clean'],
             ],
-            ['link', 'image', 'video'],
-            ['clean'],
-          ],
-          resize: {
-            locale: {},
+            resize: {
+              locale: {},
+            },
           },
-        },
-        formats: [
-          'header',
-          'bold',
-          'italic',
-          'underline',
-          'strike',
-          'blockquote',
-          'list',
-          'bullet',
-          'indent',
-          'link',
-          'image',
-        ],
-      })
+          formats: [
+            'header',
+            'bold',
+            'italic',
+            'underline',
+            'strike',
+            'blockquote',
+            'list',
+            'bullet',
+            'indent',
+            'link',
+            'image',
+          ],
+        })
+      }
+      loadQuill().then()
+    } catch (e: any) {
+      console.log(e)
+      toast.error('Internet connection issue. Reload this page!')
     }
-
-    loadQuill().then()
 
     getExamData().then()
   }, [])

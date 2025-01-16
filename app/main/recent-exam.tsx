@@ -41,6 +41,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export default function RecentExam() {
   const [exams, setExams] = useState([])
@@ -48,6 +57,9 @@ export default function RecentExam() {
   const [dialogMsg, setDialogMsg] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState(1)
+
+  const [deleteExamDialog, setDeleteExamDialog] = useState(false)
+  const [selectedDelete, setSelectedDelete] = useState()
 
   const handleDeleteExam = async (id: number) => {
     try {
@@ -173,7 +185,7 @@ export default function RecentExam() {
                   <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                   <TableCell>{formatExamDate(exam.end_date)}</TableCell>
                   <TableCell className={'flex gap-1'}>
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                       <DropdownMenuTrigger>
                         <Button variant={'secondary'}>
                           <EllipsisVertical />
@@ -213,14 +225,8 @@ export default function RecentExam() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
-                            handleCopy(exam.config_password).then()
-                          }}
-                        >
-                          <Copy /> Copy Configuration Password
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
                             handleCopy(exam.start_password).then()
+                            toast.success('Start password copied!')
                           }}
                         >
                           <Copy /> Copy Start Exam Password
@@ -228,14 +234,26 @@ export default function RecentExam() {
                         <DropdownMenuItem
                           onClick={() => {
                             handleCopy(exam.end_password).then()
+                            toast.success('End password copied!')
                           }}
                         >
-                          <Copy /> Copy Close Exam Password
+                          <Copy /> Copy End Exam Password
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            handleCopy(
+                              `${apiUrl}/exam-config/${exam.id}`
+                            ).then()
+                            toast.success('Download config link copied!')
+                          }}
+                        >
+                          <Copy /> Copy Download Config Link
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className={'text-red-500'}
                           onClick={() => {
-                            handleDeleteExam(exam.id)
+                            setSelectedDelete(exam.id)
+                            setDeleteExamDialog(true)
                           }}
                         >
                           <Trash /> Delete
@@ -259,6 +277,37 @@ export default function RecentExam() {
       ) : (
         ''
       )}
+
+      <Dialog open={deleteExamDialog} onOpenChange={setDeleteExamDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete your
+              exam and remove your data from our servers.
+            </DialogDescription>
+            <DialogFooter>
+              <Button
+                variant={'secondary'}
+                onClick={() => {
+                  setDeleteExamDialog(false)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  handleDeleteExam(selectedDelete!).then()
+                  setSelectedDelete(undefined)
+                  setDeleteExamDialog(false)
+                }}
+              >
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={dialogOpen}>
         <AlertDialogContent>

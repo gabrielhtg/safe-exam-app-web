@@ -202,6 +202,25 @@ export default function CourseDetail({ params }: any) {
     }
   }
 
+  const handleGenerateNewConfigPassword = async (examId: number) => {
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/exam/${examId}`,
+        {
+          config_password: 'new',
+        },
+        getBearerHeader(localStorage.getItem('token')!)
+      )
+
+      if (response.status === 200) {
+        toast.success('New config password generated.')
+        getAllExams(course.id).then()
+      }
+    } catch (e: any) {
+      toast.error(e.response.message)
+    }
+  }
+
   const searchExam = async () => {
     try {
       const response = await axios.get(`${apiUrl}/exam`, {
@@ -424,6 +443,12 @@ export default function CourseDetail({ params }: any) {
                       return
                     }
 
+                    if (examStartDate.getTime() < new Date().getTime()) {
+                      setExamStartDateErr(
+                        'The start date cannot be earlier current date and time'
+                      )
+                    }
+
                     if (examStartDate.getTime() > examEndDate!.getTime()) {
                       setExamStartDateErr(
                         'The start date cannot be earlier than the end date.'
@@ -459,6 +484,7 @@ export default function CourseDetail({ params }: any) {
                 <TableHead>Name</TableHead>
                 <TableHead>Start Password</TableHead>
                 <TableHead>Close Password</TableHead>
+                <TableHead>Config Password</TableHead>
                 <TableHead>Start Time</TableHead>
                 <TableHead>End Time</TableHead>
                 <TableHead>Action</TableHead>
@@ -480,6 +506,27 @@ export default function CourseDetail({ params }: any) {
                     </TableCell>
                     <TableCell>
                       {exam.end_password ? exam.end_password : '-'}
+                    </TableCell>
+                    <TableCell>
+                      <div className={'font-mono flex items-center gap-3'}>
+                        {exam.config_password ? exam.config_password : '-'}
+                        <Button
+                          variant={'outline'}
+                          onClick={() => {
+                            handleCopy(exam.config_password).then()
+                          }}
+                        >
+                          <Copy />
+                        </Button>
+                        <Button
+                          variant={'outline'}
+                          onClick={() => {
+                            handleGenerateNewConfigPassword(exam.id).then()
+                          }}
+                        >
+                          <RefreshCcw />
+                        </Button>
+                      </div>
                     </TableCell>
                     <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                     <TableCell>{formatExamDate(exam.end_date)}</TableCell>
@@ -524,14 +571,8 @@ export default function CourseDetail({ params }: any) {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              handleCopy(exam.config_password).then()
-                            }}
-                          >
-                            <Copy /> Copy Configuration Password
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
                               handleCopy(exam.start_password).then()
+                              toast.success('Start password copied!')
                             }}
                           >
                             <Copy /> Copy Start Exam Password
@@ -539,9 +580,20 @@ export default function CourseDetail({ params }: any) {
                           <DropdownMenuItem
                             onClick={() => {
                               handleCopy(exam.end_password).then()
+                              toast.success('End password copied!')
                             }}
                           >
-                            <Copy /> Copy Close Exam Password
+                            <Copy /> Copy End Exam Password
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleCopy(
+                                `${apiUrl}/exam-config/${exam.id}`
+                              ).then()
+                              toast.success('Download config link copied!')
+                            }}
+                          >
+                            <Copy /> Copy Download Config Link
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className={'text-red-500'}
@@ -563,7 +615,7 @@ export default function CourseDetail({ params }: any) {
         </div>
       </Card>
 
-      <Dialog open={deleteExamDialog}>
+      <Dialog open={deleteExamDialog} onOpenChange={setDeleteExamDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Are you absolutely sure?</DialogTitle>

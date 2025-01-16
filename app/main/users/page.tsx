@@ -19,12 +19,14 @@ import {
 import { formatExamDate } from '@/app/_services/format-exam-date'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getUserInitials } from '@/app/_services/getUserInitials.service'
-import { Trash } from 'lucide-react'
+import { CircleX, RefreshCcw, Search, Trash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export default function UsersPage() {
   const [usersData, setUsersData] = useState<any>([])
   const router = useRouter()
+  const [searchKeywords, setSearchKeywords] = useState('')
 
   const getUserData = async () => {
     try {
@@ -80,6 +82,48 @@ export default function UsersPage() {
         className={'w-full p-10 min-h-[calc(100vh-180px)]'}
       >
         <h3 className={'font-bold mb-5 text-2xl'}>Users List</h3>
+
+        <div className={'flex gap-1'}>
+          <Input
+            type={'text'}
+            className={'max-w-lg'}
+            value={searchKeywords}
+            placeholder={'Search here...'}
+            onChange={(e) => {
+              setSearchKeywords(e.target.value)
+            }}
+          />
+
+          <Button
+            onClick={() => {
+              // searchExam().then()
+            }}
+          >
+            <Search /> Search
+          </Button>
+
+          {searchKeywords !== '' ? (
+            <Button
+              onClick={() => {
+                setSearchKeywords('')
+                getUsersData().then()
+              }}
+            >
+              <CircleX /> Clear
+            </Button>
+          ) : (
+            ''
+          )}
+
+          <Button
+            onClick={() => {
+              getUsersData().then()
+              toast.success('Fresh from the oven.')
+            }}
+          >
+            <RefreshCcw /> Refresh
+          </Button>
+        </div>
 
         <div className={'border rounded-lg'}>
           <Table>

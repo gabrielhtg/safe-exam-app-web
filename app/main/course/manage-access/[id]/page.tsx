@@ -12,18 +12,20 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Copy, Dices, Trash2 } from 'lucide-react'
+import { CircleX, Copy, Dices, RefreshCcw, Search, Trash2 } from 'lucide-react'
 import axios from 'axios'
 import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { formatExamDate } from '@/app/_services/format-exam-date'
+import { Input } from '@/components/ui/input'
 
 export default function ManageAccess({ params }: any) {
   const courseId = params.id
   const [courseData, setCourseData] = useState<any>(null)
   const [allowedStudentData, setAllowedStudentData] = useState<any>([])
+  const [searchKeywords, setSearchKeywords] = useState('')
 
   const getCourse = async () => {
     try {
@@ -85,6 +87,22 @@ export default function ManageAccess({ params }: any) {
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
+    } catch (e: any) {
+      console.log(e)
+    }
+  }
+
+  const searchAllowedUser = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/allowed-student`, {
+        params: {
+          course_id: courseId,
+          search: searchKeywords,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      setAllowedStudentData(response.data.data)
     } catch (e: any) {
       console.log(e)
     }
@@ -154,6 +172,48 @@ export default function ManageAccess({ params }: any) {
               </Button>
             </div>
           </div>
+        </div>
+
+        <div className={'flex gap-1'}>
+          <Input
+            type={'text'}
+            className={'max-w-lg'}
+            value={searchKeywords}
+            placeholder={'Search here...'}
+            onChange={(e) => {
+              setSearchKeywords(e.target.value)
+            }}
+          />
+
+          <Button
+            onClick={() => {
+              searchAllowedUser().then()
+            }}
+          >
+            <Search /> Search
+          </Button>
+
+          {searchKeywords !== '' ? (
+            <Button
+              onClick={() => {
+                setSearchKeywords('')
+                getAllowedStudent().then()
+              }}
+            >
+              <CircleX /> Clear
+            </Button>
+          ) : (
+            ''
+          )}
+
+          <Button
+            onClick={() => {
+              getAllowedStudent().then()
+              toast.success('Fresh from the oven.')
+            }}
+          >
+            <RefreshCcw /> Refresh
+          </Button>
         </div>
 
         <div className={'border rounded-lg'}>

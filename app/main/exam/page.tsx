@@ -14,6 +14,7 @@ import {
   Copy,
   EllipsisVertical,
   FileLock2,
+  FileText,
   Plus,
   RefreshCcw,
   Search,
@@ -79,6 +80,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useRouter } from 'next/navigation'
 
 export default function ExamPage() {
   const [examName, setExamName] = useState('')
@@ -104,6 +106,8 @@ export default function ExamPage() {
   const [examEndDateErr, setExamEndDateErr] = useState('')
   const [courseErr, setCourseErr] = useState('')
 
+  const router = useRouter()
+
   const getExam = async () => {
     try {
       const response = await axios.get(`${apiUrl}/exam`, {
@@ -116,6 +120,24 @@ export default function ExamPage() {
       setExams(response.data.data)
     } catch (err: any) {
       toast.error(err.response.message)
+    }
+  }
+  const handleGenerateNewConfigPassword = async (examId: number) => {
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/exam/${examId}`,
+        {
+          config_password: 'new',
+        },
+        getBearerHeader(localStorage.getItem('token')!)
+      )
+
+      if (response.status === 200) {
+        toast.success('New config password generated.')
+        getExam().then()
+      }
+    } catch (e: any) {
+      toast.error(e.response.message)
     }
   }
 
@@ -300,20 +322,6 @@ export default function ExamPage() {
                         {examNameErr}
                       </span>
                     </div>
-
-                    {/*<div className="grid w-full items-center gap-1.5 ">*/}
-                    {/*  <Label htmlFor="exam-start-password">*/}
-                    {/*    Start Password*/}
-                    {/*  </Label>*/}
-                    {/*  <Input*/}
-                    {/*    type={'text'}*/}
-                    {/*    placeholder={'Type here...'}*/}
-                    {/*    id="exam-start-password"*/}
-                    {/*    onChange={(e) => {*/}
-                    {/*      setExamStartPassword(e.target.value)*/}
-                    {/*    }}*/}
-                    {/*  />*/}
-                    {/*</div>*/}
 
                     <div className="grid w-full items-center gap-1.5 ">
                       <Label>Course</Label>
@@ -500,6 +508,12 @@ export default function ExamPage() {
                         return
                       }
 
+                      if (examStartDate.getTime() < new Date().getTime()) {
+                        setExamStartDateErr(
+                          'The start date cannot be earlier current date and time'
+                        )
+                      }
+
                       if (examStartDate.getTime() > examEndDate!.getTime()) {
                         setExamStartDateErr(
                           'The start date cannot be earlier than the end date.'
@@ -535,6 +549,9 @@ export default function ExamPage() {
                 <TableRow className={'divide-x'}>
                   <TableHead>Name</TableHead>
                   <TableHead>Course</TableHead>
+                  <TableHead>Start Password</TableHead>
+                  <TableHead>End Password</TableHead>
+                  <TableHead>Config Password</TableHead>
                   <TableHead>Start Time</TableHead>
                   <TableHead>End Time</TableHead>
                   <TableHead>Action</TableHead>
@@ -552,6 +569,34 @@ export default function ExamPage() {
                     <TableRow key={index} className={'divide-x'}>
                       <TableCell>{exam.title}</TableCell>
                       <TableCell>{exam.course.title}</TableCell>
+                      <TableCell>
+                        {exam.start_password ? exam.start_password : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {exam.end_password ? exam.end_password : '-'}
+                      </TableCell>
+                      <TableCell>
+                        <div className={'font-mono flex items-center gap-3'}>
+                          {exam.config_password ? exam.config_password : '-'}
+                          <Button
+                            variant={'outline'}
+                            onClick={() => {
+                              handleCopy(exam.config_password).then()
+                              toast.success('Config password copied!')
+                            }}
+                          >
+                            <Copy />
+                          </Button>
+                          <Button
+                            variant={'outline'}
+                            onClick={() => {
+                              handleGenerateNewConfigPassword(exam.id).then()
+                            }}
+                          >
+                            <RefreshCcw />
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                       <TableCell>{formatExamDate(exam.end_date)}</TableCell>
                       <TableCell className={'flex gap-1'}>
@@ -595,14 +640,15 @@ export default function ExamPage() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
-                                handleCopy(exam.config_password).then()
+                                router.push(`/main/exam/report/${exam.id}`)
                               }}
                             >
-                              <Copy /> Copy Configuration Password
+                              <FileText /> Open Report
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
                                 handleCopy(exam.start_password).then()
+                                toast.success('Start password copied!')
                               }}
                             >
                               <Copy /> Copy Start Exam Password
@@ -610,9 +656,20 @@ export default function ExamPage() {
                             <DropdownMenuItem
                               onClick={() => {
                                 handleCopy(exam.end_password).then()
+                                toast.success('End password copied!')
                               }}
                             >
-                              <Copy /> Copy Close Exam Password
+                              <Copy /> Copy End Exam Password
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                handleCopy(
+                                  `${apiUrl}/exam-config/${exam.id}`
+                                ).then()
+                                toast.success('Download link copied!')
+                              }}
+                            >
+                              <Copy /> Copy Download Config Link
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className={'text-red-500'}
@@ -634,7 +691,7 @@ export default function ExamPage() {
           </div>
         </Card>
 
-        <Dialog open={deleteExamDialog}>
+        <Dialog open={deleteExamDialog} onOpenChange={setDeleteExamDialog}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Are you absolutely sure?</DialogTitle>
