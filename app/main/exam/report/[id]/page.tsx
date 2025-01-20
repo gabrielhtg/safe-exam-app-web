@@ -28,7 +28,7 @@ export default function ReportPage({ params }: any) {
   }
 
   const getScorePercentage = (actual: string, expected: string) => {
-    return `(${((+actual / +expected) * 100).toFixed(2)}%)`
+    return ((+actual / +expected) * 100).toFixed(2)
   }
 
   const getExam = async () => {
@@ -84,7 +84,7 @@ export default function ReportPage({ params }: any) {
         return (
           <Button
             variant="ghost"
-            className={'px-0'}
+            className={'px-0 w-full justify-start'}
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             NIM
@@ -102,7 +102,7 @@ export default function ReportPage({ params }: any) {
         return (
           <Button
             variant="ghost"
-            className={'px-0'}
+            className={'px-0 w-full justify-start'}
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Name
@@ -120,7 +120,7 @@ export default function ReportPage({ params }: any) {
         return (
           <Button
             variant="ghost"
-            className={'px-0'}
+            className={'px-0 w-full justify-start'}
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Attempt
@@ -138,27 +138,63 @@ export default function ReportPage({ params }: any) {
         return (
           <Button
             variant="ghost"
-            className={'px-0'}
+            className={'px-0 w-full justify-start'}
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Total Score
+            Score
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => {
+        return <>{row.getValue('total_score')} </>
+      },
+    },
+    {
+      accessorKey: 'expected_score',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className={'px-0 w-full justify-start'}
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Expected Score
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        return <>{row.getValue('expected_score')} </>
+      },
+    },
+    {
+      accessorKey: 'grade',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className={'px-0 w-full justify-start'}
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Grade (%)
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      accessorFn: (row) => {
+        const totalScore = row.total_score // Access total_score from data
+        const expectedScore = row.expected_score // Access expected_score from data
+
+        return (totalScore / expectedScore) * 100 // Calculate grade
+      },
+      cell: ({ row }) => {
         const totalScore = row.original.total_score // Access total_score
         const expectedScore = row.original.expected_score // Access expected_score
 
-        return (
-          <>
-            {totalScore} / {expectedScore}{' '}
-            <span className="font-bold">
-              {getScorePercentage(totalScore, expectedScore)}
-            </span>
-          </>
-        )
+        return <>{getScorePercentage(totalScore, expectedScore)}</>
       },
+      sortingFn: (a: any, b: any) => a.getValue('grade') - b.getValue('grade'),
     },
     {
       accessorKey: 'created_at',
@@ -166,7 +202,7 @@ export default function ReportPage({ params }: any) {
         return (
           <Button
             variant="ghost"
-            className={'px-0'}
+            className={'px-0 w-full justify-start'}
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Submitted At

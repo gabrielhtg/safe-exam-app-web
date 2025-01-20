@@ -15,6 +15,8 @@ import {
   FileLock2,
   CirclePlus,
   RefreshCcw,
+  UserCog,
+  FileText,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -69,6 +71,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useRouter } from 'next/navigation'
 
 export default function CourseDetail({ params }: any) {
   const [examName, setExamName] = useState('')
@@ -78,6 +81,7 @@ export default function CourseDetail({ params }: any) {
   const [examDescription] = useState('')
   const [exams, setExams] = useState([])
   const [showAddExamDialog, setShowAddExamDialog] = useState(false)
+  const router = useRouter()
 
   const [searchKeywords, setSearchKeywords] = useState('')
   const currentUsername = useSelector(selectUser).username
@@ -568,6 +572,22 @@ export default function CourseDetail({ params }: any) {
                             }}
                           >
                             <FileLock2 /> Generate Exam File
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              router.push(
+                                `/main/course/manage-access/${exam.course.id}`
+                              )
+                            }}
+                          >
+                            <UserCog /> Manage Access
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              router.push(`/main/exam/report/${exam.id}`)
+                            }}
+                          >
+                            <FileText /> Open Report
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {

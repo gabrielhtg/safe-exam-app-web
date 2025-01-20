@@ -206,7 +206,7 @@ export default function CoursePage() {
       >
         <h1 className={'font-semibold text-3xl'}>Course List</h1>
 
-        <div className={'flex gap-3'}>
+        <div className={'flex gap-3 items-center'}>
           <Input
             type={'text'}
             className={'max-w-lg'}
@@ -219,7 +219,7 @@ export default function CoursePage() {
 
           <Button
             onClick={() => {
-              searchCourse(searchKeywords!)
+              searchCourse(searchKeywords!).then()
             }}
           >
             <Search /> Search
@@ -229,7 +229,7 @@ export default function CoursePage() {
             <Button
               onClick={() => {
                 setSearchKeywords('')
-                searchCourse(undefined)
+                searchCourse(undefined).then()
               }}
             >
               <CircleX /> Clear

@@ -17,8 +17,10 @@ import {
   Copy,
   EllipsisVertical,
   FileLock2,
+  FileText,
   Plus,
   Trash,
+  UserCog,
 } from 'lucide-react'
 import { formatExamDate } from '@/app/_services/format-exam-date'
 import {
@@ -50,6 +52,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useRouter } from 'next/navigation'
 
 export default function RecentExam() {
   const [exams, setExams] = useState([])
@@ -60,6 +63,7 @@ export default function RecentExam() {
 
   const [deleteExamDialog, setDeleteExamDialog] = useState(false)
   const [selectedDelete, setSelectedDelete] = useState()
+  const router = useRouter()
 
   const handleDeleteExam = async (id: number) => {
     try {
@@ -222,6 +226,22 @@ export default function RecentExam() {
                           }}
                         >
                           <FileLock2 /> Generate Exam File
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            router.push(
+                              `/main/course/manage-access/${exam.course.id}`
+                            )
+                          }}
+                        >
+                          <UserCog /> Manage Access
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            router.push(`/main/exam/report/${exam.id}`)
+                          }}
+                        >
+                          <FileText /> Open Report
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {

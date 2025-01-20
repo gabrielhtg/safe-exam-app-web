@@ -19,6 +19,7 @@ import {
   RefreshCcw,
   Search,
   Trash,
+  UserCog,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
@@ -637,6 +638,15 @@ export default function ExamPage() {
                               }}
                             >
                               <FileLock2 /> Generate Exam File
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                router.push(
+                                  `/main/course/manage-access/${exam.course.id}`
+                                )
+                              }}
+                            >
+                              <UserCog /> Manage Access
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
