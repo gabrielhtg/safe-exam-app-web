@@ -10,8 +10,15 @@ import { toast } from 'sonner'
 import { ReportDataTable } from '@/app/main/exam/report/(components)/report-data-table'
 import { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowUpDown, EllipsisVertical } from 'lucide-react'
 import { formatExamDate } from '@/app/_services/format-exam-date'
+import Link from 'next/link'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export default function ReportPage({ params }: any) {
   const examId = params.id
@@ -212,6 +219,62 @@ export default function ReportPage({ params }: any) {
       },
       cell: ({ row }) => {
         return <>{formatExamDate(row.getValue('created_at'))} </>
+      },
+    },
+    {
+      accessorKey: 'indicated_cheating',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className={'px-0 w-full justify-start'}
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Indicated Cheating
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        if (row.getValue('indicated_cheating')) {
+          return (
+            <>
+              <span className={'text-yellow-500'}>True</span>,{' '}
+            </>
+          )
+        } else {
+          return <span className={'text-green-500'}>False</span>
+        }
+      },
+    },
+    {
+      accessorKey: 'action',
+      header: () => {
+        return (
+          <Button variant="ghost" className={'px-0 w-full justify-start'}>
+            Action
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        return (
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button variant={'secondary'}>
+                <EllipsisVertical />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`/main/exam/report/proctoring-log/${row.original.id}`}
+                >
+                  See Logs
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
       },
     },
   ]

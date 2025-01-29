@@ -61,7 +61,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
+import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import {
   Command,
@@ -680,6 +680,16 @@ export default function ExamPage() {
                               }}
                             >
                               <Copy /> Copy Download Config Link
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                handleCopy(
+                                  `${feUrl}/exam-submit/${exam.id}`
+                                ).then()
+                                toast.success('Submit link copied!')
+                              }}
+                            >
+                              <Copy /> Copy Submit Link
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className={'text-red-500'}

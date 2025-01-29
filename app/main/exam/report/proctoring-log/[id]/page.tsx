@@ -1,0 +1,141 @@
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { ContentLayout } from '@/components/admin-panel/content-layout'
+import { Card } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import axios from 'axios'
+import { apiUrl } from '@/lib/env'
+import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
+import { toast } from 'sonner'
+import Image from 'next/image'
+import { formatExamDate } from '@/app/_services/format-exam-date'
+
+export default function ProctoringLog({ params }: any) {
+  const examResultId = params.id
+  const [examResultData, setExamResultData] = useState<any>()
+  const [proctoringLogData, setProctoringLogData] = useState<any[]>([])
+  const [allowedStudentData, setAllowedStudentData] = useState([])
+
+  const getExamResult = async () => {
+    try {
+      const requestResult = await axios.get(
+        `${apiUrl}/exam-result/${examResultId}`,
+        getBearerHeader(localStorage.getItem('token')!)
+      )
+
+      setExamResultData(requestResult.data.data)
+      setProctoringLogData(requestResult.data.data.proctoring_logs)
+
+      getAllowedStudent(requestResult.data.data.exam.course_id).then()
+
+      console.log(requestResult.data.data)
+    } catch (e: any) {
+      toast.error(e.response.data.message)
+    }
+  }
+
+  const getNameByNim = (user_username: string) => {
+    const person: any = allowedStudentData.find(
+      (item: any) => item.nim === user_username
+    )
+
+    return person ? person.name : null
+  }
+
+  const getAllowedStudent = async (courseId: string) => {
+    try {
+      const response = await axios.get(`${apiUrl}/allowed-student`, {
+        params: {
+          course_id: courseId,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      setAllowedStudentData(response.data.data)
+    } catch (e: any) {
+      console.log(e)
+    }
+  }
+
+  useEffect(() => {
+    getExamResult().then()
+  }, [])
+
+  return (
+    <>
+      <ContentLayout title="Exam">
+        <Card
+          id={'card-utama'}
+          className={'w-full p-10 min-h-[calc(100vh-180px)]'}
+        >
+          <h3 className={'font-bold mb-5'}>Proctoring Log</h3>
+
+          <div className={'border rounded-lg'}>
+            <Table>
+              <TableBody>
+                <TableRow className={'divide-x'}>
+                  <TableCell className={'font-bold'}>NIM</TableCell>
+                  <TableCell>{examResultData?.user_username}</TableCell>
+                </TableRow>
+                <TableRow className={'divide-x'}>
+                  <TableCell className={'font-bold'}>NAME</TableCell>
+                  <TableCell>
+                    {getNameByNim(examResultData?.user_username)}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className={'border rounded-lg w-full mt-7'}>
+            <Table>
+              <TableHeader>
+                <TableRow className={'divide-x'}>
+                  <TableHead>No.</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>User Capture</TableHead>
+                  <TableHead>Screen Capture</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {proctoringLogData.map((data: any, index: number) => (
+                  <TableRow key={index} className={'divide-x'}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{formatExamDate(data.time)}</TableCell>
+                    <TableCell>{data.description}</TableCell>
+                    <TableCell className={'p-5'}>
+                      <Image
+                        src={`${apiUrl}/${data.user_image}`}
+                        alt={'user-image'}
+                        width={500}
+                        height={500}
+                        className={'w-58'}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Image
+                        src={`${apiUrl}/${data.screen_image}`}
+                        alt={'user-image'}
+                        width={500}
+                        height={500}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </Card>
+      </ContentLayout>
+    </>
+  )
+}
