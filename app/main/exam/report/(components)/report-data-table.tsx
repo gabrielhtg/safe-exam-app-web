@@ -21,6 +21,9 @@ import {
 } from '@/components/ui/table'
 import React from 'react'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -48,10 +51,11 @@ export function ReportDataTable<TData, TValue>({
       columnFilters,
     },
   })
+  const router = useRouter()
 
   return (
     <>
-      <div className="flex items-center py-2">
+      <div className="flex items-center py-2 gap-3">
         <Input
           placeholder="Search NIM here ..."
           value={
@@ -62,6 +66,14 @@ export function ReportDataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+
+        <Button
+          onClick={() => {
+            router.back()
+          }}
+        >
+          <ArrowLeft /> Back
+        </Button>
       </div>
 
       <div className="rounded-md border">

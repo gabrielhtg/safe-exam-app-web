@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 import { ReportDataTable } from '@/app/main/exam/report/(components)/report-data-table'
 import { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown, EllipsisVertical } from 'lucide-react'
+import { ArrowUpDown, BookOpenCheck, EllipsisVertical, Eye } from 'lucide-react'
 import { formatExamDate } from '@/app/_services/format-exam-date'
 import Link from 'next/link'
 import {
@@ -77,7 +77,6 @@ export default function ReportPage({ params }: any) {
 
       if (response.status == 200) {
         setExamResultData(response.data.data)
-        console.log(response.data.data)
       }
     } catch (e: any) {
       toast.error(e.response.message)
@@ -237,11 +236,7 @@ export default function ReportPage({ params }: any) {
       },
       cell: ({ row }) => {
         if (row.getValue('indicated_cheating')) {
-          return (
-            <>
-              <span className={'text-yellow-500'}>True</span>,{' '}
-            </>
-          )
+          return <span className={'text-yellow-500'}>True</span>
         } else {
           return <span className={'text-green-500'}>False</span>
         }
@@ -269,7 +264,14 @@ export default function ReportPage({ params }: any) {
                 <Link
                   href={`/main/exam/report/proctoring-log/${row.original.id}`}
                 >
-                  See Logs
+                  <Eye /> See Logs
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`/main/exam/report/proctoring-log/${row.original.id}`}
+                >
+                  <BookOpenCheck /> Manual Check
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>

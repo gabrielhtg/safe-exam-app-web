@@ -40,6 +40,7 @@ import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamConfigPage({ params }: any) {
@@ -49,6 +50,7 @@ export default function ExamConfigPage({ params }: any) {
   const [showDialog, setShowDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
   const [editorConfig, setEditorConfig] = useState<any>(null)
+  const router = useRouter()
 
   // state untuk exam behaviour
   const [examDescription, setExamDescription] = useState('')
@@ -227,6 +229,17 @@ export default function ExamConfigPage({ params }: any) {
 
     getExamData().then()
   }, [])
+
+  useEffect(() => {
+    if (timeLimit) {
+      setCheatingLimit(
+        (timeLimit.getHours() * 3600 +
+          timeLimit.getMinutes() * 60 +
+          timeLimit.getSeconds()) /
+          1200
+      )
+    }
+  }, [timeLimit])
 
   return (
     <ContentLayout title="Configure Exam">
@@ -600,10 +613,13 @@ export default function ExamConfigPage({ params }: any) {
           >
             <Save /> Save Configuration
           </Button>
-          <Button variant={'outline'} asChild>
-            <Link href={`/main/course/${examData?.course.id}`}>
-              <ArrowLeft /> Back
-            </Link>
+          <Button
+            variant={'outline'}
+            onClick={() => {
+              router.back()
+            }}
+          >
+            <ArrowLeft /> Back
           </Button>
           <Button variant={'outline'} asChild>
             <Link className={'flex'} href={`/main/exam/simulate/${id}`}>

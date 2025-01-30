@@ -52,8 +52,11 @@ export function Menu({ isOpen }: MenuProps) {
     <ScrollArea className="[&>div>div[style]]:!block">
       <nav className="mt-8 w-full">
         <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-50px)] items-start space-y-1 px-2">
-          {menuList.map(({ groupLabel, menus }, index) => (
-            <li className={cn('w-full', groupLabel ? 'pt-5' : '')} key={index}>
+          {menuList.map(({ groupLabel, menus }, groupIndex) => (
+            <li
+              className={cn('w-full', groupLabel ? 'pt-5' : '')}
+              key={groupIndex}
+            >
               {(isOpen && groupLabel) || isOpen === undefined ? (
                 <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
                   {groupLabel}
@@ -75,11 +78,11 @@ export function Menu({ isOpen }: MenuProps) {
                 <p className="pb-2"></p>
               )}
               {menus.map(
-                ({ href, label, icon: Icon, active, submenus }, index) =>
+                ({ href, label, icon: Icon, active, submenus }, menuIndex) =>
                   !submenus || submenus.length === 0 ? (
                     <>
                       {userData?.role === 'ADMIN' ? (
-                        <div className="w-full" key={index}>
+                        <div className="w-full" key={menuIndex}>
                           <TooltipProvider disableHoverableContent>
                             <Tooltip delayDuration={100}>
                               <TooltipTrigger asChild>
@@ -130,7 +133,7 @@ export function Menu({ isOpen }: MenuProps) {
                       ) : (
                         <>
                           {label !== 'Users' ? (
-                            <div className="w-full" key={index}>
+                            <div className="w-full" key={menuIndex}>
                               <TooltipProvider disableHoverableContent>
                                 <Tooltip delayDuration={100}>
                                   <TooltipTrigger asChild>
@@ -187,7 +190,7 @@ export function Menu({ isOpen }: MenuProps) {
                       )}
                     </>
                   ) : (
-                    <div className="w-full" key={index}>
+                    <div className="w-full" key={menuIndex}>
                       <CollapseMenuButton
                         icon={Icon}
                         label={label}
