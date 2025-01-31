@@ -17,12 +17,17 @@ import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { formatExamDate } from '@/app/_services/format-exam-date'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
 export default function ProctoringLog({ params }: any) {
   const examResultId = params.id
   const [examResultData, setExamResultData] = useState<any>()
   const [proctoringLogData, setProctoringLogData] = useState<any[]>([])
   const [allowedStudentData, setAllowedStudentData] = useState([])
+  const router = useRouter()
 
   const getExamResult = async () => {
     try {
@@ -48,6 +53,14 @@ export default function ProctoringLog({ params }: any) {
     )
 
     return person ? person.name : null
+  }
+
+  const getDeviceId = (user_username: string) => {
+    const person: any = allowedStudentData.find(
+      (item: any) => item.nim === user_username
+    )
+
+    return person ? person.device_id : null
   }
 
   const getAllowedStudent = async (courseId: string) => {
@@ -76,7 +89,17 @@ export default function ProctoringLog({ params }: any) {
           id={'card-utama'}
           className={'w-full p-10 min-h-[calc(100vh-180px)]'}
         >
-          <h3 className={'font-bold mb-5'}>Proctoring Log</h3>
+          <h3 className={'font-bold mb-5 text-3xl'}>Proctoring Log</h3>
+
+          <div className={'flex gap-3 mb-3'}>
+            <Button
+              onClick={() => {
+                router.back()
+              }}
+            >
+              <ArrowLeft /> Back
+            </Button>
+          </div>
 
           <div className={'border rounded-lg'}>
             <Table>
@@ -91,11 +114,25 @@ export default function ProctoringLog({ params }: any) {
                     {getNameByNim(examResultData?.user_username)}
                   </TableCell>
                 </TableRow>
+                <TableRow className={'divide-x'}>
+                  <TableCell className={'font-bold'}>COURSE</TableCell>
+                  <TableCell>{examResultData?.exam.course.title}</TableCell>
+                </TableRow>
+                <TableRow className={'divide-x'}>
+                  <TableCell className={'font-bold'}>EXAM</TableCell>
+                  <TableCell>{examResultData?.exam.title}</TableCell>
+                </TableRow>
+                <TableRow className={'divide-x'}>
+                  <TableCell className={'font-bold'}>DEVICE ID</TableCell>
+                  <TableCell>
+                    {getDeviceId(examResultData?.user_username)}
+                  </TableCell>
+                </TableRow>
               </TableBody>
             </Table>
           </div>
 
-          <div className={'border rounded-lg w-full mt-7'}>
+          <div className={'border rounded-lg w-full mt-3'}>
             <Table>
               <TableHeader>
                 <TableRow className={'divide-x'}>
@@ -122,12 +159,29 @@ export default function ProctoringLog({ params }: any) {
                       />
                     </TableCell>
                     <TableCell>
-                      <Image
-                        src={`${apiUrl}/${data.screen_image}`}
-                        alt={'user-image'}
-                        width={500}
-                        height={500}
-                      />
+                      <Dialog>
+                        <DialogTrigger>
+                          <Image
+                            src={`${apiUrl}/${data.screen_image}`}
+                            alt={'user-image'}
+                            width={500}
+                            height={500}
+                          />
+                        </DialogTrigger>
+                        <DialogContent
+                          className={
+                            'w-10/12 max-w-full flex justify-center h-[calc(100vh-100px)]'
+                          }
+                        >
+                          <Image
+                            src={`${apiUrl}/${data.screen_image}`}
+                            className={'border rounded-lg w-10/12'}
+                            alt={'user-image'}
+                            width={2000}
+                            height={2000}
+                          />
+                        </DialogContent>
+                      </Dialog>
                     </TableCell>
                   </TableRow>
                 ))}
