@@ -155,7 +155,7 @@ export default function ProctoringLog({ params }: any) {
                         alt={'user-image'}
                         width={500}
                         height={500}
-                        className={'w-58'}
+                        className={'w-58 rounded-lg'}
                       />
                     </TableCell>
                     <TableCell>
@@ -166,6 +166,7 @@ export default function ProctoringLog({ params }: any) {
                             alt={'user-image'}
                             width={500}
                             height={500}
+                            className={'border rounded-lg'}
                           />
                         </DialogTrigger>
                         <DialogContent
