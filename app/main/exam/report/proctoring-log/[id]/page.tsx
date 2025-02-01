@@ -16,7 +16,6 @@ import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { toast } from 'sonner'
 import Image from 'next/image'
-import { formatExamDate } from '@/app/_services/format-exam-date'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -61,6 +60,26 @@ export default function ProctoringLog({ params }: any) {
     )
 
     return person ? person.device_id : null
+  }
+
+  const formatLogtime = (dateString: string) => {
+    const date = new Date(dateString)
+
+    const formattedDate = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
+
+    const formattedTime = date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    })
+
+    return `${formattedDate}, ${formattedTime} WIB`
   }
 
   const getAllowedStudent = async (courseId: string) => {
@@ -147,7 +166,7 @@ export default function ProctoringLog({ params }: any) {
                 {proctoringLogData.map((data: any, index: number) => (
                   <TableRow key={index} className={'divide-x'}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{formatExamDate(data.time)}</TableCell>
+                    <TableCell>{formatLogtime(data.time)}</TableCell>
                     <TableCell>{data.description}</TableCell>
                     <TableCell className={'p-5'}>
                       <Image

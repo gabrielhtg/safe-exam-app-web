@@ -12,7 +12,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { CircleX, Copy, Dices, RefreshCcw, Search, Trash2 } from 'lucide-react'
+import {
+  ArrowLeft,
+  CircleX,
+  Copy,
+  Dices,
+  RefreshCcw,
+  Search,
+  Trash2,
+} from 'lucide-react'
 import axios from 'axios'
 import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
@@ -20,12 +28,14 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { formatExamDate } from '@/app/_services/format-exam-date'
 import { Input } from '@/components/ui/input'
+import { useRouter } from 'next/navigation'
 
 export default function ManageAccess({ params }: any) {
   const courseId = params.id
   const [courseData, setCourseData] = useState<any>(null)
   const [allowedStudentData, setAllowedStudentData] = useState<any>([])
   const [searchKeywords, setSearchKeywords] = useState('')
+  const router = useRouter()
 
   const getCourse = async () => {
     try {
@@ -213,6 +223,14 @@ export default function ManageAccess({ params }: any) {
             }}
           >
             <RefreshCcw /> Refresh
+          </Button>
+
+          <Button
+            onClick={() => {
+              router.back()
+            }}
+          >
+            <ArrowLeft /> Back
           </Button>
         </div>
 

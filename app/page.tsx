@@ -28,6 +28,7 @@ import { apiUrl } from '@/lib/env'
 import { setUser } from '@/lib/_slices/userSlice'
 import { AppDispatch } from '@/lib/store'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
+import { Spinner } from '@/components/custom-component/Spinner'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -36,6 +37,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [errDialog, setErrDialog] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
+  const [loadingLogin, setLoadingLogin] = useState(false)
 
   // err section
   const [usernameErr, setUsernameErr] = useState('')
@@ -58,11 +60,13 @@ export default function LoginPage() {
 
         dispatch(setUser(getUserResponse.data.data))
         localStorage.setItem('username', getUserResponse.data.data.username)
+        setLoadingLogin(false)
 
         router.push('/main')
       }
     } catch (err: any) {
       setErrDialog(true)
+      setLoadingLogin(false)
       setErrMsg(err.response.data.message)
     }
   }
@@ -129,12 +133,18 @@ export default function LoginPage() {
                     return
                   }
 
+                  setLoadingLogin(true)
                   handleLogin().then()
                 }}
                 id="button-login"
                 className="w-full"
               >
                 Login
+                {loadingLogin ? (
+                  <Spinner className={'text-primary-foreground'} />
+                ) : (
+                  ''
+                )}
               </Button>
               <Button
                 asChild={true}

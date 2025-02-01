@@ -72,6 +72,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
+import { BackButton } from '@/components/custom-component/BackButton'
 
 export default function CourseDetail({ params }: any) {
   const [examName, setExamName] = useState('')
@@ -480,8 +481,10 @@ export default function CourseDetail({ params }: any) {
           >
             <RefreshCcw /> Refresh
           </Button>
+
+          <BackButton />
         </div>
-        <div className={'border rounded-lg w-full overflow-scroll'}>
+        <div className={'border rounded-lg w-full overflow-auto'}>
           <Table>
             <TableHeader>
               <TableRow className={'divide-x'}>

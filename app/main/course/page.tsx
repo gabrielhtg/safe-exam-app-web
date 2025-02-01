@@ -55,6 +55,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Spinner } from '@/components/custom-component/Spinner'
 
 export default function CoursePage() {
   const [addDialog, setAddDialog] = useState(false)
@@ -70,6 +71,7 @@ export default function CoursePage() {
   const [courseList, setCourseList] = useState([])
   const [loadingTitle, setLoadingTitle] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
+  const [loadingSeeCourseDetail, setLoadingSeeCourseDetail] = useState(false)
 
   const router = useRouter()
 
@@ -420,10 +422,17 @@ export default function CoursePage() {
                   )}
                 </CardContent>
                 <CardFooter className={'flex gap-2'}>
-                  <Button asChild={true}>
-                    <Link href={`/main/course/${course.id}`}>
+                  <Button
+                    onClick={() => {
+                      setLoadingSeeCourseDetail(true)
+                      router.push(`/main/course/${course.id}`)
+                    }}
+                  >
+                    {loadingSeeCourseDetail ? (
+                      <Spinner className={'text-primary-foreground'} />
+                    ) : (
                       <Eye />
-                    </Link>
+                    )}
                   </Button>
 
                   {/*Bagian Edit Dialog*/}

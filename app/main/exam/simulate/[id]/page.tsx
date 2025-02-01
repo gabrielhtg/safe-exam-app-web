@@ -39,6 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { BackButton } from '@/components/custom-component/BackButton'
 
 export default function SimulatePage({ params }: any) {
   const id = params.id
@@ -342,6 +343,8 @@ export default function SimulatePage({ params }: any) {
           ) : (
             ''
           )}
+
+          <BackButton />
         </div>
       </Card>
 

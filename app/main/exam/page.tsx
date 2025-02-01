@@ -82,6 +82,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
+import { BackButton } from '@/components/custom-component/BackButton'
 
 export default function ExamPage() {
   const [examName, setExamName] = useState('')
@@ -543,6 +544,8 @@ export default function ExamPage() {
             >
               <RefreshCcw /> Refresh
             </Button>
+
+            <BackButton />
           </div>
           <div className={'border rounded-lg w-full mt-7'}>
             <Table>
