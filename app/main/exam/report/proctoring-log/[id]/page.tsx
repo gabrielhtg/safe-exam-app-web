@@ -163,48 +163,56 @@ export default function ProctoringLog({ params }: any) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {proctoringLogData.map((data: any, index: number) => (
-                  <TableRow key={index} className={'divide-x'}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{formatLogtime(data.time)}</TableCell>
-                    <TableCell>{data.description}</TableCell>
-                    <TableCell className={'p-5'}>
-                      <Image
-                        src={`${apiUrl}/${data.user_image}`}
-                        alt={'user-image'}
-                        width={500}
-                        height={500}
-                        className={'w-58 rounded-lg'}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger>
-                          <Image
-                            src={`${apiUrl}/${data.screen_image}`}
-                            alt={'user-image'}
-                            width={500}
-                            height={500}
-                            className={'border rounded-lg'}
-                          />
-                        </DialogTrigger>
-                        <DialogContent
-                          className={
-                            'w-10/12 max-w-full flex justify-center h-[calc(100vh-100px)]'
-                          }
-                        >
-                          <Image
-                            src={`${apiUrl}/${data.screen_image}`}
-                            className={'border rounded-lg w-10/12'}
-                            alt={'user-image'}
-                            width={2000}
-                            height={2000}
-                          />
-                        </DialogContent>
-                      </Dialog>
+                {proctoringLogData.length > 0 ? (
+                  proctoringLogData.map((data: any, index: number) => (
+                    <TableRow key={index} className={'divide-x'}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{formatLogtime(data.time)}</TableCell>
+                      <TableCell>{data.description}</TableCell>
+                      <TableCell className={'p-5'}>
+                        <Image
+                          src={`${apiUrl}/${data.user_image}`}
+                          alt={'user-image'}
+                          width={500}
+                          height={500}
+                          className={'w-58 rounded-lg'}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Dialog>
+                          <DialogTrigger>
+                            <Image
+                              src={`${apiUrl}/${data.screen_image}`}
+                              alt={'user-image'}
+                              width={500}
+                              height={500}
+                              className={'border rounded-lg'}
+                            />
+                          </DialogTrigger>
+                          <DialogContent
+                            className={
+                              'w-10/12 max-w-full flex justify-center h-[calc(100vh-100px)]'
+                            }
+                          >
+                            <Image
+                              src={`${apiUrl}/${data.screen_image}`}
+                              className={'border rounded-lg w-10/12'}
+                              alt={'user-image'}
+                              width={2000}
+                              height={2000}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className={'p-5 text-center'}>
+                      No Data
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>

@@ -36,12 +36,18 @@ export function Menu({ isOpen }: MenuProps) {
   }
 
   const handleGetUser = async () => {
-    const response = await axios.get(
-      `${apiUrl}/users/${localStorage.getItem('username')}`,
-      getBearerHeader(localStorage.getItem('token')!)
-    )
+    try {
+      const response = await axios.get(
+        `${apiUrl}/users/${localStorage.getItem('username')}`,
+        getBearerHeader(localStorage.getItem('token')!)
+      )
 
-    setUserData(response.data.data)
+      setUserData(response.data.data)
+    } catch (e: any) {
+      if (e.response && e.response.status === 401) {
+        router.push('/')
+      }
+    }
   }
 
   useEffect(() => {
