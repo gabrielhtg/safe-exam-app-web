@@ -146,7 +146,7 @@ export default function CoursePage() {
         setIsLoadingCreate(false)
       }
     } catch (err: any) {
-      toast.error(err.response.data.message)
+      toast.error(`Failed to create new course. ${err.response.data.message}`)
       setIsLoadingCreate(false)
     }
 
@@ -216,6 +216,10 @@ export default function CoursePage() {
             placeholder={'Search here...'}
             onChange={(e) => {
               setSearchKeywords(e.target.value)
+
+              if (e.target.value === '') {
+                searchCourse(undefined).then()
+              }
             }}
           />
 

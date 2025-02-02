@@ -16,6 +16,7 @@ import parse from 'html-react-parser'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import {
+  ArrowLeft,
   CircleCheck,
   CircleX,
   EllipsisVertical,
@@ -41,6 +42,7 @@ import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamQuestionPage({ params }: any) {
@@ -60,6 +62,7 @@ export default function ExamQuestionPage({ params }: any) {
   const [dialogType, setDialogType] = useState(1)
   const [isOptionCorrect, setIsOptionCorrect] = useState<boolean>(false)
   const [showCorrectSwitch, setShowCorrectSwitch] = useState(true)
+  const router = useRouter()
 
   const getAlertTitle = () => {
     if (dialogType == 1) {
@@ -227,6 +230,15 @@ export default function ExamQuestionPage({ params }: any) {
         <h3 className={'font-bold text-xl mb-5'}>
           {examData?.title} Question List
         </h3>
+
+        <Button
+          onClick={() => {
+            router.push('/main/exam')
+          }}
+          className={'mb-3'}
+        >
+          <ArrowLeft /> Back
+        </Button>
 
         <div id={'tempat-deskripsi'} className={'mb-3'}>
           Total Questions : {questions.length}

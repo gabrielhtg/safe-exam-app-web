@@ -106,6 +106,8 @@ export default function SimulatePage({ params }: any) {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
+      console.log(examResultResponse.data.data)
+
       setExamResultData(examResultResponse.data.data)
 
       const getQuestionResponse = await axios.get(
@@ -207,7 +209,8 @@ export default function SimulatePage({ params }: any) {
           </div>
         </div>
 
-        {examResultData.length > 0 ? (
+        {examResultData.filter((item) => item.username === currentUsername)
+          .length > 0 ? (
           <>
             <hr />
 
@@ -267,13 +270,36 @@ export default function SimulatePage({ params }: any) {
         )}
 
         <div className={'flex justify-center gap-3'}>
-          {examResultData?.length >= examData?.allowed_attempts ? (
+          {examResultData?.filter((item) => item.username === currentUsername)
+            .length >= examData?.allowed_attempts ? (
             ''
           ) : (
             <Dialog>
               <DialogTrigger asChild>
-                <Button>
-                  {examResultData.length > 0 ? 'Start Again' : 'Start Exam'}
+                <Button
+                  onClick={() => {
+                    if (
+                      !(
+                        examResultData.filter(
+                          (item) => item.username === currentUsername
+                        ).length > 0
+                      )
+                    ) {
+                      if (
+                        examData.start_password === undefined ||
+                        examData.start_password === null ||
+                        examData.start_password === ''
+                      ) {
+                        router.push(`/main/exam/simulate/start/${id}`)
+                      }
+                    }
+                  }}
+                >
+                  {examResultData.filter(
+                    (item) => item.username === currentUsername
+                  ).length > 0
+                    ? 'Start Again'
+                    : 'Start Exam'}
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -332,7 +358,8 @@ export default function SimulatePage({ params }: any) {
             </Dialog>
           )}
 
-          {examResultData.length > 0 ? (
+          {examResultData.filter((item) => item.username === currentUsername)
+            .length > 0 ? (
             <Button
               onClick={() => {
                 handleResetAttempt().then()
