@@ -529,21 +529,21 @@ export default function ExamConfigPage({ params }: any) {
             <h2 className={'font-bold mb-5'}>Question Behaviour</h2>
 
             <div className={'flex flex-col gap-8'}>
-              <div className="flex flex-col gap-3">
-                <span className={'text-sm text-muted-foreground'}>
-                  The &#34;Sequential&#34; input enforces participants to answer
-                  questions in a fixed order, without skipping or returning to
-                  previous questions.
-                </span>
-                <div className="items-center grid grid-cols-2 max-w-sm">
-                  <Label htmlFor="airplane-mode">Sequential</Label>
-                  <Switch
-                    id="airplane-mode"
-                    checked={isSequential}
-                    onCheckedChange={setIsSequential}
-                  />
-                </div>
-              </div>
+              {/*<div className="flex flex-col gap-3">*/}
+              {/*  <span className={'text-sm text-muted-foreground'}>*/}
+              {/*    The &#34;Sequential&#34; input enforces participants to answer*/}
+              {/*    questions in a fixed order, without skipping or returning to*/}
+              {/*    previous questions.*/}
+              {/*  </span>*/}
+              {/*  <div className="items-center grid grid-cols-2 max-w-sm">*/}
+              {/*    <Label htmlFor="airplane-mode">Sequential</Label>*/}
+              {/*    <Switch*/}
+              {/*      id="airplane-mode"*/}
+              {/*      checked={isSequential}*/}
+              {/*      onCheckedChange={setIsSequential}*/}
+              {/*    />*/}
+              {/*  </div>*/}
+              {/*</div>*/}
 
               <div className="flex flex-col gap-3">
                 <span className={'text-sm text-muted-foreground'}>
