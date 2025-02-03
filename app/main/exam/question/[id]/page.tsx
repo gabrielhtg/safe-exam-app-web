@@ -17,9 +17,8 @@ import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import {
   ArrowLeft,
-  CircleCheck,
-  CircleX,
   EllipsisVertical,
+  Landmark,
   Pen,
   RotateCcw,
   Trash2,
@@ -30,19 +29,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamQuestionPage({ params }: any) {
@@ -56,35 +62,10 @@ export default function ExamQuestionPage({ params }: any) {
   const [editorConfig, setEditorConfig] = useState<any>(null)
   const currentUsername = useSelector(selectUser).username
   const [examData, setExamData] = useState<any>(null)
-  const [dialogMsg, setDialogMsg] = useState('')
-  // const [loadingTitle, setLoadingTitle] = useState('')
-  const [showDialog, setShowDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
   const [isOptionCorrect, setIsOptionCorrect] = useState<boolean>(false)
   const [showCorrectSwitch, setShowCorrectSwitch] = useState(true)
   const router = useRouter()
-
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Success
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Failed
-        </>
-      )
-    }
-
-    return ''
-  }
+  const [allQuestionData, setAllQuestionData] = useState<any[]>([])
 
   const getAllQuestions = async () => {
     try {
@@ -119,30 +100,37 @@ export default function ExamQuestionPage({ params }: any) {
 
       if (response.status === 200) {
         getAllQuestions().then()
-        setShowDialog(true)
-        setDialogType(1)
-        setDialogMsg(response.data.message)
+        toast.success(response.data.message)
       }
     } catch (error: any) {
       console.log(error)
     }
   }
 
+  const handleGetAllQuestion = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/question`, {
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        params: {
+          course: examData.course.id,
+        },
+      })
+
+      setAllQuestionData(response.data.data)
+    } catch (e: any) {
+      toast.error(`Fail to get all question. ${e.response.message}`)
+    }
+  }
+
   const handleSaveQuestion = async () => {
     if (tempContent === '' && questionType !== 'essay') {
       getAllQuestions().then()
-      // setShowDialog(true)
-      // setDialogType(0)
-      // setDialogMsg('')
       toast.error('Questions cannot be empty!')
       return
     }
 
     if (value === '' && questionType === 'essay') {
       getAllQuestions().then()
-      // setShowDialog(true)
-      // setDialogType(0)
-      // setDialogMsg('Questions cannot be empty!')
       toast.error('Questions cannot be empty!')
       return
     }
@@ -222,7 +210,7 @@ export default function ExamQuestionPage({ params }: any) {
   }, [])
 
   return (
-    <ContentLayout title="Exam">
+    <ContentLayout title="Exam Question">
       <Card
         id={'card-utama'}
         className={'w-full p-10 min-h-[calc(100vh-180px)]'}
@@ -293,7 +281,11 @@ export default function ExamQuestionPage({ params }: any) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      router.push(`/main/exam/question/edit/${e.id}`)
+                    }}
+                  >
                     <Pen />
                     Edit
                   </DropdownMenuItem>
@@ -385,19 +377,75 @@ export default function ExamQuestionPage({ params }: any) {
                                     setTempContent(value)
                                     setValue('')
                                   } else {
-                                    setDialogType(0)
-                                    setDialogMsg("Question can't be empty.")
-                                    setShowDialog(true)
+                                    toast.error("Question can't be empty.")
                                   }
                                 }}
                               >
                                 Add Option
                               </Button>
+
                               <Button variant={'outline'} asChild>
                                 <Link href={'/main/exam'}>
                                   Done Add Question
                                 </Link>
                               </Button>
+
+                              <Dialog>
+                                <DialogTrigger>
+                                  <Button
+                                    variant={'outline'}
+                                    onClick={() => {
+                                      handleGetAllQuestion().then()
+                                    }}
+                                  >
+                                    <Landmark /> Question Bank
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className={'max-w-4xl w-full'}>
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Select the question you want to add
+                                    </DialogTitle>
+                                  </DialogHeader>
+
+                                  <div className={'border rounded-lg'}>
+                                    <Table>
+                                      <TableHeader>
+                                        <TableRow className={'divide-x'}>
+                                          <TableHead>Question</TableHead>
+                                          <TableHead>Type</TableHead>
+                                          <TableHead>Action</TableHead>
+                                        </TableRow>
+                                      </TableHeader>
+                                      <TableBody>
+                                        {allQuestionData?.map(
+                                          (
+                                            questionDataItem: any,
+                                            index: number
+                                          ) => (
+                                            <TableRow
+                                              key={index}
+                                              className={'divide-x'}
+                                            >
+                                              <TableCell>
+                                                {questionDataItem.content}
+                                              </TableCell>
+                                              <TableCell>
+                                                {questionDataItem.type}
+                                              </TableCell>
+                                              <TableCell>
+                                                <Button variant={'secondary'}>
+                                                  Select
+                                                </Button>
+                                              </TableCell>
+                                            </TableRow>
+                                          )
+                                        )}
+                                      </TableBody>
+                                    </Table>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
                             </div>
                           ) : (
                             <div className={'flex gap-3'}>
@@ -444,9 +492,7 @@ export default function ExamQuestionPage({ params }: any) {
                                 }
                                 setIsOptionCorrect(false)
                               } else {
-                                setDialogType(0)
-                                setDialogMsg("Option can't be empty.")
-                                setShowDialog(true)
+                                toast.error("Option can't be empty.")
                               }
                             }}
                           >
@@ -560,47 +606,6 @@ export default function ExamQuestionPage({ params }: any) {
           </div>
         </div>
       </Card>
-
-      <AlertDialog open={showDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {getAlertTitle()}
-            </AlertDialogTitle>
-            <AlertDialogDescription className={'text-center'}>
-              {dialogMsg}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setShowDialog(false)
-              }}
-            >
-              OK
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/*<AlertDialog open={loadingModal}>*/}
-      {/*  <AlertDialogContent>*/}
-      {/*    <AlertDialogHeader>*/}
-      {/*      <AlertDialogTitle*/}
-      {/*        className={'text-center flex flex-col items-center'}*/}
-      {/*      >*/}
-      {/*        {loadingTitle}*/}
-      {/*      </AlertDialogTitle>*/}
-      {/*      <AlertDialogDescription*/}
-      {/*        className={'flex w-full justify-center mt-3'}*/}
-      {/*      >*/}
-      {/*        <Loader2 className="animate-spin w-10 h-10" />*/}
-      {/*      </AlertDialogDescription>*/}
-      {/*    </AlertDialogHeader>*/}
-      {/*  </AlertDialogContent>*/}
-      {/*</AlertDialog>*/}
     </ContentLayout>
   )
 }
