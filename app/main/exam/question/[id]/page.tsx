@@ -66,6 +66,7 @@ export default function ExamQuestionPage({ params }: any) {
   const [showCorrectSwitch, setShowCorrectSwitch] = useState(true)
   const router = useRouter()
   const [allQuestionData, setAllQuestionData] = useState<any[]>([])
+  const [showAddQuestionDialog, setShowAddQuestionDialog] = useState(false)
 
   const getAllQuestions = async () => {
     try {
@@ -123,6 +124,8 @@ export default function ExamQuestionPage({ params }: any) {
   }
 
   const handleSaveQuestion = async () => {
+    console.log(tempContent)
+
     if (tempContent === '' && questionType !== 'essay') {
       getAllQuestions().then()
       toast.error('Questions cannot be empty!')
@@ -143,6 +146,36 @@ export default function ExamQuestionPage({ params }: any) {
           type: questionType,
           options: tempOptions,
           remarks: remarks,
+          course: examData.course_id,
+          created_by: currentUsername,
+          exam_id: id,
+        },
+        getBearerHeader(localStorage.getItem('token')!)
+      )
+
+      if (saveResponse.status === 200) {
+        getAllQuestions().then()
+        toast.success(saveResponse.data.message)
+      }
+    } catch (err: any) {
+      toast.success(err.response.message)
+    }
+  }
+
+  const handleAddFromQuestionBank = async (
+    content: string,
+    questionTypeParam: string,
+    optionsParam: any,
+    remarksParam: any
+  ) => {
+    try {
+      const saveResponse = await axios.post(
+        `${apiUrl}/question`,
+        {
+          content: content,
+          type: questionTypeParam,
+          options: optionsParam,
+          remarks: remarksParam,
           course: examData.course_id,
           created_by: currentUsername,
           exam_id: id,
@@ -309,9 +342,9 @@ export default function ExamQuestionPage({ params }: any) {
                 <div className={'mb-3'}>
                   {parse(tempContent)}
 
-                  {tempOptions.length > 0 ? (
+                  {tempOptions?.length > 0 ? (
                     <div className={'flex ms-5 flex-col mt-2'}>
-                      {tempOptions.map((item: any, index: number) => (
+                      {tempOptions?.map((item: any, index: number) => (
                         <div key={index} className={'flex items-center gap-3'}>
                           <div>
                             {questionType === 'multiple' ? (
@@ -390,11 +423,12 @@ export default function ExamQuestionPage({ params }: any) {
                                 </Link>
                               </Button>
 
-                              <Dialog>
+                              <Dialog open={showAddQuestionDialog}>
                                 <DialogTrigger>
                                   <Button
                                     variant={'outline'}
                                     onClick={() => {
+                                      setShowAddQuestionDialog(true)
                                       handleGetAllQuestion().then()
                                     }}
                                   >
@@ -428,13 +462,28 @@ export default function ExamQuestionPage({ params }: any) {
                                               className={'divide-x'}
                                             >
                                               <TableCell>
-                                                {questionDataItem.content}
+                                                {parse(
+                                                  questionDataItem.content
+                                                )}
                                               </TableCell>
                                               <TableCell>
                                                 {questionDataItem.type}
                                               </TableCell>
                                               <TableCell>
-                                                <Button variant={'secondary'}>
+                                                <Button
+                                                  variant={'secondary'}
+                                                  onClick={() => {
+                                                    setShowAddQuestionDialog(
+                                                      false
+                                                    )
+                                                    handleAddFromQuestionBank(
+                                                      questionDataItem.content,
+                                                      questionDataItem.type,
+                                                      questionDataItem.options,
+                                                      questionDataItem.remarks
+                                                    ).then()
+                                                  }}
+                                                >
                                                   Select
                                                 </Button>
                                               </TableCell>
@@ -501,7 +550,7 @@ export default function ExamQuestionPage({ params }: any) {
                               : 'Save Option'}
                           </Button>
 
-                          {tempOptions.length > 1 &&
+                          {tempOptions?.length > 1 &&
                           (value === '' || value === '<p><br></p>') ? (
                             <Button
                               onClick={() => {
