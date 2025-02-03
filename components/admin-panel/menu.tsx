@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { Ellipsis, LogOut } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 
@@ -16,6 +15,11 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip'
 import logoutService from '@/app/_services/logout.service'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { apiUrl } from '@/lib/env'
+import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
+import Link from 'next/link'
 
 interface MenuProps {
   isOpen: boolean | undefined
@@ -25,17 +29,40 @@ export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname()
   const menuList = getMenuList(pathname)
   const router = useRouter()
+  const [userData, setUserData] = useState<any>()
 
   const handleLogout = () => {
     logoutService(router)
   }
 
+  const handleGetUser = async () => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}/users/${localStorage.getItem('username')}`,
+        getBearerHeader(localStorage.getItem('token')!)
+      )
+
+      setUserData(response.data.data)
+    } catch (e: any) {
+      if (e.response && e.response.status === 401) {
+        router.push('/')
+      }
+    }
+  }
+
+  useEffect(() => {
+    handleGetUser().then()
+  }, [])
+
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
       <nav className="mt-8 w-full">
         <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-50px)] items-start space-y-1 px-2">
-          {menuList.map(({ groupLabel, menus }, index) => (
-            <li className={cn('w-full', groupLabel ? 'pt-5' : '')} key={index}>
+          {menuList.map(({ groupLabel, menus }, groupIndex) => (
+            <li
+              className={cn('w-full', groupLabel ? 'pt-5' : '')}
+              key={groupIndex}
+            >
               {(isOpen && groupLabel) || isOpen === undefined ? (
                 <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
                   {groupLabel}
@@ -57,56 +84,119 @@ export function Menu({ isOpen }: MenuProps) {
                 <p className="pb-2"></p>
               )}
               {menus.map(
-                ({ href, label, icon: Icon, active, submenus }, index) =>
+                ({ href, label, icon: Icon, active, submenus }, menuIndex) =>
                   !submenus || submenus.length === 0 ? (
-                    <div className="w-full" key={index}>
-                      <TooltipProvider disableHoverableContent>
-                        <Tooltip delayDuration={100}>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant={
-                                (active === undefined &&
-                                  href.includes(pathname.split('/')[2]) &&
-                                  href.split('/').length > 1) ||
-                                (active === undefined &&
-                                  pathname === href &&
-                                  href.split('/').length == 2) ||
-                                active
-                                  ? 'secondary'
-                                  : 'ghost'
-                              }
-                              className="w-full justify-start h-10 mb-1"
-                              asChild
-                            >
-                              <Link href={href}>
-                                <span
-                                  className={cn(isOpen === false ? '' : 'mr-4')}
+                    <>
+                      {userData?.role === 'ADMIN' ? (
+                        <div className="w-full" key={menuIndex}>
+                          <TooltipProvider disableHoverableContent>
+                            <Tooltip delayDuration={100}>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant={
+                                    (active === undefined &&
+                                      href.includes(pathname.split('/')[2]) &&
+                                      href.split('/').length > 1) ||
+                                    (active === undefined &&
+                                      pathname === href &&
+                                      href.split('/').length == 2) ||
+                                    active
+                                      ? 'secondary'
+                                      : 'ghost'
+                                  }
+                                  className="w-full justify-start h-10 mb-1"
+                                  asChild
                                 >
-                                  <Icon size={18} />
-                                </span>
-                                <p
-                                  className={cn(
-                                    'max-w-[200px] truncate',
-                                    isOpen === false
-                                      ? '-translate-x-96 opacity-0'
-                                      : 'translate-x-0 opacity-100'
-                                  )}
-                                >
+                                  <Link href={href}>
+                                    <span
+                                      className={cn(
+                                        isOpen === false ? '' : 'mr-4'
+                                      )}
+                                    >
+                                      <Icon size={18} />
+                                    </span>
+                                    <p
+                                      className={cn(
+                                        'max-w-[200px] truncate',
+                                        isOpen === false
+                                          ? '-translate-x-96 opacity-0'
+                                          : 'translate-x-0 opacity-100'
+                                      )}
+                                    >
+                                      {label}
+                                    </p>
+                                  </Link>
+                                </Button>
+                              </TooltipTrigger>
+                              {isOpen === false && (
+                                <TooltipContent side="right">
                                   {label}
-                                </p>
-                              </Link>
-                            </Button>
-                          </TooltipTrigger>
-                          {isOpen === false && (
-                            <TooltipContent side="right">
-                              {label}
-                            </TooltipContent>
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      ) : (
+                        <>
+                          {label !== 'Users' ? (
+                            <div className="w-full" key={menuIndex}>
+                              <TooltipProvider disableHoverableContent>
+                                <Tooltip delayDuration={100}>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant={
+                                        (active === undefined &&
+                                          href.includes(
+                                            pathname.split('/')[2]
+                                          ) &&
+                                          href.split('/').length > 1) ||
+                                        (active === undefined &&
+                                          pathname === href &&
+                                          href.split('/').length == 2) ||
+                                        active
+                                          ? 'secondary'
+                                          : 'ghost'
+                                      }
+                                      className="w-full justify-start h-10 mb-1"
+                                      asChild
+                                    >
+                                      <Link href={href}>
+                                        <span
+                                          className={cn(
+                                            isOpen === false ? '' : 'mr-4'
+                                          )}
+                                        >
+                                          <Icon size={18} />
+                                        </span>
+                                        <p
+                                          className={cn(
+                                            'max-w-[200px] truncate',
+                                            isOpen === false
+                                              ? '-translate-x-96 opacity-0'
+                                              : 'translate-x-0 opacity-100'
+                                          )}
+                                        >
+                                          {label}
+                                        </p>
+                                      </Link>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  {isOpen === false && (
+                                    <TooltipContent side="right">
+                                      {label}
+                                    </TooltipContent>
+                                  )}
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          ) : (
+                            ''
                           )}
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
+                        </>
+                      )}
+                    </>
                   ) : (
-                    <div className="w-full" key={index}>
+                    <div className="w-full" key={menuIndex}>
                       <CollapseMenuButton
                         icon={Icon}
                         label={label}

@@ -5,6 +5,7 @@ import {
   LayoutGrid,
   LucideIcon,
   Landmark,
+  Users,
 } from 'lucide-react'
 
 type Submenu = {
@@ -62,11 +63,11 @@ export function getMenuList(pathname: string): Group[] {
     {
       groupLabel: 'Settings',
       menus: [
-        // {
-        //   href: '/users',
-        //   label: 'Users',
-        //   icon: Users,
-        // },
+        {
+          href: '/main/users',
+          label: 'Users',
+          icon: Users,
+        },
         {
           href: '/main/profile',
           label: 'Account',

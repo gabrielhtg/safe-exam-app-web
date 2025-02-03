@@ -12,20 +12,14 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
+import { apiUrl, compressOptions } from '@/lib/env'
 import { useState } from 'react'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { CircleCheck, CircleX, ImagePlus, LogIn } from 'lucide-react'
+import { ImagePlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Skeleton } from '@/components/ui/skeleton'
+import { toast, Toaster } from 'sonner'
+import imageCompression from 'browser-image-compression'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -37,9 +31,12 @@ export default function RegisterPage() {
   const [fotoProfil, setFotoProfil] = useState<File | undefined>()
   const router = useRouter()
 
-  const [dialogMsg, setDialogMsg] = useState('')
-  const [errDialog, setErrDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
+  // err section
+  const [nameErr, setNameErr] = useState('')
+  const [usernameErr, setUsernameErr] = useState('')
+  const [emailErr, setEmailErr] = useState('')
+  const [passwordErr, setPasswordErr] = useState('')
+  const [rePasswordErr, setRePasswordErr] = useState('')
 
   const handleRegister = async () => {
     const formData = new FormData()
@@ -47,53 +44,34 @@ export default function RegisterPage() {
     formData.append('username', username)
     formData.append('email', email)
     formData.append('password', password)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    formData.append('profile_pict', fotoProfil)
+    if (fotoProfil) {
+      const compressedImage = await imageCompression(
+        fotoProfil!,
+        compressOptions
+      )
+      formData.append('profile_pict', compressedImage)
+    } else {
+      formData.append('profile_pict', fotoProfil!)
+    }
+
     try {
       if (password == rePassword) {
-        const response = await axios.post(
-          `${apiUrl}/users/`,
-          formData
-        )
+        const response = await axios.post(`${apiUrl}/users/`, formData)
 
         if (response.status === 200) {
-          setDialogType(1)
-          setDialogMsg(response.data.message)
-          setErrDialog(true)
+          toast.success(response.data.message, {
+            action: {
+              label: 'Login',
+              onClick: () => router.push('/'),
+            },
+          })
         }
       } else {
-        setDialogMsg('Passwords are not the same!')
-        setErrDialog(true)
-        setDialogType(0)
+        toast.error('Passwords are not the same!')
       }
     } catch (err: any) {
-      setDialogMsg(err.response.data.message)
-      setErrDialog(true)
-      setDialogType(0)
+      toast.error(err.response.data.message)
     }
-  }
-
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Register Success!
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Register Failed!
-        </>
-      )
-    }
-
-    return ''
   }
 
   return (
@@ -136,66 +114,111 @@ export default function RegisterPage() {
               className={'mb-3'}
               id="picture"
               type="file"
+              accept="image/jpeg, image/png"
               onChange={(e) => {
                 setProfilePict(URL.createObjectURL(e.target.files![0]))
                 setFotoProfil(e.target.files![0])
               }}
             />
 
-            <Input
-              id={'input-name'}
-              type={'text'}
-              className={'mb-3'}
-              onChange={(e) => {
-                setName(e.target.value)
-              }}
-              placeholder={'Name'}
-            />
+            <div className={'flex flex-col mb-3'}>
+              <Input
+                id={'input-name'}
+                type={'text'}
+                className={'mb-3'}
+                onChange={(e) => {
+                  setName(e.target.value)
+                }}
+                placeholder={'Name'}
+              />
+              <span className={'text-red-500 text-sm'}>{nameErr}</span>
+            </div>
 
-            <Input
-              id={'input-username'}
-              type={'text'}
-              onChange={(e) => {
-                setUsername(e.target.value)
-              }}
-              className={'mb-3'}
-              placeholder={'Username'}
-            />
+            <div className={'flex flex-col mb-3'}>
+              <Input
+                id={'input-username'}
+                type={'text'}
+                onChange={(e) => {
+                  setUsername(e.target.value)
+                }}
+                placeholder={'Username'}
+              />
+              <span className={'text-red-500 text-sm'}>{usernameErr}</span>
+            </div>
 
-            <Input
-              id={'input-email'}
-              type={'email'}
-              onChange={(e) => {
-                setEmail(e.target.value)
-              }}
-              className={'mb-3'}
-              placeholder={'Email'}
-            />
+            <div className={'flex flex-col mb-3'}>
+              <Input
+                id={'input-email'}
+                type={'email'}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                }}
+                placeholder={'Email'}
+              />
+              <span className={'text-red-500 text-sm'}>{emailErr}</span>
+            </div>
 
-            <Input
-              id={'input-password'}
-              type={'password'}
-              className={'mb-3'}
-              placeholder={'Password'}
-              onChange={(e) => {
-                setPassword(e.target.value)
-              }}
-            />
+            <div className={'flex flex-col mb-3'}>
+              <Input
+                id={'input-password'}
+                type={'password'}
+                placeholder={'Password'}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                }}
+              />
+              <span className={'text-red-500 text-sm'}>{passwordErr}</span>
+            </div>
 
-            <Input
-              id={'input-reenter-password'}
-              type={'password'}
-              onChange={(e) => {
-                setRePassword(e.target.value)
-              }}
-              placeholder={'Confirm Password'}
-            />
+            <div className={'flex flex-col'}>
+              <Input
+                id={'input-reenter-password'}
+                type={'password'}
+                onChange={(e) => {
+                  setRePassword(e.target.value)
+                }}
+                placeholder={'Confirm Password'}
+              />
+              <span className={'text-red-500 text-sm'}>{rePasswordErr}</span>
+            </div>
           </CardContent>
 
           <CardFooter className={'gap-x-3 flex-col items-start'}>
             <div className="flex gap-x-3 w-full">
               <Button
-                onClick={handleRegister}
+                onClick={() => {
+                  if (username === '') {
+                    setUsernameErr('Cannot be blank')
+                    return
+                  }
+
+                  if (name === '') {
+                    setNameErr('Cannot be blank')
+                    return
+                  }
+
+                  if (email === '') {
+                    setEmailErr('Cannot be blank')
+                    return
+                  }
+
+                  if (!email.includes('@')) {
+                    setEmailErr('Not a valid email')
+                    return
+                  }
+
+                  if (password === '') {
+                    setPasswordErr('Cannot be blank')
+                    return
+                  }
+
+                  if (rePassword === '') {
+                    setRePasswordErr('Cannot be blank')
+                    return
+                  }
+
+                  handleRegister().then()
+                }}
                 id="button-register"
                 className="w-full"
               >
@@ -214,31 +237,7 @@ export default function RegisterPage() {
         </Card>
       </div>
 
-      <AlertDialog open={errDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {getAlertTitle()}
-            </AlertDialogTitle>
-            <AlertDialogDescription className={'text-center'}>
-              {dialogMsg}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setErrDialog(false)
-                router.push('/')
-              }}
-            >
-              <LogIn />
-              Login Now
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Toaster />
     </>
   )
 }

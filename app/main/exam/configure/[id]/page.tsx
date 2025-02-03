@@ -8,7 +8,15 @@ import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import axios from 'axios'
 import { apiUrl } from '@/lib/env'
 import { Button } from '@/components/ui/button'
-import { CircleCheck, CirclePlay, CircleX, RotateCcw, Save } from 'lucide-react'
+import {
+  ArrowLeft,
+  CalendarIcon,
+  CircleCheck,
+  CirclePlay,
+  CircleX,
+  RotateCcw,
+  Save,
+} from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -23,6 +31,16 @@ import dynamic from 'next/dynamic'
 import { Input } from '@/components/ui/input'
 import { TimePickerDemo } from '@/components/custom-component/time-picker-demo'
 import Link from 'next/link'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
+import { Calendar } from '@/components/ui/calendar'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamConfigPage({ params }: any) {
@@ -32,6 +50,7 @@ export default function ExamConfigPage({ params }: any) {
   const [showDialog, setShowDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
   const [editorConfig, setEditorConfig] = useState<any>(null)
+  const router = useRouter()
 
   // state untuk exam behaviour
   const [examDescription, setExamDescription] = useState('')
@@ -44,11 +63,20 @@ export default function ExamConfigPage({ params }: any) {
   const [cheatingLimit, setCheatingLimit] = useState(5)
   const [passingGrade, setPassingGrade] = useState(75)
   const [timeLimit, setTimeLimit] = useState<Date>()
+  const [examStartDate, setExamStartDate] = useState<Date>()
+  const [examEndDate, setExamEndDate] = useState<Date>()
 
   // state untuk question behaviour
   const [isSequential, setIsSequential] = useState(false)
   const [shuffleOptions, setShuffleOptions] = useState(false)
   const [shuffleQuestions, setShuffleQuestions] = useState(false)
+
+  // err state
+  const [startTimeErr, setStartTimeErr] = useState('')
+  const [endTimeErr, setEndTimeErr] = useState('')
+  const [allowedAttemptErr, setAllowedAttemptErr] = useState('')
+  const [cheatingLimitErr, setCheatingLimitErr] = useState('')
+  const [passingGradeErr, setPassingGradeErr] = useState('')
 
   const getAlertTitle = () => {
     if (dialogType == 1) {
@@ -92,6 +120,8 @@ export default function ExamConfigPage({ params }: any) {
     setShuffleOptions(response.data.data.shuffle_options)
     setStartPassword(response.data.data.start_password)
     setEndPassword(response.data.data.end_password)
+    setExamStartDate(new Date(response.data.data.start_date))
+    setExamEndDate(new Date(response.data.data.end_date))
 
     const tempDate = new Date()
     tempDate.setHours(
@@ -124,6 +154,8 @@ export default function ExamConfigPage({ params }: any) {
           cheating_limit: cheatingLimit,
           start_password: startPassword,
           end_password: endPassword,
+          start_date: examStartDate,
+          end_date: examEndDate,
           time_limit: timeLimit
             ? timeLimit.getHours() * 3600 +
               timeLimit.getMinutes() * 60 +
@@ -145,54 +177,69 @@ export default function ExamConfigPage({ params }: any) {
   }
 
   useEffect(() => {
-    const loadQuill = async () => {
-      const { Quill } = (await import('react-quill')).default
-      const QuillResizeImage = (await import('quill-resize-image')).default
+    try {
+      const loadQuill = async () => {
+        const { Quill } = (await import('react-quill')).default
+        const QuillResizeImage = (await import('quill-resize-image')).default
 
-      Quill.register('modules/resize', QuillResizeImage)
+        Quill.register('modules/resize', QuillResizeImage)
 
-      setEditorConfig({
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, 3, 4, false] }],
-            [{ font: [] }],
-            [{ size: [] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-            [{ color: [] }, { background: [] }],
-            [{ align: [] }],
-            [
-              { list: 'ordered' },
-              { list: 'bullet' },
-              { indent: '-1' },
-              { indent: '+1' },
+        setEditorConfig({
+          modules: {
+            toolbar: [
+              [{ header: [1, 2, 3, 4, false] }],
+              [{ font: [] }],
+              [{ size: [] }],
+              ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+              [{ color: [] }, { background: [] }],
+              [{ align: [] }],
+              [
+                { list: 'ordered' },
+                { list: 'bullet' },
+                { indent: '-1' },
+                { indent: '+1' },
+              ],
+              ['link', 'image', 'video'],
+              ['clean'],
             ],
-            ['link', 'image', 'video'],
-            ['clean'],
-          ],
-          resize: {
-            locale: {},
+            resize: {
+              locale: {},
+            },
           },
-        },
-        formats: [
-          'header',
-          'bold',
-          'italic',
-          'underline',
-          'strike',
-          'blockquote',
-          'list',
-          'bullet',
-          'indent',
-          'link',
-          'image',
-        ],
-      })
+          formats: [
+            'header',
+            'bold',
+            'italic',
+            'underline',
+            'strike',
+            'blockquote',
+            'list',
+            'bullet',
+            'indent',
+            'link',
+            'image',
+          ],
+        })
+      }
+      loadQuill().then()
+    } catch (e: any) {
+      console.log(e)
+      toast.error('Internet connection issue. Reload this page!')
     }
-
-    loadQuill().then()
 
     getExamData().then()
   }, [])
+
+  useEffect(() => {
+    if (timeLimit) {
+      setCheatingLimit(
+        (timeLimit.getHours() * 3600 +
+          timeLimit.getMinutes() * 60 +
+          timeLimit.getSeconds()) /
+          1200
+      )
+    }
+  }, [timeLimit])
 
   return (
     <ContentLayout title="Configure Exam">
@@ -292,8 +339,13 @@ export default function ExamConfigPage({ params }: any) {
                       type={'number'}
                       id="shuffle-options"
                       className={'w-[80px]'}
+                      min={1}
+                      max={5}
                     />
                   </div>
+                  <span className={'text-red-500 text-sm'}>
+                    {allowedAttemptErr}
+                  </span>
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -308,10 +360,14 @@ export default function ExamConfigPage({ params }: any) {
                       value={cheatingLimit}
                       onChange={(e) => setCheatingLimit(+e.target.value)}
                       type={'number'}
+                      min={0}
                       id="cheating-limit"
                       className={'w-[80px]'}
                     />
                   </div>
+                  <span className={'text-red-500 text-sm'}>
+                    {cheatingLimitErr}
+                  </span>
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -326,11 +382,15 @@ export default function ExamConfigPage({ params }: any) {
                       value={passingGrade}
                       onChange={(e) => setPassingGrade(+e.target.value)}
                       type={'number'}
+                      min={1}
                       id="passing-grade"
                       className={'w-[80px]'}
                     />
                   </div>
                 </div>
+                <span className={'text-red-500 text-sm'}>
+                  {passingGradeErr}
+                </span>
               </div>
 
               {/* Sebelah kanan */}
@@ -377,6 +437,88 @@ export default function ExamConfigPage({ params }: any) {
                     <TimePickerDemo date={timeLimit} setDate={setTimeLimit} />
                   </div>
                 </div>
+
+                <div className="flex flex-col gap-3">
+                  <span className={'text-sm text-muted-foreground'}>
+                    Start time functions to determine when the exam can start.
+                  </span>
+                  <div className="items-center grid grid-cols-2 max-w-sm">
+                    <Label>Start Time</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            'justify-start text-left font-normal',
+                            !examStartDate && 'text-muted-foreground'
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {examStartDate ? (
+                            format(examStartDate, 'dd MMM yyy HH:mm')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={examStartDate}
+                          onSelect={setExamStartDate}
+                        />
+                        <div className="p-3 border-t border-border">
+                          <TimePickerDemo
+                            setDate={setExamStartDate}
+                            date={examStartDate}
+                          />
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <span className={'text-red-500 text-sm'}>{startTimeErr}</span>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <span className={'text-sm text-muted-foreground'}>
+                    End time functions to determine when the exam will end.
+                  </span>
+                  <div className="items-center grid grid-cols-2 max-w-sm">
+                    <Label>End Time</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            'justify-start text-left font-normal',
+                            !examEndDate && 'text-muted-foreground'
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {examEndDate ? (
+                            format(examEndDate, 'dd MMM yyy HH:mm')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={examEndDate}
+                          onSelect={setExamEndDate}
+                        />
+                        <div className="p-3 border-t border-border">
+                          <TimePickerDemo
+                            setDate={setExamEndDate}
+                            date={examEndDate}
+                          />
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <span className={'text-red-500 text-sm'}>{endTimeErr}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -387,21 +529,21 @@ export default function ExamConfigPage({ params }: any) {
             <h2 className={'font-bold mb-5'}>Question Behaviour</h2>
 
             <div className={'flex flex-col gap-8'}>
-              <div className="flex flex-col gap-3">
-                <span className={'text-sm text-muted-foreground'}>
-                  The &#34;Sequential&#34; input enforces participants to answer
-                  questions in a fixed order, without skipping or returning to
-                  previous questions.
-                </span>
-                <div className="items-center grid grid-cols-2 max-w-sm">
-                  <Label htmlFor="airplane-mode">Sequential</Label>
-                  <Switch
-                    id="airplane-mode"
-                    checked={isSequential}
-                    onCheckedChange={setIsSequential}
-                  />
-                </div>
-              </div>
+              {/*<div className="flex flex-col gap-3">*/}
+              {/*  <span className={'text-sm text-muted-foreground'}>*/}
+              {/*    The &#34;Sequential&#34; input enforces participants to answer*/}
+              {/*    questions in a fixed order, without skipping or returning to*/}
+              {/*    previous questions.*/}
+              {/*  </span>*/}
+              {/*  <div className="items-center grid grid-cols-2 max-w-sm">*/}
+              {/*    <Label htmlFor="airplane-mode">Sequential</Label>*/}
+              {/*    <Switch*/}
+              {/*      id="airplane-mode"*/}
+              {/*      checked={isSequential}*/}
+              {/*      onCheckedChange={setIsSequential}*/}
+              {/*    />*/}
+              {/*  </div>*/}
+              {/*</div>*/}
 
               <div className="flex flex-col gap-3">
                 <span className={'text-sm text-muted-foreground'}>
@@ -439,8 +581,45 @@ export default function ExamConfigPage({ params }: any) {
         </div>
 
         <div className={'flex gap-3'}>
-          <Button onClick={handleSaveConfig}>
+          <Button
+            onClick={() => {
+              if (allowedAttemps <= 0) {
+                setAllowedAttemptErr('Allowed Attempts must be greater than 0.')
+                return
+              }
+
+              if (cheatingLimit < 0) {
+                setCheatingLimitErr('Cheating limits cannot be negative.')
+                return
+              }
+
+              if (passingGrade < 1) {
+                setPassingGradeErr('Passing Grade must be greater than 0.')
+                return
+              }
+
+              if (examStartDate!.getTime() > examEndDate!.getTime()) {
+                setStartTimeErr(
+                  'The start date cannot be earlier than the end date.'
+                )
+                setEndTimeErr(
+                  'The end date cannot be later than the start date.'
+                )
+                return
+              }
+
+              handleSaveConfig().then()
+            }}
+          >
             <Save /> Save Configuration
+          </Button>
+          <Button
+            variant={'outline'}
+            onClick={() => {
+              router.back()
+            }}
+          >
+            <ArrowLeft /> Back
           </Button>
           <Button variant={'outline'} asChild>
             <Link className={'flex'} href={`/main/exam/simulate/${id}`}>

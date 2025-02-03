@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-  CircleCheck,
   CircleX,
   Eye,
   ImagePlus,
@@ -18,8 +17,10 @@ import {
   Loader2,
   Pencil,
   Plus,
+  RefreshCcw,
   Search,
   Trash2,
+  UserCog,
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -42,31 +43,42 @@ import { Skeleton } from '@/components/ui/skeleton'
 import axios from 'axios'
 import { apiUrl, compressOptions } from '@/lib/env'
 import imageCompression from 'browser-image-compression'
-import { useSelector } from 'react-redux'
-import { selectUser } from '@/lib/_slices/userSlice'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import TextTruncate from 'react-text-truncate'
+import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Spinner } from '@/components/custom-component/Spinner'
 
 export default function CoursePage() {
-  const [dialogMsg, setDialogMsg] = useState('')
-  const [errDialog, setErrDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
+  const [addDialog, setAddDialog] = useState(false)
   const [isLoadingCreate, setIsLoadingCreate] = useState(false)
 
   const [courseImage, setCourseImage] = useState('')
   const [courseImageFile, setCourseImageFile] = useState<File | undefined>()
   const [courseTitle, setCourseTitle] = useState('')
-  const [courseTitleOld, setCourseTitleOld] = useState('')
   const [courseDesc, setCourseDesc] = useState('')
-  const currentUsername = useSelector(selectUser).username
+  const [courseTitleErr, setCourseTitleErr] = useState('')
+  const [courseDescErr, setCourseDescErr] = useState('')
+  const [courseImageErr, setCourseImageErr] = useState('')
   const [courseList, setCourseList] = useState([])
   const [loadingTitle, setLoadingTitle] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
+  const [loadingSeeCourseDetail, setLoadingSeeCourseDetail] = useState(false)
+
+  const router = useRouter()
 
   const getAllCourse = async () => {
     const response = await axios.get(`${apiUrl}/course`, {
       params: {
-        uploader: currentUsername,
+        uploader: localStorage.getItem('username'),
       },
       headers: getBearerHeader(localStorage.getItem('token')!).headers,
     })
@@ -96,14 +108,10 @@ export default function CoursePage() {
         getBearerHeader(localStorage.getItem('token')!)
       )
 
-      setErrDialog(true)
-      setDialogType(1)
-      setDialogMsg(removeResponse.data.message)
+      toast.success(removeResponse.data.message)
       getAllCourse().then()
     } catch (err: any) {
-      setErrDialog(true)
-      setDialogType(0)
-      setDialogMsg(err.response.data.message)
+      toast.error(err.response.data.message)
       getAllCourse().then()
     }
   }
@@ -114,15 +122,17 @@ export default function CoursePage() {
     const formData = new FormData()
     formData.append('title', courseTitle)
     formData.append('description', courseDesc)
-    formData.append('username', currentUsername)
+    formData.append('username', localStorage.getItem('username')!)
 
     try {
-      const compressedImage = await imageCompression(
-        courseImageFile!,
-        compressOptions
-      )
+      if (courseImageFile) {
+        const compressedImage = await imageCompression(
+          courseImageFile!,
+          compressOptions
+        )
 
-      formData.append('course_pict', compressedImage)
+        formData.append('course_pict', compressedImage)
+      }
 
       const response = await axios.post(
         `${apiUrl}/course`,
@@ -132,49 +142,29 @@ export default function CoursePage() {
 
       if (response.status === 200) {
         getAllCourse().then()
-        setErrDialog(true)
-        setDialogType(1)
-        setDialogMsg(response.data.message)
+        toast.success(response.data.message)
         setIsLoadingCreate(false)
       }
     } catch (err: any) {
-      setErrDialog(true)
-      setDialogType(0)
-      setDialogMsg(err.response.data.message)
+      toast.error(`Failed to create new course. ${err.response.data.message}`)
       setIsLoadingCreate(false)
     }
+
+    setCourseImage('')
+    setCourseImageFile(undefined)
+    setAddDialog(false)
+    setCourseTitle('')
+    setCourseDesc('')
   }
 
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Success
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Failed
-        </>
-      )
-    }
-
-    return ''
-  }
-
-  const handleEditCourse = async () => {
+  const handleEditCourse = async (id: string) => {
     setIsLoadingCreate(true)
     setLoadingTitle('Updating Course')
     const formData = new FormData()
     formData.append('title', courseTitle)
     formData.append('description', courseDesc)
-    formData.append('username', currentUsername)
-    formData.append('old_title', courseTitleOld)
+    formData.append('username', localStorage.getItem('username')!)
+    formData.append('id', id)
 
     try {
       if (courseImageFile) {
@@ -194,17 +184,18 @@ export default function CoursePage() {
 
       if (response.status === 200) {
         getAllCourse().then()
-        setErrDialog(true)
-        setDialogType(1)
-        setDialogMsg(response.data.message)
+        toast.success(response.data.message)
         setIsLoadingCreate(false)
       }
     } catch (err: any) {
-      setErrDialog(true)
-      setDialogType(0)
-      setDialogMsg(err.response.data.message)
+      toast.error(err.response.data.message)
       setIsLoadingCreate(false)
     }
+
+    setCourseImage('')
+    setCourseImageFile(undefined)
+    setCourseTitle('')
+    setCourseDesc('')
   }
 
   return (
@@ -215,8 +206,45 @@ export default function CoursePage() {
           'flex flex-col gap-3 md:gap-5 p-10 min-h-[calc(100vh-180px)] rounded-lg shadow'
         }
       >
-        <div className={'flex'}>
-          <AlertDialog>
+        <h1 className={'font-semibold text-3xl'}>Course List</h1>
+
+        <div className={'flex gap-3 items-center'}>
+          <Input
+            type={'text'}
+            className={'max-w-lg'}
+            value={searchKeywords}
+            placeholder={'Search here...'}
+            onChange={(e) => {
+              setSearchKeywords(e.target.value)
+
+              if (e.target.value === '') {
+                searchCourse(undefined).then()
+              }
+            }}
+          />
+
+          <Button
+            onClick={() => {
+              searchCourse(searchKeywords!).then()
+            }}
+          >
+            <Search /> Search
+          </Button>
+
+          {searchKeywords !== '' ? (
+            <Button
+              onClick={() => {
+                setSearchKeywords('')
+                searchCourse(undefined).then()
+              }}
+            >
+              <CircleX /> Clear
+            </Button>
+          ) : (
+            ''
+          )}
+
+          <AlertDialog open={addDialog} onOpenChange={setAddDialog}>
             <AlertDialogTrigger>
               <Button>
                 <Plus />
@@ -232,20 +260,28 @@ export default function CoursePage() {
                     <Input
                       type="text"
                       id="course-title"
+                      value={courseTitle}
                       onChange={(e) => {
                         setCourseTitle(e.target.value)
                       }}
                     />
+                    <span className={'text-sm text-red-500'}>
+                      {courseTitleErr}
+                    </span>
                   </div>
 
                   <div className="grid w-full items-center gap-1.5 ">
                     <Label htmlFor="course-desc">Course Description</Label>
                     <Textarea
+                      value={courseDesc}
                       id="course-desc"
                       onChange={(e) => {
                         setCourseDesc(e.target.value)
                       }}
                     />
+                    <span className={'text-sm text-red-500'}>
+                      {courseDescErr}
+                    </span>
                   </div>
 
                   <div className="grid w-full items-center gap-1.5">
@@ -272,55 +308,75 @@ export default function CoursePage() {
                     <Input
                       type="file"
                       id="course-image"
+                      accept="image/jpeg, image/png"
                       onChange={(e) => {
-                        setCourseImage(URL.createObjectURL(e.target.files![0]))
-                        setCourseImageFile(e.target.files![0])
+                        setCourseImageErr('')
+                        const file = e.target.files?.[0] // Ambil file pertama yang diunggah
+                        if (file) {
+                          if (
+                            file.type === 'image/jpeg' ||
+                            file.type === 'image/png'
+                          ) {
+                            setCourseImage(URL.createObjectURL(file))
+                            setCourseImageFile(file)
+                          } else {
+                            setCourseImageErr(
+                              'Only JPEG or PNG files are allowed!'
+                            )
+                            e.target.value = '' // Reset input file
+                          }
+                        }
                       }}
                     />
+                    <span className={'text-sm text-red-500'}>
+                      {courseImageErr}
+                    </span>
                   </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleAddCourse}>
+                <AlertDialogCancel
+                  onClick={() => {
+                    setCourseDesc('')
+                    setCourseTitleErr('')
+                    setCourseDescErr('')
+                    setCourseImageErr('')
+                    setCourseTitle('')
+                    setCourseImage('')
+                    setCourseImageFile(undefined)
+                  }}
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <Button
+                  onClick={() => {
+                    if (courseTitle === '') {
+                      setCourseTitleErr('Cannot be blank!')
+                    }
+
+                    if (courseDesc === '') {
+                      setCourseDescErr('Cannot be blank!')
+                    }
+
+                    if (courseTitle !== '' && courseDesc !== '') {
+                      handleAddCourse().then()
+                    }
+                  }}
+                >
                   Save
-                </AlertDialogAction>
+                </Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-        </div>
-
-        <div className={'flex gap-3'}>
-          <Input
-            type={'text'}
-            className={'max-w-lg'}
-            value={searchKeywords}
-            placeholder={'Search here...'}
-            onChange={(e) => {
-              setSearchKeywords(e.target.value)
-            }}
-          />
 
           <Button
             onClick={() => {
-              searchCourse(searchKeywords!)
+              getAllCourse().then()
+              toast.success('Course refreshed!')
             }}
           >
-            <Search /> Search
+            <RefreshCcw /> Refresh
           </Button>
-
-          {searchKeywords !== '' ? (
-            <Button
-              onClick={() => {
-                setSearchKeywords('')
-                searchCourse(undefined)
-              }}
-            >
-              <CircleX /> Clear
-            </Button>
-          ) : (
-            ''
-          )}
         </div>
 
         {courseList.length === 0 ? ( // Gunakan triple equals (===) untuk perbandingan
@@ -329,27 +385,58 @@ export default function CoursePage() {
             There are no courses!
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
             {courseList.map((course: any, index: number) => (
               <Card className={'w-full'} key={index}>
                 <CardHeader>
                   <CardTitle>{course.title}</CardTitle>
-                  <CardDescription>{course.description}</CardDescription>
+                  <CardDescription>
+                    <TextTruncate
+                      line={1}
+                      element="span"
+                      truncateText="…"
+                      text={course.description}
+                      textTruncateChild={
+                        <Link href={`/main/course/${course.id}`}>See More</Link>
+                      }
+                    />
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Image
-                    className={'object-cover h-40 rounded-lg'}
-                    src={`${apiUrl}/${course.image}`}
-                    width={500}
-                    height={500}
-                    alt={'course-image'}
-                  />
+                  {course.image ? (
+                    <Image
+                      className={'object-cover h-40 rounded-lg'}
+                      src={`${apiUrl}/${course.image}`}
+                      width={500}
+                      height={500}
+                      alt={'course-image'}
+                    />
+                  ) : (
+                    <div
+                      className={
+                        'w-full h-40 flex items-center justify-center bg-muted rounded-lg'
+                      }
+                    >
+                      <span
+                        className={'font-bold text-muted-foreground text-2xl'}
+                      >
+                        {course.title}
+                      </span>
+                    </div>
+                  )}
                 </CardContent>
                 <CardFooter className={'flex gap-2'}>
-                  <Button asChild={true}>
-                    <Link href={`/main/course/${course.title}`}>
+                  <Button
+                    onClick={() => {
+                      setLoadingSeeCourseDetail(true)
+                      router.push(`/main/course/${course.id}`)
+                    }}
+                  >
+                    {loadingSeeCourseDetail ? (
+                      <Spinner className={'text-primary-foreground'} />
+                    ) : (
                       <Eye />
-                    </Link>
+                    )}
                   </Button>
 
                   {/*Bagian Edit Dialog*/}
@@ -359,7 +446,6 @@ export default function CoursePage() {
                         setCourseTitle(course.title)
                         setCourseDesc(course.description)
                         setCourseImage(`${apiUrl}/${course.image}`)
-                        setCourseTitleOld(course.title)
                       }}
                     >
                       <Button>
@@ -384,6 +470,9 @@ export default function CoursePage() {
                                 setCourseTitle(e.target.value)
                               }}
                             />
+                            <span className={'text-sm text-red-500'}>
+                              {courseTitleErr}
+                            </span>
                           </div>
 
                           <div className="grid w-full items-center gap-1.5 ">
@@ -397,12 +486,16 @@ export default function CoursePage() {
                                 setCourseDesc(e.target.value)
                               }}
                             />
+                            <span className={'text-sm text-red-500'}>
+                              {courseDescErr}
+                            </span>
                           </div>
 
                           <div className="grid w-full items-center gap-1.5">
                             <Label htmlFor="course-image">Course Image</Label>
 
-                            {course.image == null ? (
+                            {course.image == null &&
+                            courseImageFile === undefined ? (
                               <Skeleton
                                 className={
                                   'w-full h-48 flex items-center justify-center'
@@ -423,6 +516,7 @@ export default function CoursePage() {
                             <Input
                               type="file"
                               id="course-image"
+                              accept="image/jpeg, image/png"
                               onChange={(e) => {
                                 setCourseImage(
                                   URL.createObjectURL(e.target.files![0])
@@ -430,17 +524,55 @@ export default function CoursePage() {
                                 setCourseImageFile(e.target.files![0])
                               }}
                             />
+
+                            <span className={'text-sm text-red-500'}>
+                              {courseImageErr}
+                            </span>
                           </div>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleEditCourse}>
+                        <AlertDialogCancel
+                          onClick={() => {
+                            setCourseDesc('')
+                            setCourseTitleErr('')
+                            setCourseDescErr('')
+                            setCourseImageErr('')
+                            setCourseTitle('')
+                            setCourseImage('')
+                            setCourseImageFile(undefined)
+                          }}
+                        >
+                          Cancel
+                        </AlertDialogCancel>
+                        <Button
+                          onClick={() => {
+                            if (courseTitle === '') {
+                              setCourseTitleErr('Cannot be blank!')
+                            }
+
+                            if (courseDesc === '') {
+                              setCourseDescErr('Cannot be blank!')
+                            }
+
+                            if (courseTitle !== '' && courseDesc !== '') {
+                              handleEditCourse(`${course.id}`).then()
+                            }
+                          }}
+                        >
                           Save
-                        </AlertDialogAction>
+                        </Button>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
+
+                  <Button
+                    onClick={() => {
+                      router.push(`/main/course/manage-access/${course.id}`)
+                    }}
+                  >
+                    <UserCog />
+                  </Button>
 
                   {/*Bagian Delete Dialog*/}
                   <AlertDialog>
@@ -460,14 +592,13 @@ export default function CoursePage() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <Button
-                          variant={'destructive'}
+                        <AlertDialogAction
                           onClick={() => {
-                            handleRemoveCourse(course.title)
+                            handleRemoveCourse(course.id).then()
                           }}
                         >
                           Delete
-                        </Button>
+                        </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
@@ -478,46 +609,18 @@ export default function CoursePage() {
         )}
       </Card>
 
-      <AlertDialog open={errDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {getAlertTitle()}
-            </AlertDialogTitle>
-            <AlertDialogDescription className={'text-center'}>
-              {dialogMsg}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setErrDialog(false)
-              }}
-            >
-              OK
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={isLoadingCreate}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
+      <Dialog open={isLoadingCreate}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className={'text-center flex flex-col items-center'}>
               {loadingTitle}
-            </AlertDialogTitle>
-            <AlertDialogDescription
-              className={'flex w-full justify-center mt-3'}
-            >
+            </DialogTitle>
+            <DialogDescription className={'flex w-full justify-center mt-3'}>
               <Loader2 className="animate-spin w-10 h-10" />
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-        </AlertDialogContent>
-      </AlertDialog>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </ContentLayout>
   )
 }

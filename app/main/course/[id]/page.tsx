@@ -5,22 +5,21 @@ import { Button } from '@/components/ui/button'
 import {
   Bolt,
   CalendarIcon,
-  CircleCheck,
   CirclePlay,
   CircleX,
   EllipsisVertical,
-  Loader2,
   Plus,
   Search,
   Trash,
   Copy,
   FileLock2,
   CirclePlus,
-  Users,
+  RefreshCcw,
+  UserCog,
+  FileText,
 } from 'lucide-react'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -32,7 +31,7 @@ import {
 import { ContentLayout } from '@/components/admin-panel/content-layout'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
+import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import {
   Table,
@@ -63,21 +62,26 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
+import { BackButton } from '@/components/custom-component/BackButton'
 
-export default function CoursePage({ params }: any) {
-  const [dialogMsg, setDialogMsg] = useState('')
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
-  const [isLoadingCreate, setIsLoadingCreate] = useState(false)
-  const [loadingTitle] = useState('')
+export default function CourseDetail({ params }: any) {
   const [examName, setExamName] = useState('')
   const [examStartDate, setExamStartDate] = useState<Date>()
   const [examEndDate, setExamEndDate] = useState<Date>()
   const [examStartPassword, setExamStartPassword] = useState('')
-  const [examStartRePassword, setExamStartRePassword] = useState('')
   const [examDescription] = useState('')
   const [exams, setExams] = useState([])
+  const [showAddExamDialog, setShowAddExamDialog] = useState(false)
   const router = useRouter()
 
   const [searchKeywords, setSearchKeywords] = useState('')
@@ -88,15 +92,23 @@ export default function CoursePage({ params }: any) {
     description: '',
   })
 
+  const [deleteExamDialog, setDeleteExamDialog] = useState(false)
+  const [selectedDelete, setSelectedDelete] = useState()
+
+  // error message holder
+  const [examNameErr, setExamNameErr] = useState('')
+  const [examStartDateErr, setExamStartDateErr] = useState('')
+  const [examEndDateErr, setExamEndDateErr] = useState('')
+
   const getCourse = async () => {
     try {
       const response = await axios.get(
-        `${apiUrl}/course/${params.title}`,
+        `${apiUrl}/course/${params.id}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 
       setCourse(response.data.data)
-      getAllExams(response.data.data.title).then()
+      getAllExams(response.data.data.id).then()
     } catch (err: any) {
       console.log(err)
     }
@@ -111,11 +123,11 @@ export default function CoursePage({ params }: any) {
     }
   }
 
-  const getAllExams = async (courseTitle: string) => {
+  const getAllExams = async (courseId: string) => {
     try {
       const response = await axios.get(`${apiUrl}/exam`, {
         params: {
-          course: courseTitle,
+          course: courseId,
           uploader: currentUsername,
         },
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
@@ -134,58 +146,48 @@ export default function CoursePage({ params }: any) {
       })
 
       if (deleteResponse.status === 200) {
-        setDialogOpen(true)
-        setDialogType(1)
-        setDialogMsg(deleteResponse.data.message)
-        setIsLoadingCreate(false)
+        toast.success(deleteResponse.data.message)
         getAllExams(course.title).then()
       }
     } catch (err: any) {
-      setDialogOpen(true)
-      setDialogType(0)
-      setDialogMsg(err.response.message)
-      setIsLoadingCreate(false)
+      toast.error(err.response.message)
     }
   }
 
   const handleAddExam = async () => {
-    if (examStartPassword === examStartRePassword) {
-      const submitData = {
-        title: examName,
-        start_password: examStartPassword,
-        start_date: examStartDate,
-        end_date: examEndDate,
-        course_title: course.title,
-        created_by: currentUsername,
-        description: examDescription,
-      }
-
-      try {
-        const response = await axios.post(
-          `${apiUrl}/exam`,
-          submitData,
-          getBearerHeader(localStorage.getItem('token')!)
-        )
-
-        if (response.status === 200) {
-          setDialogOpen(true)
-          setDialogType(1)
-          setDialogMsg(response.data.message)
-          setIsLoadingCreate(false)
-          getAllExams(course.title).then()
-        }
-      } catch (err: any) {
-        setDialogOpen(true)
-        setDialogType(0)
-        setDialogMsg(err.response.data.message)
-        setIsLoadingCreate(false)
-      }
-    } else {
-      setDialogOpen(true)
-      setDialogType(0)
-      setDialogMsg('Start Password Not Same')
-      setIsLoadingCreate(false)
+    const submitData = {
+      title: examName,
+      start_password: examStartPassword,
+      start_date: examStartDate,
+      end_date: examEndDate,
+      course_id: course.id,
+      created_by: currentUsername,
+      description: examDescription,
     }
+
+    try {
+      const response = await axios.post(
+        `${apiUrl}/exam`,
+        submitData,
+        getBearerHeader(localStorage.getItem('token')!)
+      )
+
+      if (response.status === 200) {
+        toast.success(response.data.message)
+        getAllExams(course.title).then()
+      }
+    } catch (err: any) {
+      toast.error(err.response.data.message)
+    }
+
+    setExamName('')
+    setExamNameErr('')
+    setExamStartPassword('')
+    setExamStartDateErr('')
+    setExamStartDate(undefined)
+    setExamEndDateErr('')
+    setExamEndDate(undefined)
+    setShowAddExamDialog(false)
   }
 
   const handleDownloadExamFile = async (examId: number) => {
@@ -197,37 +199,51 @@ export default function CoursePage({ params }: any) {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
-      router.push(`${apiUrl}/${response.data.data}`)
+      if (response.status == 200) {
+        window.location.href = `${apiUrl}/${response.data.data}`
+      }
     } catch (err: any) {
-      console.log(err)
+      toast.error(err.response.data.message)
+    }
+  }
+
+  const handleGenerateNewConfigPassword = async (examId: number) => {
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/exam/${examId}`,
+        {
+          config_password: 'new',
+        },
+        getBearerHeader(localStorage.getItem('token')!)
+      )
+
+      if (response.status === 200) {
+        toast.success('New config password generated.')
+        getAllExams(course.id).then()
+      }
+    } catch (e: any) {
+      toast.error(e.response.message)
+    }
+  }
+
+  const searchExam = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/exam`, {
+        params: {
+          search: searchKeywords,
+        },
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+
+      setExams(response.data.data)
+    } catch (e: any) {
+      toast.error(e.response.message)
     }
   }
 
   useEffect(() => {
     getCourse().then()
   }, [])
-
-  const getAlertTitle = () => {
-    if (dialogType == 1) {
-      return (
-        <>
-          <CircleCheck className={'mb-3 text-green-500'} size={38} />
-          Success
-        </>
-      )
-    }
-
-    if (dialogType == 0) {
-      return (
-        <>
-          <CircleX className={'mb-3 text-red-600'} size={38} />
-          Failed
-        </>
-      )
-    }
-
-    return ''
-  }
 
   return (
     <ContentLayout title="Course">
@@ -257,9 +273,9 @@ export default function CoursePage({ params }: any) {
           />
 
           <Button
-          // onClick={() => {
-          //   searchCourse(searchKeywords!)
-          // }}
+            onClick={() => {
+              searchExam().then()
+            }}
           >
             <Search /> Search
           </Button>
@@ -268,7 +284,7 @@ export default function CoursePage({ params }: any) {
             <Button
               onClick={() => {
                 setSearchKeywords('')
-                // searchCourse(undefined)
+                getAllExams(course.id).then()
               }}
             >
               <CircleX /> Clear
@@ -277,7 +293,10 @@ export default function CoursePage({ params }: any) {
             ''
           )}
 
-          <AlertDialog>
+          <AlertDialog
+            open={showAddExamDialog}
+            onOpenChange={setShowAddExamDialog}
+          >
             <AlertDialogTrigger asChild={true}>
               <Button>
                 <Plus />
@@ -299,33 +318,22 @@ export default function CoursePage({ params }: any) {
                         setExamName(e.target.value)
                       }}
                     />
+                    <span className={'text-red-500 text-sm'}>
+                      {examNameErr}
+                    </span>
                   </div>
 
-                  <div className="grid w-full items-center gap-1.5 ">
-                    <Label htmlFor="exam-start-password">Start Password</Label>
-                    <Input
-                      type={'password'}
-                      placeholder={'Type here...'}
-                      id="exam-start-password"
-                      onChange={(e) => {
-                        setExamStartPassword(e.target.value)
-                      }}
-                    />
-                  </div>
-
-                  <div className="grid w-full items-center gap-1.5 ">
-                    <Label htmlFor="exam-start-reenter-password">
-                      Re-Enter Start Password
-                    </Label>
-                    <Input
-                      type={'password'}
-                      placeholder={'Type here...'}
-                      id="exam-start-reenter-password"
-                      onChange={(e) => {
-                        setExamStartRePassword(e.target.value)
-                      }}
-                    />
-                  </div>
+                  {/*<div className="grid w-full items-center gap-1.5 ">*/}
+                  {/*  <Label htmlFor="exam-start-password">Start Password</Label>*/}
+                  {/*  <Input*/}
+                  {/*    type={'text'}*/}
+                  {/*    placeholder={'Type here...'}*/}
+                  {/*    id="exam-start-password"*/}
+                  {/*    onChange={(e) => {*/}
+                  {/*      setExamStartPassword(e.target.value)*/}
+                  {/*    }}*/}
+                  {/*  />*/}
+                  {/*</div>*/}
 
                   <div className="grid w-full items-center gap-1.5 ">
                     <Label>Exam Start Date</Label>
@@ -361,6 +369,9 @@ export default function CoursePage({ params }: any) {
                         </div>
                       </PopoverContent>
                     </Popover>
+                    <span className={'text-red-500 text-sm'}>
+                      {examStartDateErr}
+                    </span>
                   </div>
 
                   <div className="grid w-full items-center gap-1.5 ">
@@ -397,25 +408,90 @@ export default function CoursePage({ params }: any) {
                         </div>
                       </PopoverContent>
                     </Popover>
+                    <span className={'text-red-500 text-sm'}>
+                      {examEndDateErr}
+                    </span>
                   </div>
                 </div>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleAddExam}>
+                <AlertDialogCancel
+                  onClick={() => {
+                    setExamName('')
+                    setExamNameErr('')
+                    setExamStartDateErr('')
+                    setExamStartDate(undefined)
+                    setExamEndDateErr('')
+                    setExamEndDate(undefined)
+                  }}
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <Button
+                  onClick={() => {
+                    setExamNameErr('')
+                    setExamStartDateErr('')
+                    setExamEndDateErr('')
+
+                    if (examName === '') {
+                      setExamNameErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (examStartDate === undefined) {
+                      setExamStartDateErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (examEndDateErr === undefined) {
+                      setExamEndDateErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (examStartDate.getTime() < new Date().getTime()) {
+                      setExamStartDateErr(
+                        'The start date cannot be earlier current date and time'
+                      )
+                    }
+
+                    if (examStartDate.getTime() > examEndDate!.getTime()) {
+                      setExamStartDateErr(
+                        'The start date cannot be earlier than the end date.'
+                      )
+                      setExamEndDateErr(
+                        'The end date cannot be later than the start date.'
+                      )
+                      return
+                    }
+
+                    handleAddExam().then()
+                  }}
+                >
                   Add
-                </AlertDialogAction>
+                </Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          <Button
+            onClick={() => {
+              getAllExams(course.id).then()
+              toast.success('Refreshed')
+            }}
+          >
+            <RefreshCcw /> Refresh
+          </Button>
+
+          <BackButton />
         </div>
-        <div className={'border rounded-lg w-full overflow-scroll'}>
+        <div className={'border rounded-lg w-full overflow-auto'}>
           <Table>
             <TableHeader>
               <TableRow className={'divide-x'}>
                 <TableHead>Name</TableHead>
                 <TableHead>Start Password</TableHead>
                 <TableHead>Close Password</TableHead>
+                <TableHead>Config Password</TableHead>
                 <TableHead>Start Time</TableHead>
                 <TableHead>End Time</TableHead>
                 <TableHead>Action</TableHead>
@@ -438,10 +514,32 @@ export default function CoursePage({ params }: any) {
                     <TableCell>
                       {exam.end_password ? exam.end_password : '-'}
                     </TableCell>
+                    <TableCell>
+                      <div className={'font-mono flex items-center gap-3'}>
+                        {exam.config_password ? exam.config_password : '-'}
+                        <Button
+                          variant={'outline'}
+                          onClick={() => {
+                            handleCopy(exam.config_password).then()
+                            toast.success('Config password copied.')
+                          }}
+                        >
+                          <Copy />
+                        </Button>
+                        <Button
+                          variant={'outline'}
+                          onClick={() => {
+                            handleGenerateNewConfigPassword(exam.id).then()
+                          }}
+                        >
+                          <RefreshCcw />
+                        </Button>
+                      </div>
+                    </TableCell>
                     <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                     <TableCell>{formatExamDate(exam.end_date)}</TableCell>
                     <TableCell className={'flex gap-1'}>
-                      <DropdownMenu>
+                      <DropdownMenu modal={false}>
                         <DropdownMenuTrigger>
                           <Button variant={'secondary'}>
                             <EllipsisVertical />
@@ -472,9 +570,6 @@ export default function CoursePage({ params }: any) {
                               <CirclePlus /> Add Question
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Users /> Manage Access
-                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
                               handleDownloadExamFile(exam.id).then()
@@ -484,22 +579,61 @@ export default function CoursePage({ params }: any) {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              handleCopy(exam.start_password).then()
+                              router.push(
+                                `/main/course/manage-access/${exam.course.id}`
+                              )
                             }}
                           >
-                            <Copy /> Copy Entry Password
+                            <UserCog /> Manage Access
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              router.push(`/main/exam/report/${exam.id}`)
+                            }}
+                          >
+                            <FileText /> Open Report
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleCopy(exam.start_password).then()
+                              toast.success('Start password copied!')
+                            }}
+                          >
+                            <Copy /> Copy Start Exam Password
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
                               handleCopy(exam.end_password).then()
+                              toast.success('End password copied!')
                             }}
                           >
-                            <Copy /> Copy Close Password
+                            <Copy /> Copy End Exam Password
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleCopy(
+                                `${apiUrl}/exam-config/${exam.id}`
+                              ).then()
+                              toast.success('Download config link copied!')
+                            }}
+                          >
+                            <Copy /> Copy Download Config Link
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              handleCopy(
+                                `${feUrl}/exam-submit/${exam.id}`
+                              ).then()
+                              toast.success('Submit link copied!')
+                            }}
+                          >
+                            <Copy /> Copy Submit Link
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className={'text-red-500'}
                             onClick={() => {
-                              handleDeleteExam(exam.id)
+                              setSelectedDelete(exam.id)
+                              setDeleteExamDialog(true)
                             }}
                           >
                             <Trash /> Delete
@@ -515,46 +649,36 @@ export default function CoursePage({ params }: any) {
         </div>
       </Card>
 
-      <AlertDialog open={dialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {getAlertTitle()}
-            </AlertDialogTitle>
-            <AlertDialogDescription className={'text-center'}>
-              {dialogMsg}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={'!justify-center'}>
-            <Button
-              onClick={() => {
-                setDialogOpen(false)
-              }}
-            >
-              OK
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={isLoadingCreate}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle
-              className={'text-center flex flex-col items-center'}
-            >
-              {loadingTitle}
-            </AlertDialogTitle>
-            <AlertDialogDescription
-              className={'flex w-full justify-center mt-3'}
-            >
-              <Loader2 className="animate-spin w-10 h-10" />
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={deleteExamDialog} onOpenChange={setDeleteExamDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete your
+              exam and remove your data from our servers.
+            </DialogDescription>
+            <DialogFooter>
+              <Button
+                variant={'secondary'}
+                onClick={() => {
+                  setDeleteExamDialog(false)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  handleDeleteExam(selectedDelete!).then()
+                  setSelectedDelete(undefined)
+                  setDeleteExamDialog(false)
+                }}
+              >
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </ContentLayout>
   )
 }

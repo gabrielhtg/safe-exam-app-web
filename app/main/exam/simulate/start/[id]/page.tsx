@@ -36,6 +36,7 @@ export default function ExamSimulationStart({ params }: any) {
   const [editorConfig, setEditorConfig] = useState<any>(null)
   const router = useRouter()
   const [submitState, setSubmitState] = useState(1)
+  // const [selectedQuestion, setSelectedQuestion] = useState<any>()
 
   // state untuk exam behaviour
   const [hoursLimit, setHoursLimit] = useState<number>()
@@ -178,17 +179,20 @@ export default function ExamSimulationStart({ params }: any) {
 
   return (
     <ContentLayout title="Configure Exam">
-      <Card id={'card-utama'} className={'w-full p-10 h-[calc(100vh-180px)]'}>
+      <Card
+        id={'card-utama'}
+        className={'w-full p-10 h-[calc(100vh-180px)] overflow-auto'}
+      >
         <h3 className={'font-bold text-xl mb-5'}>
           {examData ? examData.title : ''} {examData?.course_title}
         </h3>
 
-        <div className={'flex gap-5 h-full pb-10'}>
+        <div className={'flex gap-5 h-[calc(100%-80px)]'}>
           {/*sebelah kiri*/}
           {submitState === 1 ? (
             <div
               className={
-                'flex flex-col w-full overflow-y-scroll scroll-smooth border rounded-lg px-5 pb-5'
+                'flex flex-col w-full min-h-[350px] overflow-y-auto scroll-smooth border rounded-lg px-5 pb-5'
               }
             >
               {questions.map((e: any, questionIndex) => (
@@ -465,30 +469,6 @@ export default function ExamSimulationStart({ params }: any) {
           </div>
         </div>
       </Card>
-
-      {/*<AlertDialog open={showDialog}>*/}
-      {/*  <AlertDialogContent>*/}
-      {/*    <AlertDialogHeader>*/}
-      {/*      <AlertDialogTitle*/}
-      {/*        className={'text-center flex flex-col items-center'}*/}
-      {/*      >*/}
-      {/*        {getAlertTitle()}*/}
-      {/*      </AlertDialogTitle>*/}
-      {/*      <AlertDialogDescription className={'text-center'}>*/}
-      {/*        {dialogMsg}*/}
-      {/*      </AlertDialogDescription>*/}
-      {/*    </AlertDialogHeader>*/}
-      {/*    <AlertDialogFooter className={'!justify-center'}>*/}
-      {/*      <Button*/}
-      {/*        onClick={() => {*/}
-      {/*          setShowDialog(false)*/}
-      {/*        }}*/}
-      {/*      >*/}
-      {/*        OK*/}
-      {/*      </Button>*/}
-      {/*    </AlertDialogFooter>*/}
-      {/*  </AlertDialogContent>*/}
-      {/*</AlertDialog>*/}
     </ContentLayout>
   )
 }

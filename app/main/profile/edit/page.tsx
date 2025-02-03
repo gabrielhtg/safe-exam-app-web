@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import { getUserInitials } from '@/app/_services/getUserInitials.service'
-import { apiUrl } from '@/lib/env'
+import { apiUrl, compressOptions } from '@/lib/env'
 import { formatProfileDate } from '@/app/_services/formatProfileDate.service'
 import { Input } from '@/components/ui/input'
 import { ArrowLeft, CircleCheck, CircleX, Save } from 'lucide-react'
@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Card } from '@/components/ui/card'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
+import imageCompression from 'browser-image-compression'
 
 export default function EditProfilePage() {
   const router = useRouter()
@@ -48,9 +49,8 @@ export default function EditProfilePage() {
     formData.append('username', username)
     formData.append('email', email)
     formData.append('old_username', oldUsername)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    formData.append('profile_pict', fotoProfil)
+    const compressedImage = await imageCompression(fotoProfil!, compressOptions)
+    formData.append('profile_pict', compressedImage)
 
     try {
       const updateResponse = await axios.put(
@@ -100,7 +100,12 @@ export default function EditProfilePage() {
         }
       >
         <Avatar className={'w-24 h-24 md:w-48 md:h-48'}>
-          <AvatarImage className={'object-cover'} src={profilePict} />
+          {currentUser.profile_pict ? (
+            <AvatarImage className={'object-cover'} src={profilePict} />
+          ) : (
+            ''
+          )}
+
           <AvatarFallback>{getUserInitials(name)}</AvatarFallback>
         </Avatar>
 
@@ -115,7 +120,7 @@ export default function EditProfilePage() {
           />
           <span className={'text-xs ms-2 text-yellow-600'}>
             *Direkomendasikan untuk menggunakan gambar dengan ukuran 1:1 dan
-            &lt;= 2MB.
+            &lt;= 1MB.
           </span>
         </div>
 
