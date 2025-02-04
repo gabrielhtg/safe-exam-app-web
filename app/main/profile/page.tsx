@@ -15,8 +15,6 @@ import { Card } from '@/components/ui/card'
 import { ContentLayout } from '@/components/admin-panel/content-layout'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -32,8 +30,13 @@ import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 export default function ProfilePage() {
   const currentUser = useSelector(selectUser)
   const [oldPassword, setOldPassword] = useState('')
+  const [oldPasswordErr, setOldPasswordErr] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [newPasswordErr, setNewPasswordErr] = useState('')
   const [reNewPassword, setReNewPassword] = useState('')
+  const [reNewPasswordErr, setReNewPasswordErr] = useState('')
+  const [showChangePasswordDialog, setShowChangePasswordDialog] =
+    useState(false)
 
   const [dialogMsg, setDialogMsg] = useState('')
   const [errDialog, setErrDialog] = useState(false)
@@ -55,10 +58,12 @@ export default function ProfilePage() {
       setDialogType(1)
       setErrDialog(true)
       setDialogMsg(response.data.message)
+      setShowChangePasswordDialog(false)
     } catch (err: any) {
       setDialogType(0)
       setErrDialog(true)
       setDialogMsg(err.response.data.message)
+      setShowChangePasswordDialog(false)
     }
   }
 
@@ -138,9 +143,13 @@ export default function ProfilePage() {
               <Pencil /> Edit
             </Link>
           </Button>
-          <AlertDialog>
+          <AlertDialog open={showChangePasswordDialog}>
             <AlertDialogTrigger>
-              <Button>
+              <Button
+                onClick={() => {
+                  setShowChangePasswordDialog(true)
+                }}
+              >
                 <KeyRound />
                 Change Password
               </Button>
@@ -158,6 +167,7 @@ export default function ProfilePage() {
                         setOldPassword(e.target.value)
                       }}
                     />
+                    <span className={'text-red-500'}>{oldPasswordErr}</span>
                   </div>
 
                   <div className="grid w-full items-center gap-1.5 ">
@@ -169,6 +179,7 @@ export default function ProfilePage() {
                         setNewPassword(e.target.value)
                       }}
                     />
+                    <span className={'text-red-500'}>{newPasswordErr}</span>
                   </div>
 
                   <div className="grid w-full items-center gap-1.5">
@@ -180,14 +191,50 @@ export default function ProfilePage() {
                         setReNewPassword(e.target.value)
                       }}
                     />
+                    <span className={'text-red-500'}>{reNewPasswordErr}</span>
                   </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleChangePassword}>
+                <Button
+                  onClick={() => {
+                    setShowChangePasswordDialog(false)
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    setNewPasswordErr('')
+                    setOldPasswordErr('')
+                    setReNewPasswordErr('')
+
+                    if (oldPassword === '') {
+                      setOldPasswordErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (newPassword === '') {
+                      setNewPasswordErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (reNewPassword === '') {
+                      setReNewPasswordErr('Cannot be blank!')
+                      return
+                    }
+
+                    if (newPassword !== reNewPassword) {
+                      setNewPasswordErr('Not match.')
+                      setReNewPasswordErr('Not match.')
+                      return
+                    }
+
+                    handleChangePassword().then()
+                  }}
+                >
                   Save
-                </AlertDialogAction>
+                </Button>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

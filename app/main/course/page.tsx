@@ -72,6 +72,7 @@ export default function CoursePage() {
   const [loadingTitle, setLoadingTitle] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
   const [loadingSeeCourseDetail, setLoadingSeeCourseDetail] = useState(false)
+  const [showEditCourse, setShowEditCourse] = useState(false)
 
   const router = useRouter()
 
@@ -440,12 +441,13 @@ export default function CoursePage() {
                   </Button>
 
                   {/*Bagian Edit Dialog*/}
-                  <AlertDialog>
+                  <AlertDialog open={showEditCourse}>
                     <AlertDialogTrigger
                       onClick={() => {
                         setCourseTitle(course.title)
                         setCourseDesc(course.description)
                         setCourseImage(`${apiUrl}/${course.image}`)
+                        setShowEditCourse(true)
                       }}
                     >
                       <Button>
@@ -541,6 +543,7 @@ export default function CoursePage() {
                             setCourseTitle('')
                             setCourseImage('')
                             setCourseImageFile(undefined)
+                            setShowEditCourse(false)
                           }}
                         >
                           Cancel
@@ -549,14 +552,17 @@ export default function CoursePage() {
                           onClick={() => {
                             if (courseTitle === '') {
                               setCourseTitleErr('Cannot be blank!')
+                              return
                             }
 
                             if (courseDesc === '') {
                               setCourseDescErr('Cannot be blank!')
+                              return
                             }
 
                             if (courseTitle !== '' && courseDesc !== '') {
                               handleEditCourse(`${course.id}`).then()
+                              setShowEditCourse(false)
                             }
                           }}
                         >

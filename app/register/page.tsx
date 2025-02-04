@@ -121,7 +121,7 @@ export default function RegisterPage() {
               }}
             />
 
-            <div className={'flex flex-col mb-3'}>
+            <div className={'flex flex-col'}>
               <Input
                 id={'input-name'}
                 type={'text'}
