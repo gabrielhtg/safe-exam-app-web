@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Card,
   CardContent,
@@ -9,8 +11,30 @@ import { LockKeyhole } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { Toaster } from '@/components/ui/sonner'
+import axios from 'axios'
+import { apiUrl } from '@/lib/env'
 
 export default function ResetPasswordPage() {
+  const [email, setEmail] = useState<string>('')
+  const [emailErr, setEmailErr] = useState<string>('')
+
+  const handleResetPassword = async () => {
+    try {
+      const response = await axios.post(`${apiUrl}/auth/reset-password`, {
+        email: email,
+      })
+
+      if (response.status == 200) {
+        toast.success(response.data.message)
+      }
+    } catch (e: any) {
+      toast.error(e.response.data.message)
+    }
+  }
+
   return (
     <div className={'flex items-center justify-center h-screen'}>
       <Card className={'w-[400px]'}>
@@ -29,9 +53,34 @@ export default function ResetPasswordPage() {
         </CardHeader>
 
         <CardContent>
-          <Input id={'input-email'} placeholder={'Email'}></Input>
+          <Input
+            id={'input-email'}
+            placeholder={'Email'}
+            value={email}
+            onChange={(e: any) => {
+              setEmail(e.target.value)
+            }}
+          />
+          <span className={'text-red-500 text-sm'}>{emailErr}</span>
 
-          <Button className={'w-full mt-5'}>Send Login Link</Button>
+          <Button
+            onClick={() => {
+              if (email === '') {
+                setEmailErr('Cannot be blank!')
+                return
+              }
+
+              if (!email.includes('@')) {
+                setEmailErr('Invalid email')
+                return
+              }
+
+              handleResetPassword().then()
+            }}
+            className={'w-full mt-5'}
+          >
+            Reset Password
+          </Button>
           <Button
             className={'w-full mt-3'}
             variant={'secondary'}
@@ -41,6 +90,7 @@ export default function ResetPasswordPage() {
           </Button>
         </CardContent>
       </Card>
+      <Toaster />
     </div>
   )
 }
