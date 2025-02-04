@@ -26,6 +26,7 @@ import {
 import { Card } from '@/components/ui/card'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import imageCompression from 'browser-image-compression'
+import { includes } from 'lodash'
 
 export default function EditProfilePage() {
   const router = useRouter()
@@ -38,6 +39,7 @@ export default function EditProfilePage() {
     `${apiUrl}/${currentUser.profile_pict}`
   )
   const [fotoProfil, setFotoProfil] = useState<File | undefined>()
+  const [emailErr, setEmailErr] = useState('')
 
   const [dialogMsg, setDialogMsg] = useState('')
   const [errDialog, setErrDialog] = useState(false)
@@ -49,8 +51,14 @@ export default function EditProfilePage() {
     formData.append('username', username)
     formData.append('email', email)
     formData.append('old_username', oldUsername)
-    const compressedImage = await imageCompression(fotoProfil!, compressOptions)
-    formData.append('profile_pict', compressedImage)
+    if (fotoProfil) {
+      const compressedImage = await imageCompression(
+        fotoProfil!,
+        compressOptions
+      )
+
+      formData.append('profile_pict', compressedImage)
+    }
 
     try {
       const updateResponse = await axios.put(
@@ -65,7 +73,7 @@ export default function EditProfilePage() {
     } catch (err: any) {
       setDialogType(0)
       setErrDialog(true)
-      setDialogMsg(err.response.data.message)
+      setDialogMsg(`Failed to edit profile. ${err.response.data.message}`)
     }
   }
 
@@ -135,6 +143,8 @@ export default function EditProfilePage() {
                     type={'email'}
                     onChange={(e) => setEmail(e.target.value)}
                   />
+
+                  <span className={'text-red-500'}>{emailErr}</span>
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -168,7 +178,18 @@ export default function EditProfilePage() {
         </div>
 
         <div className={'flex gap-3'}>
-          <Button onClick={handleSubmit}>
+          <Button
+            onClick={() => {
+              setEmailErr('')
+
+              if (!email.includes('@')) {
+                setEmailErr('Invalid Email')
+                return
+              }
+
+              handleSubmit().then()
+            }}
+          >
             <Save /> Save
           </Button>
           <Button variant={'secondary'} asChild={true}>

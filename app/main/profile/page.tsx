@@ -161,7 +161,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="grid w-full items-center gap-1.5 ">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">New Password</Label>
                     <Input
                       type="password"
                       id="password"
@@ -172,7 +172,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="re-password">Re-Enter Password</Label>
+                    <Label htmlFor="re-password">Re-Enter New Password</Label>
                     <Input
                       type="password"
                       id="re-password"

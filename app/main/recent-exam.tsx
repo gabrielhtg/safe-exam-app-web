@@ -89,6 +89,7 @@ export default function RecentExam() {
       const response = await axios.get(`${apiUrl}/exam`, {
         params: {
           uploader: currentUsername,
+          take: 5,
         },
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })

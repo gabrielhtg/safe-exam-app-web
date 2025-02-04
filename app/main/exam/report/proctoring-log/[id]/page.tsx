@@ -170,13 +170,18 @@ export default function ProctoringLog({ params }: any) {
                       <TableCell>{formatLogtime(data.time)}</TableCell>
                       <TableCell>{data.description}</TableCell>
                       <TableCell className={'p-5'}>
-                        <Image
-                          src={`${apiUrl}/${data.user_image}`}
-                          alt={'user-image'}
-                          width={500}
-                          height={500}
-                          className={'w-58 rounded-lg'}
-                        />
+                        {data.description ===
+                        'The examinee was detected changing window.' ? (
+                          'No user image'
+                        ) : (
+                          <Image
+                            src={`${apiUrl}/${data.user_image}`}
+                            alt={'user-image'}
+                            width={500}
+                            height={500}
+                            className={'w-58 rounded-lg'}
+                          />
+                        )}
                       </TableCell>
                       <TableCell>
                         <Dialog>
