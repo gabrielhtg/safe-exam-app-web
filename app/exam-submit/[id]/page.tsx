@@ -91,7 +91,7 @@ export default function ExamSubmitPage({ params }: any) {
           Submit
         </Button>
       </div>
-      <Toaster />
+      <Toaster richColors />
     </div>
   )
 }

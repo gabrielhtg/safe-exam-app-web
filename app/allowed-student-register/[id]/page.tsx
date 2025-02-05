@@ -120,7 +120,7 @@ export default function AllowedUserRegisterPage({ params }: any) {
           Enroll Now
         </Button>
       </div>
-      <Toaster />
+      <Toaster richColors />
     </div>
   )
 }

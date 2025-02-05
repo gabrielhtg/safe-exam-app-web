@@ -36,6 +36,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -470,22 +471,24 @@ export default function ExamQuestionPage({ params }: any) {
                                                 {questionDataItem.type}
                                               </TableCell>
                                               <TableCell>
-                                                <Button
-                                                  variant={'secondary'}
-                                                  onClick={() => {
-                                                    setShowAddQuestionDialog(
-                                                      false
-                                                    )
-                                                    handleAddFromQuestionBank(
-                                                      questionDataItem.content,
-                                                      questionDataItem.type,
-                                                      questionDataItem.options,
-                                                      questionDataItem.remarks
-                                                    ).then()
-                                                  }}
-                                                >
-                                                  Select
-                                                </Button>
+                                                <DialogClose asChild>
+                                                  <Button
+                                                    variant={'secondary'}
+                                                    onClick={() => {
+                                                      setShowAddQuestionDialog(
+                                                        false
+                                                      )
+                                                      handleAddFromQuestionBank(
+                                                        questionDataItem.content,
+                                                        questionDataItem.type,
+                                                        questionDataItem.options,
+                                                        questionDataItem.remarks
+                                                      ).then()
+                                                    }}
+                                                  >
+                                                    Select
+                                                  </Button>
+                                                </DialogClose>
                                               </TableCell>
                                             </TableRow>
                                           )

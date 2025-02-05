@@ -267,7 +267,7 @@ export default function ExamPage() {
               type={'text'}
               className={'max-w-lg'}
               value={searchKeywords}
-              placeholder={'Search here...'}
+              placeholder={'Search by exam title or course here...'}
               onChange={(e) => {
                 setSearchKeywords(e.target.value)
               }}
@@ -351,7 +351,7 @@ export default function ExamPage() {
                               className="h-9"
                             />
                             <CommandList>
-                              <CommandEmpty>No framework found.</CommandEmpty>
+                              <CommandEmpty>No course added.</CommandEmpty>
                               <CommandGroup>
                                 {courses.map((course: any) => (
                                   <CommandItem

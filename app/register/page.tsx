@@ -128,6 +128,7 @@ export default function RegisterPage() {
                 className={'mb-3'}
                 onChange={(e) => {
                   setName(e.target.value)
+                  setNameErr('')
                 }}
                 placeholder={'Name'}
               />
@@ -140,6 +141,7 @@ export default function RegisterPage() {
                 type={'text'}
                 onChange={(e) => {
                   setUsername(e.target.value)
+                  setUsernameErr('')
                 }}
                 placeholder={'Username'}
               />
@@ -152,6 +154,7 @@ export default function RegisterPage() {
                 type={'email'}
                 onChange={(e) => {
                   setEmail(e.target.value)
+                  setEmailErr('')
                 }}
                 placeholder={'Email'}
               />
@@ -165,6 +168,7 @@ export default function RegisterPage() {
                 placeholder={'Password'}
                 onChange={(e) => {
                   setPassword(e.target.value)
+                  setPasswordErr('')
                 }}
               />
               <span className={'text-red-500 text-sm'}>{passwordErr}</span>
@@ -176,6 +180,7 @@ export default function RegisterPage() {
                 type={'password'}
                 onChange={(e) => {
                   setRePassword(e.target.value)
+                  setRePasswordErr('')
                 }}
                 placeholder={'Confirm Password'}
               />
@@ -187,6 +192,12 @@ export default function RegisterPage() {
             <div className="flex gap-x-3 w-full">
               <Button
                 onClick={() => {
+                  setUsernameErr('')
+                  setNameErr('')
+                  setEmailErr('')
+                  setPasswordErr('')
+                  setRePasswordErr('')
+
                   if (username === '') {
                     setUsernameErr('Cannot be blank')
                     return
@@ -237,7 +248,7 @@ export default function RegisterPage() {
         </Card>
       </div>
 
-      <Toaster />
+      <Toaster richColors />
     </>
   )
 }

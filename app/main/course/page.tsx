@@ -264,6 +264,7 @@ export default function CoursePage() {
                       value={courseTitle}
                       onChange={(e) => {
                         setCourseTitle(e.target.value)
+                        setCourseTitleErr('')
                       }}
                     />
                     <span className={'text-sm text-red-500'}>
@@ -278,6 +279,7 @@ export default function CoursePage() {
                       id="course-desc"
                       onChange={(e) => {
                         setCourseDesc(e.target.value)
+                        setCourseDescErr('')
                       }}
                     />
                     <span className={'text-sm text-red-500'}>
@@ -351,17 +353,24 @@ export default function CoursePage() {
                 </AlertDialogCancel>
                 <Button
                   onClick={() => {
-                    if (courseTitle === '') {
+                    if (courseTitle.trim() === '') {
                       setCourseTitleErr('Cannot be blank!')
+                      return
                     }
 
-                    if (courseDesc === '') {
+                    if (courseTitle.length > 60) {
+                      setCourseTitleErr(
+                        'The course title cannot be longer than 60 characters.'
+                      )
+                      return
+                    }
+
+                    if (courseDesc.trim() === '') {
                       setCourseDescErr('Cannot be blank!')
+                      return
                     }
 
-                    if (courseTitle !== '' && courseDesc !== '') {
-                      handleAddCourse().then()
-                    }
+                    handleAddCourse().then()
                   }}
                 >
                   Save

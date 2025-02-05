@@ -147,7 +147,7 @@ export default function CourseDetail({ params }: any) {
 
       if (deleteResponse.status === 200) {
         toast.success(deleteResponse.data.message)
-        getAllExams(course.title).then()
+        getAllExams(course.id).then()
       }
     } catch (err: any) {
       toast.error(err.response.message)
@@ -174,7 +174,7 @@ export default function CourseDetail({ params }: any) {
 
       if (response.status === 200) {
         toast.success(response.data.message)
-        getAllExams(course.title).then()
+        getAllExams(course.id).then()
       }
     } catch (err: any) {
       toast.error(err.response.data.message)

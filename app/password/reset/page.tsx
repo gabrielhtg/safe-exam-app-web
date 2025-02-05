@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
           <CardTitle className={'text-center'}>Trouble Logging In?</CardTitle>
 
           <CardDescription className={'text-center'}>
-            Enter your email and we&aposll send you a link to get back into your
+            Enter your email and we will send you a link to get back into your
             account.
           </CardDescription>
         </CardHeader>
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
           </Button>
         </CardContent>
       </Card>
-      <Toaster />
+      <Toaster richColors />
     </div>
   )
 }
