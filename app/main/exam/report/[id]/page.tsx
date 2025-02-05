@@ -269,7 +269,7 @@ export default function ReportPage({ params }: any) {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/main/exam/report/proctoring-log/${row.original.id}`}
+                  href={`/main/exam/report/manual-grading/${row.original.id}`}
                 >
                   <BookOpenCheck /> Manual Check
                 </Link>
