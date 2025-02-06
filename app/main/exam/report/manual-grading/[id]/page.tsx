@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { ContentLayout } from '@/components/admin-panel/content-layout';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import axios from 'axios';
 import { apiUrl } from '@/lib/env';
@@ -51,6 +51,18 @@ export default function ProctoringLog({ params }: any) {
     }
   };
 
+  const calculateTotalScore = async () => {
+    try{
+      const score = await axios.patch(
+        `${apiUrl}/exam-result/${examResultId}/calculate-score`,
+        getBearerHeader(localStorage.getItem('token')!)
+      );
+      setEssayAnswers(score.data.data);
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || 'Failed to fetch essay answers');
+    }
+  }
+
   const handleInputChange = (answerId: number, field: 'score' | 'isCorrect', value: any) => {
     setGrades((prev) => ({
       ...prev,
@@ -84,17 +96,30 @@ export default function ProctoringLog({ params }: any) {
           <ArrowLeft /> Back
         </Button>
         {essayAnswers.length > 0 ? (
-          <div className="border rounded-lg mt-2 p-5">
-            <h4 className="font-bold">Essay Answers</h4>
+          <div className="border rounded-lg mt-4 p-6">
+          <h4 className="font-bold text-lg mb-3">Essay Answers</h4>
+        
+          <div className="space-y-4">
             {essayAnswers.map((answer) => (
-              <div key={answer.id} className="border p-4 mt-3 rounded-lg">
-                <h5 className="font-semibold">Question:</h5>
-                <p>{parse(answer.question.content)}</p>
-
-                <h5 className="mt-3 font-semibold">Answer:</h5>
-                <p>{answer.answer?.text || 'No answer given'}</p>
-
-                <div className="mt-3 flex items-center gap-2">
+              <div key={answer.id} className="border p-5 rounded-lg">
+                <h5 className="font-semibold text-base">Question:</h5>
+                <p className="text-sm mb-2">{parse(answer.question.content)}</p>
+        
+                <h5 className="font-semibold text-base mt-4">Answer:</h5>
+                <p className="text-sm mb-3">{answer.answer?.text || 'No answer given'}</p>
+        
+                {/* Score Card */}
+                <Card className="w-[100px] mt-3">
+                  <CardHeader>
+                    <CardTitle className="text-center text-sm">Score</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex justify-center items-center h-10">
+                    <p className="text-center text-base">{answer.score || 'Not graded yet'}</p>
+                  </CardContent>
+                </Card>
+        
+                {/* Grading Input & Button */}
+                <div className="mt-4 flex items-center gap-3">
                   <Input
                     type="number"
                     value={grades[answer.id]?.score ?? ''}
@@ -102,17 +127,18 @@ export default function ProctoringLog({ params }: any) {
                     min="0"
                     onChange={(e) => handleInputChange(answer.id, 'score', Number(e.target.value))}
                     placeholder="Enter Score"
-                    className="w-30 h-11 text-sm px-2"
+                    className="w-28 h-10 text-sm px-3 border rounded-md"
                   />
                   <p className="text-sm text-muted-foreground">out of {answer.question.point}</p>
-                  <Button onClick={() => submitGrade(answer.id)} className="w-30 ml-3 h-12 px-3 text-sm">
+                  <Button onClick={() => submitGrade(answer.id)} className="w-32 h-11 px-4 text-sm">
                     Submit Grade
                   </Button>
                 </div>
-
               </div>
             ))}
           </div>
+        </div>
+        
         ) : (
           <p className="text-center mt-5">No essay answers found.</p>
         )}
