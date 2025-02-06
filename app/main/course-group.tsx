@@ -20,6 +20,7 @@ import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function CourseGroup() {
   const [courseList, setCourseList] = useState([])
@@ -44,7 +45,7 @@ export default function CourseGroup() {
 
         setCourseList(getResponse.data.data)
       } catch (err: any) {
-        console.log(err)
+        toast.error(err.response.data.message)
       }
     }
 

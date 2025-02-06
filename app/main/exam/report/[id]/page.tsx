@@ -62,7 +62,7 @@ export default function ReportPage({ params }: any) {
 
       setAllowedStudentData(response.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 

@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { toast } from 'sonner'
 
 export type Question = {
   content: string
@@ -38,7 +39,7 @@ export default function QuestionsPage() {
 
       setQuestionData(data.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -146,7 +147,7 @@ export default function QuestionsPage() {
               getAllQuestion().then()
             }
           } catch (error: any) {
-            console.log(error)
+            toast.error(error.response.data.message)
           }
         }
 

@@ -171,7 +171,7 @@ export default function ExamPage() {
 
       setcourses(getResponse.data.data)
     } catch (err: any) {
-      console.log(err)
+      toast.error(err.response.data.message)
     }
   }
 
@@ -241,10 +241,9 @@ export default function ExamPage() {
 
   const handleCopy = async (text: string) => {
     try {
-      console.log(navigator.clipboard)
       await navigator.clipboard.writeText(text)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 

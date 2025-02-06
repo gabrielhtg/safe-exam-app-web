@@ -45,7 +45,7 @@ export default function ManageAccess({ params }: any) {
 
       setCourseData(response.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -60,7 +60,7 @@ export default function ManageAccess({ params }: any) {
 
       setAllowedStudentData(response.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -76,7 +76,7 @@ export default function ManageAccess({ params }: any) {
 
       setCourseData(response.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -90,7 +90,7 @@ export default function ManageAccess({ params }: any) {
 
       toast.success(response.data.message)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -98,7 +98,7 @@ export default function ManageAccess({ params }: any) {
     try {
       await navigator.clipboard.writeText(text)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -114,7 +114,7 @@ export default function ManageAccess({ params }: any) {
 
       setAllowedStudentData(response.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 

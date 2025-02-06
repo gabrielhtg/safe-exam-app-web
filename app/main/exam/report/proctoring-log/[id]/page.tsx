@@ -39,8 +39,6 @@ export default function ProctoringLog({ params }: any) {
       setProctoringLogData(requestResult.data.data.proctoring_logs)
 
       getAllowedStudent(requestResult.data.data.exam.course_id).then()
-
-      console.log(requestResult.data.data)
     } catch (e: any) {
       toast.error(e.response.data.message)
     }
@@ -93,7 +91,7 @@ export default function ProctoringLog({ params }: any) {
 
       setAllowedStudentData(response.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 

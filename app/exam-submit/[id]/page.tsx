@@ -24,7 +24,7 @@ export default function ExamSubmitPage({ params }: any) {
 
       setExamData(response.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 

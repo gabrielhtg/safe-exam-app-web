@@ -96,7 +96,7 @@ export default function RecentExam() {
 
       setExams(response.data.data)
     } catch (err: any) {
-      console.log(err)
+      toast.error(err.response.data.message)
     }
   }
 
@@ -124,10 +124,9 @@ export default function RecentExam() {
 
   const handleCopy = async (text: string) => {
     try {
-      console.log(navigator.clipboard)
       await navigator.clipboard.writeText(text)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
