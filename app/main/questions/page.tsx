@@ -92,7 +92,7 @@ export default function QuestionsPage() {
       },
     },
     {
-      accessorKey: 'course_title',
+      accessorKey: 'course.title',
       header: ({ column }) => {
         return (
           <Button

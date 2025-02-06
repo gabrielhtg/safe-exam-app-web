@@ -602,7 +602,7 @@ export default function ExamPage() {
                       </TableCell>
                       <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                       <TableCell>{formatExamDate(exam.end_date)}</TableCell>
-                      <TableCell className={'flex gap-1'}>
+                      <TableCell>
                         <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <Button variant={'secondary'}>
