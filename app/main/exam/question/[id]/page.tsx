@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import {
   ArrowLeft,
+  CircleX,
   EllipsisVertical,
   Landmark,
   Pen,
@@ -439,14 +440,34 @@ export default function ExamQuestionPage({ params }: any) {
                                     <Landmark /> Question Bank
                                   </Button>
                                 </DialogTrigger>
-                                <DialogContent className={'max-w-4xl w-full'}>
+                                <DialogContent
+                                  className={
+                                    'max-w-4xl w-full max-h-[calc(100vh-100px)] h-full'
+                                  }
+                                >
                                   <DialogHeader>
                                     <DialogTitle>
-                                      Select the question you want to add
+                                      <span className={'text-2xl'}>
+                                        Select the question you want to add
+                                      </span>
                                     </DialogTitle>
                                   </DialogHeader>
 
-                                  <div className={'border rounded-lg'}>
+                                  <div>
+                                    <Button
+                                      onClick={() => {
+                                        setShowAddQuestionDialog(false)
+                                      }}
+                                    >
+                                      <CircleX /> Close
+                                    </Button>
+                                  </div>
+
+                                  <div
+                                    className={
+                                      'border rounded-lg mt-4 overflow-y-auto'
+                                    }
+                                  >
                                     <Table>
                                       <TableHeader>
                                         <TableRow className={'divide-x'}>
