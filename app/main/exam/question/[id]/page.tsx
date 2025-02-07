@@ -442,83 +442,85 @@ export default function ExamQuestionPage({ params }: any) {
                                 </DialogTrigger>
                                 <DialogContent
                                   className={
-                                    'max-w-4xl w-full max-h-[calc(100vh-100px)] h-full'
+                                    'max-w-4xl w-full max-h-[calc(100vh-100px)]'
                                   }
                                 >
-                                  <DialogHeader>
-                                    <DialogTitle>
-                                      <span className={'text-2xl'}>
-                                        Select the question you want to add
-                                      </span>
-                                    </DialogTitle>
-                                  </DialogHeader>
-
                                   <div>
-                                    <Button
-                                      onClick={() => {
-                                        setShowAddQuestionDialog(false)
-                                      }}
-                                    >
-                                      <CircleX /> Close
-                                    </Button>
-                                  </div>
+                                    <DialogHeader>
+                                      <DialogTitle>
+                                        <span className={'text-2xl'}>
+                                          Select the question you want to add
+                                        </span>
+                                      </DialogTitle>
+                                    </DialogHeader>
 
-                                  <div
-                                    className={
-                                      'border rounded-lg mt-4 overflow-y-auto'
-                                    }
-                                  >
-                                    <Table>
-                                      <TableHeader>
-                                        <TableRow className={'divide-x'}>
-                                          <TableHead>Question</TableHead>
-                                          <TableHead>Type</TableHead>
-                                          <TableHead>Action</TableHead>
-                                        </TableRow>
-                                      </TableHeader>
-                                      <TableBody>
-                                        {allQuestionData?.map(
-                                          (
-                                            questionDataItem: any,
-                                            index: number
-                                          ) => (
-                                            <TableRow
-                                              key={index}
-                                              className={'divide-x'}
-                                            >
-                                              <TableCell>
-                                                {parse(
-                                                  questionDataItem.content
-                                                )}
-                                              </TableCell>
-                                              <TableCell>
-                                                {questionDataItem.type}
-                                              </TableCell>
-                                              <TableCell>
-                                                <DialogClose asChild>
-                                                  <Button
-                                                    variant={'secondary'}
-                                                    onClick={() => {
-                                                      setShowAddQuestionDialog(
-                                                        false
-                                                      )
-                                                      handleAddFromQuestionBank(
-                                                        questionDataItem.content,
-                                                        questionDataItem.type,
-                                                        questionDataItem.options,
-                                                        questionDataItem.remarks
-                                                      ).then()
-                                                    }}
-                                                  >
-                                                    Select
-                                                  </Button>
-                                                </DialogClose>
-                                              </TableCell>
-                                            </TableRow>
-                                          )
-                                        )}
-                                      </TableBody>
-                                    </Table>
+                                    <div className={'mt-5'}>
+                                      <Button
+                                        onClick={() => {
+                                          setShowAddQuestionDialog(false)
+                                        }}
+                                      >
+                                        <CircleX /> Close
+                                      </Button>
+                                    </div>
+
+                                    <div
+                                      className={
+                                        'border rounded-lg mt-4 overflow-y-auto'
+                                      }
+                                    >
+                                      <Table>
+                                        <TableHeader>
+                                          <TableRow className={'divide-x'}>
+                                            <TableHead>Question</TableHead>
+                                            <TableHead>Type</TableHead>
+                                            <TableHead>Action</TableHead>
+                                          </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                          {allQuestionData?.map(
+                                            (
+                                              questionDataItem: any,
+                                              index: number
+                                            ) => (
+                                              <TableRow
+                                                key={index}
+                                                className={'divide-x'}
+                                              >
+                                                <TableCell>
+                                                  {parse(
+                                                    questionDataItem.content
+                                                  )}
+                                                </TableCell>
+                                                <TableCell>
+                                                  {questionDataItem.type}
+                                                </TableCell>
+                                                <TableCell>
+                                                  <DialogClose asChild>
+                                                    <Button
+                                                      variant={'secondary'}
+                                                      onClick={() => {
+                                                        setShowAddQuestionDialog(
+                                                          false
+                                                        )
+                                                        handleAddFromQuestionBank(
+                                                          questionDataItem.content,
+                                                          questionDataItem.type,
+                                                          questionDataItem.options,
+                                                          questionDataItem.remarks
+                                                        ).then()
+                                                      }}
+                                                    >
+                                                      Select
+                                                    </Button>
+                                                  </DialogClose>
+                                                </TableCell>
+                                              </TableRow>
+                                            )
+                                          )}
+                                        </TableBody>
+                                      </Table>
+                                    </div>
                                   </div>
                                 </DialogContent>
                               </Dialog>
