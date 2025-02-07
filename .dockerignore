@@ -1,10 +1,8 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+### NextJS template
 # dependencies
 /node_modules
 /.pnp
 .pnp.js
-.yarn/install-state.gz
 
 # testing
 /coverage
@@ -24,6 +22,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
 # local env files
 .env*.local
@@ -32,8 +31,5 @@ yarn-error.log*
 .vercel
 
 # typescript
-*.tsbuildinfo
 next-env.d.ts
 
-.idea
-lib/env.ts

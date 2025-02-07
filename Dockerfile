@@ -9,6 +9,7 @@ COPY package.json ./
 
 COPY . .
 
+RUN rm -rf .next
 RUN npm install
 RUN npm run build
 
