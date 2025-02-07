@@ -2,87 +2,77 @@
 
 import React, { useEffect, useState } from 'react';
 import { ContentLayout } from '@/components/admin-panel/content-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import axios from 'axios';
 import { apiUrl } from '@/lib/env';
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import parse from 'html-react-parser'
+import { ArrowLeft } from 'lucide-react';
+import parse from 'html-react-parser';
 
 export default function ProctoringLog({ params }: any) {
   const examResultId = params.id;
-  const [examResultData, setExamResultData] = useState<any>(null);
-  const [allowedStudentData, setAllowedStudentData] = useState<any[]>([]);
   const [essayAnswers, setEssayAnswers] = useState<any[]>([]);
-  const [grades, setGrades] = useState<Record<number, { score: number; isCorrect: boolean }>>({});
+  const [grades, setGrades] = useState<Record<number, string>>({});
   const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchEssayAnswers = async () => {
       try {
-        const { data } = await axios.get(
-          `${apiUrl}/exam-result/${examResultId}`,
+        const essayRes = await axios.get(
+          `${apiUrl}/exam/${examResultId}/essayAnswer`,
           getBearerHeader(localStorage.getItem('token')!)
         );
-        setExamResultData(data.data);
-        fetchEssayAnswers();
+        setEssayAnswers(essayRes.data.data);
       } catch (e: any) {
-        toast.error(e.response?.data?.message || 'Failed to fetch data');
+        toast.error(e.response?.data?.message || 'Failed to fetch essay answers');
       }
     };
-    
-    fetchData();
+
+    fetchEssayAnswers();
   }, [examResultId]);
 
-  const fetchEssayAnswers = async () => {
-    try {
-      const essayRes = await axios.get(
-        `${apiUrl}/exam/${examResultId}/essayAnswer`,
-        getBearerHeader(localStorage.getItem('token')!)
-      );
-      setEssayAnswers(essayRes.data.data);
-    } catch (e: any) {
-      toast.error(e.response?.data?.message || 'Failed to fetch essay answers');
-    }
-  };
+  // Handle perubahan nilai input
+  const handleInputChange = (answerId: number, value: string) => {
+    if (!/^\d*\.?\d*$/.test(value)) return; // Cegah karakter selain angka & titik
 
-  const calculateTotalScore = async () => {
-    try{
-      const score = await axios.patch(
-        `${apiUrl}/exam-result/${examResultId}/calculate-score`,
-        getBearerHeader(localStorage.getItem('token')!)
-      );
-      setEssayAnswers(score.data.data);
-    } catch (e: any) {
-      toast.error(e.response?.data?.message || 'Failed to fetch essay answers');
-    }
-  }
-
-  const handleInputChange = (answerId: number, field: 'score' | 'isCorrect', value: any) => {
     setGrades((prev) => ({
       ...prev,
-      [answerId]: { ...prev[answerId], [field]: value },
+      [answerId]: value, // Simpan sebagai string
     }));
-    console.log(`Updated ${field} for ID ${answerId}:`, value); // Debugging
   };
 
+  // Handle submit & update langsung di UI
   const submitGrade = async (answerId: number) => {
-    const { score, isCorrect } = grades[answerId] || {};
-    if (score === undefined) return toast.error('Score is required');
+    const scoreStr = grades[answerId];
+    if (!scoreStr) return toast.error('Score is required');
+
+    const score = parseFloat(scoreStr);
+    if (isNaN(score)) return toast.error('Invalid score');
 
     try {
       await axios.patch(
         `${apiUrl}/exam-result/${answerId}/grade`,
-        { score, isCorrect },
+        { score },
         getBearerHeader(localStorage.getItem('token')!)
       );
+
       toast.success('Grade submitted successfully');
-      fetchEssayAnswers();
+
+      // Langsung update nilai di UI tanpa fetch ulang
+      setEssayAnswers((prevAnswers) =>
+        prevAnswers.map((answer) =>
+          answer.id === answerId ? { ...answer, score } : answer
+        )
+      );
+
+      // Reset input setelah submit
+      setGrades((prev) => ({
+        ...prev,
+        [answerId]: '',
+      }));
     } catch (e: any) {
       toast.error(e.response?.data?.message || 'Failed to submit grade');
     }
@@ -95,50 +85,50 @@ export default function ProctoringLog({ params }: any) {
         <Button onClick={() => router.back()}>
           <ArrowLeft /> Back
         </Button>
+
         {essayAnswers.length > 0 ? (
           <div className="border rounded-lg mt-4 p-6">
-          <h4 className="font-bold text-lg mb-3">Essay Answers</h4>
-        
-          <div className="space-y-4">
-            {essayAnswers.map((answer) => (
-              <div key={answer.id} className="border p-5 rounded-lg">
-                <h5 className="font-semibold text-base">Question:</h5>
-                <p className="text-sm mb-2">{parse(answer.question.content)}</p>
-        
-                <h5 className="font-semibold text-base mt-4">Answer:</h5>
-                <p className="text-sm mb-3">{answer.answer?.text || 'No answer given'}</p>
-        
-                {/* Score Card */}
-                <Card className="w-[100px] mt-3">
-                  <CardHeader>
-                    <CardTitle className="text-center text-sm">Score</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex justify-center items-center h-10">
-                    <p className="text-center text-base">{answer.score || 'Not graded yet'}</p>
-                  </CardContent>
-                </Card>
-        
-                {/* Grading Input & Button */}
-                <div className="mt-4 flex items-center gap-3">
-                  <Input
-                    type="number"
-                    value={grades[answer.id]?.score ?? ''}
-                    step="0.1"
-                    min="0"
-                    onChange={(e) => handleInputChange(answer.id, 'score', Number(e.target.value))}
-                    placeholder="Enter Score"
-                    className="w-28 h-10 text-sm px-3 border rounded-md"
-                  />
-                  <p className="text-sm text-muted-foreground">out of {answer.question.point}</p>
-                  <Button onClick={() => submitGrade(answer.id)} className="w-32 h-11 px-4 text-sm">
-                    Submit Grade
-                  </Button>
+            <div className="space-y-6">
+              {essayAnswers.map((answer) => (
+                <div key={answer.id} className="w-full h-auto">
+                  <div className="font-bold">Question:</div>
+                  <div>{parse(answer.question.content)}</div>
+
+                  <div className="mt-3">
+                    <span className="font-bold">Answer:</span>
+                    <div className="border w-full rounded-lg p-2 mt-1">
+                      {parse(answer.answer || 'Not Answered')}
+                    </div>
+                  </div>
+
+                  {/* Input dan Submit Button */}
+                  <div className="flex items-center gap-2 mt-3">
+                    <input
+                      type="text"
+                      className="border p-2 rounded w-20 text-right"
+                      placeholder="0"
+                      value={grades[answer.id] || ''}
+                      onChange={(e) => handleInputChange(answer.id, e.target.value)}
+                    />
+                    <div className="text-muted-foreground">out of {answer.question.point}</div>
+                    <Button type="button" onClick={() => submitGrade(answer.id)}>
+                      Submit
+                    </Button>
+                  </div>
+
+                  {/* Tampilkan nilai setelah submit */}
+                  <div className="w-[85px] flex flex-col gap-5">
+                    <div className="w-[85px] border rounded-lg flex flex-col p-5 mt-3">
+                      <p className="font-bold">Score</p>
+                      <div className="mt-3 text-center w-full text-2xl">
+                        {answer.score ?? '-'}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-        
         ) : (
           <p className="text-center mt-5">No essay answers found.</p>
         )}

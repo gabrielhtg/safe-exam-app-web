@@ -274,6 +274,13 @@ export default function ReportPage({ params }: any) {
                   <BookOpenCheck /> Manual Check
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`/main/exam/report/review-result/${row.original.id}`}
+                >
+                  <BookOpenCheck /> Review Result
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )
