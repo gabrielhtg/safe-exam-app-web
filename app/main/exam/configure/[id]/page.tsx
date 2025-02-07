@@ -222,8 +222,7 @@ export default function ExamConfigPage({ params }: any) {
         })
       }
       loadQuill().then()
-    } catch (e: any) {
-      console.log(e)
+    } catch {
       toast.error('Internet connection issue. Reload this page!')
     }
 

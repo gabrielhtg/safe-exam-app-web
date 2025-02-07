@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import {
   ArrowLeft,
+  CircleX,
   EllipsisVertical,
   Landmark,
   Pen,
@@ -50,6 +51,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { stripHtml } from '@/app/_services/strip-html'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamQuestionPage({ params }: any) {
@@ -80,7 +82,7 @@ export default function ExamQuestionPage({ params }: any) {
 
       setQuestions(response.data.data)
     } catch (err: any) {
-      console.log(err)
+      toast.error(err.response.data.message)
     }
   }
 
@@ -105,7 +107,7 @@ export default function ExamQuestionPage({ params }: any) {
         toast.success(response.data.message)
       }
     } catch (error: any) {
-      console.log(error)
+      toast.error(error.response.data.message)
     }
   }
 
@@ -125,8 +127,6 @@ export default function ExamQuestionPage({ params }: any) {
   }
 
   const handleSaveQuestion = async () => {
-    console.log(tempContent)
-
     if (tempContent === '' && questionType !== 'essay') {
       getAllQuestions().then()
       toast.error('Questions cannot be empty!')
@@ -407,7 +407,11 @@ export default function ExamQuestionPage({ params }: any) {
                             <div className={'flex gap-3'}>
                               <Button
                                 onClick={() => {
-                                  if (value !== '' && value !== '<p><br></p>') {
+                                  if (
+                                    value !== '' &&
+                                    value !== '<p><br></p>' &&
+                                    stripHtml(value).trim() !== ''
+                                  ) {
                                     setTempContent(value)
                                     setValue('')
                                   } else {
@@ -436,14 +440,34 @@ export default function ExamQuestionPage({ params }: any) {
                                     <Landmark /> Question Bank
                                   </Button>
                                 </DialogTrigger>
-                                <DialogContent className={'max-w-4xl w-full'}>
+                                <DialogContent
+                                  className={
+                                    'max-w-4xl w-full max-h-[calc(100vh-100px)] h-full'
+                                  }
+                                >
                                   <DialogHeader>
                                     <DialogTitle>
-                                      Select the question you want to add
+                                      <span className={'text-2xl'}>
+                                        Select the question you want to add
+                                      </span>
                                     </DialogTitle>
                                   </DialogHeader>
 
-                                  <div className={'border rounded-lg'}>
+                                  <div>
+                                    <Button
+                                      onClick={() => {
+                                        setShowAddQuestionDialog(false)
+                                      }}
+                                    >
+                                      <CircleX /> Close
+                                    </Button>
+                                  </div>
+
+                                  <div
+                                    className={
+                                      'border rounded-lg mt-4 overflow-y-auto'
+                                    }
+                                  >
                                     <Table>
                                       <TableHeader>
                                         <TableRow className={'divide-x'}>
@@ -503,7 +527,7 @@ export default function ExamQuestionPage({ params }: any) {
                             <div className={'flex gap-3'}>
                               <Button
                                 onClick={() => {
-                                  handleSaveQuestion()
+                                  handleSaveQuestion().then()
                                   setValue('')
                                   setRemarks(1)
                                   setTempContent('')

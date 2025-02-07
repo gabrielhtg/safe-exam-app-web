@@ -28,6 +28,7 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import { apiUrl } from '@/lib/env'
 import { getUserInitials } from '@/app/_services/getUserInitials.service'
+import { toast } from 'sonner'
 
 export function UserNav() {
   const router = useRouter()
@@ -51,8 +52,8 @@ export function UserNav() {
         )
 
         dispatch(setUser(response.data.data))
-      } catch (err) {
-        console.log(err)
+      } catch (err: any) {
+        toast.error(err.response.data.message)
         router.push('/')
       }
     }

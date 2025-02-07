@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { toast } from 'sonner'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function ExamSimulationStart({ params }: any) {
@@ -97,7 +98,7 @@ export default function ExamSimulationStart({ params }: any) {
         setQuestions(response.data.data)
       }
     } catch (err: any) {
-      console.log(err)
+      toast.error(err.response.data.message)
     }
   }
 
@@ -124,7 +125,7 @@ export default function ExamSimulationStart({ params }: any) {
         }
       }
     } catch (e: any) {
-      console.log(e.response.data.message)
+      toast.error(e.response.data.message)
     }
   }
 

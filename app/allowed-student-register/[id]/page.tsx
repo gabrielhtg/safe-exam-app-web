@@ -25,7 +25,7 @@ export default function AllowedUserRegisterPage({ params }: any) {
 
       setCourseData(response.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 

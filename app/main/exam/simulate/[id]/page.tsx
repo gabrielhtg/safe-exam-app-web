@@ -40,6 +40,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { BackButton } from '@/components/custom-component/BackButton'
+import { toast } from 'sonner'
 
 export default function SimulatePage({ params }: any) {
   const id = params.id
@@ -106,8 +107,6 @@ export default function SimulatePage({ params }: any) {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
-      console.log(examResultResponse.data.data)
-
       setExamResultData(examResultResponse.data.data)
 
       const getQuestionResponse = await axios.get(
@@ -122,7 +121,7 @@ export default function SimulatePage({ params }: any) {
 
       setQuestion(getQuestionResponse.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -146,7 +145,7 @@ export default function SimulatePage({ params }: any) {
 
       setExamResultData(examResultResponse.data.data)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -275,33 +274,25 @@ export default function SimulatePage({ params }: any) {
             ''
           ) : (
             <Dialog>
-              <DialogTrigger asChild>
+              {examData?.start_password ? (
+                <DialogTrigger asChild>
+                  <Button>
+                    {examResultData.filter(
+                      (item) => item.username === currentUsername
+                    ).length > 0
+                      ? 'Start Again'
+                      : 'Start Exam'}
+                  </Button>
+                </DialogTrigger>
+              ) : (
                 <Button
                   onClick={() => {
-                    if (
-                      !(
-                        examResultData.filter(
-                          (item) => item.username === currentUsername
-                        ).length > 0
-                      )
-                    ) {
-                      if (
-                        examData.start_password === undefined ||
-                        examData.start_password === null ||
-                        examData.start_password === ''
-                      ) {
-                        router.push(`/main/exam/simulate/start/${id}`)
-                      }
-                    }
+                    router.push(`/main/exam/simulate/start/${id}`)
                   }}
                 >
-                  {examResultData.filter(
-                    (item) => item.username === currentUsername
-                  ).length > 0
-                    ? 'Start Again'
-                    : 'Start Exam'}
+                  Start Exam
                 </Button>
-              </DialogTrigger>
+              )}
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle className={'mb-5'}>

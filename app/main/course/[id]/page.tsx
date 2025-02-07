@@ -110,16 +110,15 @@ export default function CourseDetail({ params }: any) {
       setCourse(response.data.data)
       getAllExams(response.data.data.id).then()
     } catch (err: any) {
-      console.log(err)
+      toast.error(err.response.data.message)
     }
   }
 
   const handleCopy = async (text: string) => {
     try {
-      console.log(navigator.clipboard)
       await navigator.clipboard.writeText(text)
     } catch (e: any) {
-      console.log(e)
+      toast.error(e.response.data.message)
     }
   }
 
@@ -135,7 +134,7 @@ export default function CourseDetail({ params }: any) {
 
       setExams(response.data.data)
     } catch (err: any) {
-      console.log(err)
+      toast.error(err.response.data.message)
     }
   }
 
@@ -538,7 +537,7 @@ export default function CourseDetail({ params }: any) {
                     </TableCell>
                     <TableCell>{formatExamDate(exam.start_date)}</TableCell>
                     <TableCell>{formatExamDate(exam.end_date)}</TableCell>
-                    <TableCell className={'flex gap-1'}>
+                    <TableCell>
                       <DropdownMenu modal={false}>
                         <DropdownMenuTrigger>
                           <Button variant={'secondary'}>
