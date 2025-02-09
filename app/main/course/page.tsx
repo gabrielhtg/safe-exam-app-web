@@ -73,6 +73,7 @@ export default function CoursePage() {
   const [searchKeywords, setSearchKeywords] = useState('')
   const [loadingSeeCourseDetail, setLoadingSeeCourseDetail] = useState(false)
   const [showEditCourse, setShowEditCourse] = useState(false)
+  const [selectedCourse, setSelectedCourse] = useState(0)
 
   const router = useRouter()
 
@@ -158,14 +159,14 @@ export default function CoursePage() {
     setCourseDesc('')
   }
 
-  const handleEditCourse = async (id: string) => {
+  const handleEditCourse = async (id: number) => {
     setIsLoadingCreate(true)
     setLoadingTitle('Updating Course')
     const formData = new FormData()
     formData.append('title', courseTitle)
     formData.append('description', courseDesc)
     formData.append('username', localStorage.getItem('username')!)
-    formData.append('id', id)
+    formData.append('id', `${id}`)
 
     try {
       if (courseImageFile) {
@@ -456,6 +457,7 @@ export default function CoursePage() {
                         setCourseTitle(course.title)
                         setCourseDesc(course.description)
                         setCourseImage(`${apiUrl}/${course.image}`)
+                        setSelectedCourse(course.id)
                         setShowEditCourse(true)
                       }}
                     >
@@ -570,7 +572,7 @@ export default function CoursePage() {
                             }
 
                             if (courseTitle !== '' && courseDesc !== '') {
-                              handleEditCourse(`${course.id}`).then()
+                              handleEditCourse(selectedCourse).then()
                               setShowEditCourse(false)
                             }
                           }}

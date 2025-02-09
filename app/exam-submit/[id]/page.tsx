@@ -35,7 +35,7 @@ export default function ExamSubmitPage({ params }: any) {
     }
 
     const formData = new FormData()
-
+    formData.append('exam_id', examId)
     formData.append('result_file', resultFile)
 
     try {

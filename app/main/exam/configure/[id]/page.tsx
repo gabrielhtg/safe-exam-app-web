@@ -597,6 +597,13 @@ export default function ExamConfigPage({ params }: any) {
                 return
               }
 
+              if (passingGrade > 100) {
+                setPassingGradeErr(
+                  'Passing Grade must be less than or equal to 100'
+                )
+                return
+              }
+
               if (examStartDate!.getTime() > examEndDate!.getTime()) {
                 setStartTimeErr(
                   'The start date cannot be earlier than the end date.'
