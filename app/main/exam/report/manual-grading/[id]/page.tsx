@@ -11,12 +11,44 @@ import { getBearerHeader } from '@/app/_services/getBearerHeader.service';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import parse from 'html-react-parser';
+import { get } from 'lodash';
 
 export default function ProctoringLog({ params }: any) {
   const examResultId = params.id;
   const [essayAnswers, setEssayAnswers] = useState<any[]>([]);
   const [grades, setGrades] = useState<Record<number, string>>({});
   const router = useRouter();
+  const [examResultData, setExamResultData] = useState([])
+  const examId = params.id
+  
+
+  const getExamResult = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/exam-result`, {
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        params: {
+          exam: examId,
+        },
+      })
+
+      if (response.status == 200) {
+        setExamResultData(response.data.data)
+        console.log("updated exam",response.data.data)
+      }
+    } catch (e: any) {
+      toast.error(e.response.message)
+    }
+  }
+
+  const updateGradingStatus = async () => {
+    try {
+      await axios.put(`${apiUrl}/exam-result/${examId}/grading`, { examId }) // Sesuaikan endpoint
+      getExamResult() // Refresh data setelah update
+    } catch (e: any) {
+      toast.error('Failed to update grading status')
+    }
+  }
+  
 
   useEffect(() => {
     const fetchEssayAnswers = async () => {
@@ -31,7 +63,10 @@ export default function ProctoringLog({ params }: any) {
       }
     };
 
-    fetchEssayAnswers();
+    fetchEssayAnswers().then()
+    updateGradingStatus().then()
+    getExam().then()
+    getExamResult().then()
   }, [examResultId]);
 
   // Handle perubahan nilai input
@@ -43,6 +78,16 @@ export default function ProctoringLog({ params }: any) {
       [answerId]: value, // Simpan sebagai string
     }));
   };
+
+  const getExam = async () => {
+    try {
+      await axios.get(`${apiUrl}/exam/${examId}`, {
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
+    } catch (err: any) {
+      toast.error(err.response.message)
+    }
+  }
 
   // Handle submit & update langsung di UI
   const submitGrade = async (answerId: number) => {

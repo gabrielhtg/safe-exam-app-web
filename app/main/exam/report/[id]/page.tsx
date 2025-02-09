@@ -65,6 +65,7 @@ export default function ReportPage({ params }: any) {
       toast.error(e.response.data.message)
     }
   }
+  
 
   const getExamResult = async () => {
     try {
@@ -77,6 +78,7 @@ export default function ReportPage({ params }: any) {
 
       if (response.status == 200) {
         setExamResultData(response.data.data)
+        console.log("updated exam",response.data.data)
       }
     } catch (e: any) {
       toast.error(e.response.message)
@@ -175,7 +177,7 @@ export default function ReportPage({ params }: any) {
       },
     },
     {
-      accessorKey: 'grade',
+      accessorKey: 'graded',
       header: ({ column }) => {
         return (
           <Button
@@ -201,6 +203,29 @@ export default function ReportPage({ params }: any) {
         return <>{getScorePercentage(totalScore, expectedScore)}</>
       },
       sortingFn: (a: any, b: any) => a.getValue('grade') - b.getValue('grade'),
+    },
+    {
+      accessorKey: 'graded-status',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className={'px-0 w-full justify-start'}
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Status
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        console.log("graded", row.original)
+        if (row.getValue('graded')) {
+          return <span className={'text-green-500'}>Has been graded</span>
+        } else {
+          return <span className={'text-yellow-500'}>Has not been graded</span>
+        }
+      },
     },
     {
       accessorKey: 'created_at',
@@ -291,7 +316,13 @@ export default function ReportPage({ params }: any) {
   useEffect(() => {
     getExam().then()
     getExamResult().then()
-  }, [])
+    // updateGradingStatus().then()
+    const interval = setInterval(() => {
+      getExamResult();
+    }, 5000); // Setiap 5 detik
+  
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <ContentLayout title="Exam">
