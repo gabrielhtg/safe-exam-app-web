@@ -139,6 +139,18 @@ export default function ExamQuestionPage({ params }: any) {
       return
     }
 
+    if (!tempOptions.some((item) => item.isCorrect === true)) {
+      setTempContent('')
+      setTempOptions([])
+      setShowCorrectSwitch(true)
+      setIsOptionCorrect(false)
+      setValue('')
+      toast.error('There must be at least 1 correct answer.')
+      return
+    }
+
+    console.log(tempOptions)
+
     try {
       const saveResponse = await axios.post(
         `${apiUrl}/question`,
@@ -466,7 +478,7 @@ export default function ExamQuestionPage({ params }: any) {
 
                                     <div
                                       className={
-                                        'border rounded-lg mt-4 overflow-y-auto'
+                                        'border rounded-lg mt-4 overflow-y-auto max-h-[calc(100vh-260px)]'
                                       }
                                     >
                                       <Table>

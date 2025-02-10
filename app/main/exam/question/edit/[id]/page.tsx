@@ -204,7 +204,12 @@ export default function EditQuestionPage({ params }: any) {
                                                 isCorrect:
                                                   !tempOption.isCorrect,
                                               }
-                                            : tempOption
+                                            : questionType === 'multiple'
+                                              ? {
+                                                  ...tempOption,
+                                                  isCorrect: false,
+                                                }
+                                              : tempOption
                                       ),
                                     }))
                                   }}
@@ -237,11 +242,7 @@ export default function EditQuestionPage({ params }: any) {
                         onValueChange={(value) => setQuestionType(value)}
                       >
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem
-                            value="multiple"
-                            id="multiple"
-                            aria-selected={true}
-                          />
+                          <RadioGroupItem value="multiple" id="multiple" />
                           <Label htmlFor="multiple">Multiple Choice</Label>
                         </div>
                         <div className="flex items-center space-x-2">

@@ -228,6 +228,20 @@ export default function RegisterPage() {
                     return
                   }
 
+                  if (password.length > 25) {
+                    setPasswordErr(
+                      'The number of password characters cannot be more than 25 characters.'
+                    )
+                    return
+                  }
+
+                  if (rePassword.length > 25) {
+                    setRePasswordErr(
+                      'The number of password characters cannot be more than 25 characters.'
+                    )
+                    return
+                  }
+
                   handleRegister().then()
                 }}
                 id="button-register"

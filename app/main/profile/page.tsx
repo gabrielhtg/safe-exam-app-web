@@ -224,6 +224,20 @@ export default function ProfilePage() {
                       return
                     }
 
+                    if (newPassword.length > 25) {
+                      setNewPasswordErr(
+                        'The number of password characters cannot be more than 25 characters.'
+                      )
+                      return
+                    }
+
+                    if (reNewPassword.length > 25) {
+                      setReNewPasswordErr(
+                        'The number of password characters cannot be more than 25 characters.'
+                      )
+                      return
+                    }
+
                     if (newPassword !== reNewPassword) {
                       setNewPasswordErr('Not match.')
                       setReNewPasswordErr('Not match.')
