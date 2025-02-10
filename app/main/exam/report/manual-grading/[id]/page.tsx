@@ -42,12 +42,22 @@ export default function ProctoringLog({ params }: any) {
 
   const updateGradingStatus = async () => {
     try {
-      await axios.put(`${apiUrl}/exam-result/${examId}/grading`, { examId }) // Sesuaikan endpoint
-      getExamResult() // Refresh data setelah update
-    } catch (e: any) {
-      toast.error('Failed to update grading status')
+      await axios.patch(
+        `${apiUrl}/exam-result/${examResultId}/update-graded`,  // Pastikan endpoint URL benar
+        { graded: true },  // Kirimkan nilai graded di body request
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,  // Pastikan token diambil dengan benar
+          },
+        }
+      );
+      // Optionally, Anda bisa menampilkan notifikasi sukses
+      toast.success('Grading status updated successfully');
+    } catch (e) {
+      toast.error('Failed to update grading status');
     }
-  }
+  };
+  
   
 
   useEffect(() => {
@@ -64,7 +74,6 @@ export default function ProctoringLog({ params }: any) {
     };
 
     fetchEssayAnswers().then()
-    updateGradingStatus().then()
     getExam().then()
     getExamResult().then()
   }, [examResultId]);
@@ -177,6 +186,9 @@ export default function ProctoringLog({ params }: any) {
         ) : (
           <p className="text-center mt-5">No essay answers found.</p>
         )}
+        <Button className='mt-5' onClick={updateGradingStatus}>
+          <ArrowLeft /> Save
+        </Button>
       </Card>
     </ContentLayout>
   );

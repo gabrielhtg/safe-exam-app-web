@@ -55,52 +55,39 @@ export default function ReviewResult({ params }: any) {
 
   return (
     <ContentLayout title="review-result">
-      <Card id={'card-utama'} className={'w-full p-10 h-[calc(100vh-180px)]'}>
-        <h3 className={'font-bold text-xl mb-5'}>
-          Result of {examResultData ? examResultData.title : ''} {examResultData?.course_title}
-        </h3>
-        <Button className='gap-3' onClick={() => router.back()}>
-                  <ArrowLeft /> Back
+      <Button onClick={() => router.back()}>
+          <ArrowLeft /> Back
         </Button>
+      <Card id={'card-utama'} className={'w-full p-10 mt-5 flex flex-col min-h-[calc(100vh-180px)]'}>
+        <span className={'font-bold text-xl mb-5'}>
+          Result of {examResultData ? examResultData.title : ''} {examResultData?.course_title}
+        </span>
+        
 
-        <div className={'flex gap-5 h-auto pb-10 mt-5'}>
-          {/*sebelah kiri*/}
-          <div
-            className={
-              'flex flex-col w-full overflow-y-scroll scroll-smooth border rounded-lg px-5 pb-5'
-            }
-          >
+        <div className={'flex gap-5 h-full pb-10 mt-5'}>
+          {/* Sebelah kiri (konten utama) */}
+          <div className={'flex flex-col w-full overflow-y-scroll scroll-smooth border rounded-lg px-5 pb-5'}>
             {essayAnswers.map((answer: any, ansIndex) => (
-              <div
-                key={ansIndex}
-                id={`${ansIndex}`}
-                className={'flex gap-3 rounded-lg p-5 pb-0 mr-5'}
-              >
+              <div key={ansIndex} className={'flex gap-3 rounded-lg p-5 pb-0 mr-5'}>
                 <div>{ansIndex + 1}.</div>
                 <div className={'w-full h-auto'}>
                   {parse(answer.question.content)}
                   {answer.question.type === 'essay' ? (
                     <div className={'mt-3'}>
                       <span className={'font-bold'}>Your answer :</span>
-
                       <div className={'border w-full rounded-lg p-2 mt-1'}>
                         {parse(answer.answer ? answer.answer : 'Not Answered')}
                       </div>
                     </div>
                   ) : (
-                    <RadioGroup
-                      value={answer.answer}
-                      className={'flex ms-5 flex-col mt-2'}
-                    >
+                    <RadioGroup value={answer.answer} className={'flex ms-5 flex-col mt-2'}>
                       {answer.question.options.map((option: any, optionIndex: number) => {
-                        // Tentukan apakah opsi ini terpilih
                         const isSelected =
                           answer.question.type === 'multiple'
                             ? answer.answer === option.id
                             : answer.question.type === 'check-box'
                             ? (answer.answer || []).includes(option.id)
                             : false;
-                        // Tentukan kelas berdasarkan apakah opsi terpilih dan apakah benar
                         const optionClass = isSelected
                           ? option.isCorrect
                             ? 'bg-green-300'
@@ -124,7 +111,7 @@ export default function ReviewResult({ params }: any) {
                                 </div>
                               )}
                             </div>
-                            <div className={optionClass + " p-1 rounded"}>
+                            <div className={optionClass + ' p-1 rounded'}>
                               {answer.question.type === 'multiple' && (
                                 <div>{parse(option.option)}</div>
                               )}
@@ -140,7 +127,6 @@ export default function ReviewResult({ params }: any) {
                           </div>
                         );
                       })}
-
                     </RadioGroup>
                   )}
 
@@ -152,16 +138,13 @@ export default function ReviewResult({ params }: any) {
             ))}
           </div>
 
-          {/*sebelah kanan*/}
+          {/* Sebelah kanan (footer atau informasi lainnya) */}
           <div className={'max-w-xs w-full flex flex-col gap-5'}>
-
             <div className={'border rounded-lg w-full flex flex-col p-5'}>
               <span className={'font-bold'}>Grade</span>
-
               <div className={'mt-3 text-center w-full text-3xl'}>
                 {(
-                  (examResultData?.total_score /
-                    examResultData?.expected_score) *
+                  (examResultData?.total_score / examResultData?.expected_score) *
                   100
                 ).toFixed(2)}{' '}
                 / 100.00
@@ -170,6 +153,7 @@ export default function ReviewResult({ params }: any) {
           </div>
         </div>
       </Card>
+
     </ContentLayout>
   );
 }
