@@ -24,7 +24,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { CircleX } from 'lucide-react'
 import { useDispatch } from 'react-redux'
-import { apiUrl } from '@/lib/env'
 import { setUser } from '@/lib/_slices/userSlice'
 import { AppDispatch } from '@/lib/store'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
@@ -45,16 +44,19 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      const loginResponse = await axios.post(`${apiUrl}/auth/login`, {
-        username: username,
-        password: password,
-      })
+      const loginResponse = await axios.post(
+        `${process.env.API_URL}/auth/login`,
+        {
+          username: username,
+          password: password,
+        }
+      )
 
       localStorage.setItem('token', loginResponse.data.data.access_token)
 
       if (loginResponse.status === 200) {
         const getUserResponse = await axios.get(
-          `${apiUrl}/users/${username}`,
+          `${process.env.API_URL}/users/${username}`,
           getBearerHeader(localStorage.getItem('token')!)
         )
 

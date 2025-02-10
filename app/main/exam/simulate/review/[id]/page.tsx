@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { Button } from '@/components/ui/button'
 import parse from 'html-react-parser'
 import Link from 'next/link'
@@ -24,7 +23,7 @@ export default function ReviewPage({ params }: any) {
 
   const getExamResult = async () => {
     const response = await axios.get(
-      `${apiUrl}/exam-result/${id}`,
+      `${process.env.API_URL}/exam-result/${id}`,
       getBearerHeader(localStorage.getItem('token')!)
     )
 

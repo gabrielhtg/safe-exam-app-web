@@ -31,7 +31,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
@@ -67,9 +66,12 @@ export default function RecentExam() {
 
   const handleDeleteExam = async (id: number) => {
     try {
-      const deleteResponse = await axios.delete(`${apiUrl}/exam/${id}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const deleteResponse = await axios.delete(
+        `${process.env.API_URL}/exam/${id}`,
+        {
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       if (deleteResponse.status === 200) {
         setDialogOpen(true)
@@ -86,7 +88,7 @@ export default function RecentExam() {
 
   const getExam = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/exam`, {
+      const response = await axios.get(`${process.env.API_URL}/exam`, {
         params: {
           uploader: currentUsername,
           take: 5,
@@ -132,15 +134,18 @@ export default function RecentExam() {
 
   const handleDownloadExamFile = async (examId: number) => {
     try {
-      const response = await axios.get(`${apiUrl}/exam/generate-file`, {
-        params: {
-          id: examId,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/exam/generate-file`,
+        {
+          params: {
+            id: examId,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       if (response.status == 200) {
-        window.location.href = `${apiUrl}/${response.data.data}`
+        window.location.href = `${process.env.API_URL}/${response.data.data}`
       }
     } catch (err: any) {
       setDialogOpen(true)
@@ -262,7 +267,7 @@ export default function RecentExam() {
                         <DropdownMenuItem
                           onClick={() => {
                             handleCopy(
-                              `${apiUrl}/exam-config/${exam.id}`
+                              `${process.env.API_URL}/exam-config/${exam.id}`
                             ).then()
                             toast.success('Download config link copied!')
                           }}
@@ -271,7 +276,9 @@ export default function RecentExam() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
-                            handleCopy(`${feUrl}/exam-submit/${exam.id}`).then()
+                            handleCopy(
+                              `${process.env.FE_URL}/exam-submit/${exam.id}`
+                            ).then()
                             toast.success('Submit link copied!')
                           }}
                         >

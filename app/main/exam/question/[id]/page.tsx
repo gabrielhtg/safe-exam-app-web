@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input'
 import dynamic from 'next/dynamic'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { Button } from '@/components/ui/button'
 import parse from 'html-react-parser'
 import { useSelector } from 'react-redux'
@@ -73,7 +72,7 @@ export default function ExamQuestionPage({ params }: any) {
 
   const getAllQuestions = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/question`, {
+      const response = await axios.get(`${process.env.API_URL}/question`, {
         params: {
           exam: id,
         },
@@ -88,7 +87,7 @@ export default function ExamQuestionPage({ params }: any) {
 
   const getExamData = async () => {
     const response = await axios.get(
-      `${apiUrl}/exam/${id}`,
+      `${process.env.API_URL}/exam/${id}`,
       getBearerHeader(localStorage.getItem('token')!)
     )
 
@@ -98,7 +97,7 @@ export default function ExamQuestionPage({ params }: any) {
   const handleDelete = async (questionId: number) => {
     try {
       const response = await axios.delete(
-        `${apiUrl}/question/${questionId}`,
+        `${process.env.API_URL}/question/${questionId}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 
@@ -113,7 +112,7 @@ export default function ExamQuestionPage({ params }: any) {
 
   const handleGetAllQuestion = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/question`, {
+      const response = await axios.get(`${process.env.API_URL}/question`, {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
         params: {
           course: examData.course.id,
@@ -153,7 +152,7 @@ export default function ExamQuestionPage({ params }: any) {
 
     try {
       const saveResponse = await axios.post(
-        `${apiUrl}/question`,
+        `${process.env.API_URL}/question`,
         {
           content: questionType === 'essay' ? value : tempContent,
           type: questionType,
@@ -183,7 +182,7 @@ export default function ExamQuestionPage({ params }: any) {
   ) => {
     try {
       const saveResponse = await axios.post(
-        `${apiUrl}/question`,
+        `${process.env.API_URL}/question`,
         {
           content: content,
           type: questionTypeParam,

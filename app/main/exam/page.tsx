@@ -61,7 +61,6 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import axios from 'axios'
-import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import {
   Command,
@@ -112,7 +111,7 @@ export default function ExamPage() {
 
   const getExam = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/exam`, {
+      const response = await axios.get(`${process.env.API_URL}/exam`, {
         params: {
           uploader: currentUsername,
         },
@@ -127,7 +126,7 @@ export default function ExamPage() {
   const handleGenerateNewConfigPassword = async (examId: number) => {
     try {
       const response = await axios.patch(
-        `${apiUrl}/exam/${examId}`,
+        `${process.env.API_URL}/exam/${examId}`,
         {
           config_password: 'new',
         },
@@ -145,15 +144,18 @@ export default function ExamPage() {
 
   const handleDownloadExamFile = async (examId: number) => {
     try {
-      const response = await axios.get(`${apiUrl}/exam/generate-file`, {
-        params: {
-          id: examId,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/exam/generate-file`,
+        {
+          params: {
+            id: examId,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       if (response.status == 200) {
-        window.location.href = `${apiUrl}/${response.data.data}`
+        window.location.href = `${process.env.API_URL}/${response.data.data}`
       }
     } catch (err: any) {
       toast.error(err.response.data.message)
@@ -162,7 +164,7 @@ export default function ExamPage() {
 
   const getCourses = async () => {
     try {
-      const getResponse = await axios.get(`${apiUrl}/course`, {
+      const getResponse = await axios.get(`${process.env.API_URL}/course`, {
         params: {
           uploader: currentUsername,
         },
@@ -187,7 +189,7 @@ export default function ExamPage() {
 
     try {
       const response = await axios.post(
-        `${apiUrl}/exam`,
+        `${process.env.API_URL}/exam`,
         submitData,
         getBearerHeader(localStorage.getItem('token')!)
       )
@@ -211,7 +213,7 @@ export default function ExamPage() {
 
   const searchExam = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/exam`, {
+      const response = await axios.get(`${process.env.API_URL}/exam`, {
         params: {
           search: searchKeywords,
         },
@@ -226,9 +228,12 @@ export default function ExamPage() {
 
   const handleDeleteExam = async (id: number) => {
     try {
-      const deleteResponse = await axios.delete(`${apiUrl}/exam/${id}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const deleteResponse = await axios.delete(
+        `${process.env.API_URL}/exam/${id}`,
+        {
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       if (deleteResponse.status === 200) {
         toast.success(deleteResponse.data.message)
@@ -676,7 +681,7 @@ export default function ExamPage() {
                             <DropdownMenuItem
                               onClick={() => {
                                 handleCopy(
-                                  `${apiUrl}/exam-config/${exam.id}`
+                                  `${process.env.API_URL}/exam-config/${exam.id}`
                                 ).then()
                                 toast.success('Download link copied!')
                               }}
@@ -686,7 +691,7 @@ export default function ExamPage() {
                             <DropdownMenuItem
                               onClick={() => {
                                 handleCopy(
-                                  `${feUrl}/exam-submit/${exam.id}`
+                                  `${process.env.FE_URL}/exam-submit/${exam.id}`
                                 ).then()
                                 toast.success('Submit link copied!')
                               }}

@@ -26,7 +26,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectUser, setUser } from '@/lib/_slices/userSlice'
 import { useEffect } from 'react'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getUserInitials } from '@/app/_services/getUserInitials.service'
 import { toast } from 'sonner'
 
@@ -43,7 +42,7 @@ export function UserNav() {
     const getUserData = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/users/${localStorage.getItem('username')}`,
+          `${process.env.API_URL}/users/${localStorage.getItem('username')}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -75,7 +74,7 @@ export function UserNav() {
                   {user.profile_pict ? (
                     <AvatarImage
                       className={'object-cover'}
-                      src={`${apiUrl}/${user.profile_pict}`}
+                      src={`${process.env.API_URL}/${user.profile_pict}`}
                       alt="Avatar"
                     />
                   ) : (

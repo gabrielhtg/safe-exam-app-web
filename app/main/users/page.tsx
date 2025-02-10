@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
@@ -31,7 +30,7 @@ export default function UsersPage() {
   const getUserData = async () => {
     try {
       const response = await axios.get(
-        `${apiUrl}/users/${localStorage.getItem('username')}`,
+        `${process.env.API_URL}/users/${localStorage.getItem('username')}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 
@@ -46,7 +45,7 @@ export default function UsersPage() {
   const getUsersData = async () => {
     try {
       const response = await axios.get(
-        `${apiUrl}/users`,
+        `${process.env.API_URL}/users`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 
@@ -59,7 +58,7 @@ export default function UsersPage() {
   const handleRemoveUser = async (username: string) => {
     try {
       const response = await axios.delete(
-        `${apiUrl}/users/${username}`,
+        `${process.env.API_URL}/users/${username}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 

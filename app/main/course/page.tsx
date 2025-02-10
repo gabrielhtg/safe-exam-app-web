@@ -41,7 +41,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import axios from 'axios'
-import { apiUrl, compressOptions } from '@/lib/env'
+import { compressOptions } from '@/lib/env'
 import imageCompression from 'browser-image-compression'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import Link from 'next/link'
@@ -78,7 +78,7 @@ export default function CoursePage() {
   const router = useRouter()
 
   const getAllCourse = async () => {
-    const response = await axios.get(`${apiUrl}/course`, {
+    const response = await axios.get(`${process.env.API_URL}/course`, {
       params: {
         uploader: localStorage.getItem('username'),
       },
@@ -89,7 +89,7 @@ export default function CoursePage() {
   }
 
   const searchCourse = async (keywords: string | undefined) => {
-    const response = await axios.get(`${apiUrl}/course`, {
+    const response = await axios.get(`${process.env.API_URL}/course`, {
       headers: getBearerHeader(localStorage.getItem('token')!).headers,
       params: {
         search: keywords,
@@ -106,7 +106,7 @@ export default function CoursePage() {
   const handleRemoveCourse = async (title: string) => {
     try {
       const removeResponse = await axios.delete(
-        `${apiUrl}/course/${title}`,
+        `${process.env.API_URL}/course/${title}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 
@@ -137,7 +137,7 @@ export default function CoursePage() {
       }
 
       const response = await axios.post(
-        `${apiUrl}/course`,
+        `${process.env.API_URL}/course`,
         formData,
         getBearerHeader(localStorage.getItem('token')!)
       )
@@ -179,7 +179,7 @@ export default function CoursePage() {
       }
 
       const response = await axios.patch(
-        `${apiUrl}/course`,
+        `${process.env.API_URL}/course`,
         formData,
         getBearerHeader(localStorage.getItem('token')!)
       )
@@ -417,7 +417,7 @@ export default function CoursePage() {
                   {course.image ? (
                     <Image
                       className={'object-cover h-40 rounded-lg'}
-                      src={`${apiUrl}/${course.image}`}
+                      src={`${process.env.API_URL}/${course.image}`}
                       width={500}
                       height={500}
                       alt={'course-image'}
@@ -456,7 +456,7 @@ export default function CoursePage() {
                       onClick={() => {
                         setCourseTitle(course.title)
                         setCourseDesc(course.description)
-                        setCourseImage(`${apiUrl}/${course.image}`)
+                        setCourseImage(`${process.env.API_URL}/${course.image}`)
                         setSelectedCourse(course.id)
                         setShowEditCourse(true)
                       }}

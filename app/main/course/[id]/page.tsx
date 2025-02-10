@@ -31,7 +31,6 @@ import {
 import { ContentLayout } from '@/components/admin-panel/content-layout'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import {
   Table,
@@ -103,7 +102,7 @@ export default function CourseDetail({ params }: any) {
   const getCourse = async () => {
     try {
       const response = await axios.get(
-        `${apiUrl}/course/${params.id}`,
+        `${process.env.API_URL}/course/${params.id}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 
@@ -124,7 +123,7 @@ export default function CourseDetail({ params }: any) {
 
   const getAllExams = async (courseId: string) => {
     try {
-      const response = await axios.get(`${apiUrl}/exam`, {
+      const response = await axios.get(`${process.env.API_URL}/exam`, {
         params: {
           course: courseId,
           uploader: currentUsername,
@@ -140,9 +139,12 @@ export default function CourseDetail({ params }: any) {
 
   const handleDeleteExam = async (id: number) => {
     try {
-      const deleteResponse = await axios.delete(`${apiUrl}/exam/${id}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const deleteResponse = await axios.delete(
+        `${process.env.API_URL}/exam/${id}`,
+        {
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       if (deleteResponse.status === 200) {
         toast.success(deleteResponse.data.message)
@@ -166,7 +168,7 @@ export default function CourseDetail({ params }: any) {
 
     try {
       const response = await axios.post(
-        `${apiUrl}/exam`,
+        `${process.env.API_URL}/exam`,
         submitData,
         getBearerHeader(localStorage.getItem('token')!)
       )
@@ -191,15 +193,18 @@ export default function CourseDetail({ params }: any) {
 
   const handleDownloadExamFile = async (examId: number) => {
     try {
-      const response = await axios.get(`${apiUrl}/exam/generate-file`, {
-        params: {
-          id: examId,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/exam/generate-file`,
+        {
+          params: {
+            id: examId,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       if (response.status == 200) {
-        window.location.href = `${apiUrl}/${response.data.data}`
+        window.location.href = `${process.env.API_URL}/${response.data.data}`
       }
     } catch (err: any) {
       toast.error(err.response.data.message)
@@ -209,7 +214,7 @@ export default function CourseDetail({ params }: any) {
   const handleGenerateNewConfigPassword = async (examId: number) => {
     try {
       const response = await axios.patch(
-        `${apiUrl}/exam/${examId}`,
+        `${process.env.API_URL}/exam/${examId}`,
         {
           config_password: 'new',
         },
@@ -227,7 +232,7 @@ export default function CourseDetail({ params }: any) {
 
   const searchExam = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/exam`, {
+      const response = await axios.get(`${process.env.API_URL}/exam`, {
         params: {
           search: searchKeywords,
         },
@@ -611,7 +616,7 @@ export default function CourseDetail({ params }: any) {
                           <DropdownMenuItem
                             onClick={() => {
                               handleCopy(
-                                `${apiUrl}/exam-config/${exam.id}`
+                                `${process.env.API_URL}/exam-config/${exam.id}`
                               ).then()
                               toast.success('Download config link copied!')
                             }}
@@ -621,7 +626,7 @@ export default function CourseDetail({ params }: any) {
                           <DropdownMenuItem
                             onClick={() => {
                               handleCopy(
-                                `${feUrl}/exam-submit/${exam.id}`
+                                `${process.env.FE_URL}/exam-submit/${exam.id}`
                               ).then()
                               toast.success('Submit link copied!')
                             }}

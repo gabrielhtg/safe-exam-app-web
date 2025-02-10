@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { toast } from 'sonner'
 import { Label } from '@/components/ui/label'
@@ -18,9 +17,12 @@ export default function ExamSubmitPage({ params }: any) {
 
   const getExam = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/exam/${examId}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/exam/${examId}`,
+        {
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setExamData(response.data.data)
     } catch (e: any) {
@@ -39,7 +41,10 @@ export default function ExamSubmitPage({ params }: any) {
     formData.append('result_file', resultFile)
 
     try {
-      const submitData = await axios.post(`${apiUrl}/exam/submit`, formData)
+      const submitData = await axios.post(
+        `${process.env.API_URL}/exam/submit`,
+        formData
+      )
       toast.success(submitData.data.message)
     } catch (e: any) {
       toast.error(e.response.data.message)

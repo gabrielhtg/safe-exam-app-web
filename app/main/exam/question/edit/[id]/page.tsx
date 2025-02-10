@@ -10,7 +10,6 @@ import { ContentLayout } from '@/components/admin-panel/content-layout'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
-import { apiUrl } from '@/lib/env'
 import axios from 'axios'
 import { toast } from 'sonner'
 import 'react-quill/dist/quill.snow.css'
@@ -30,7 +29,7 @@ export default function EditQuestionPage({ params }: any) {
   const getExamData = async () => {
     try {
       const response = await axios.get(
-        `${apiUrl}/question/${questionId}`,
+        `${process.env.API_URL}/question/${questionId}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
       setQuestionData(response.data.data)
@@ -42,7 +41,7 @@ export default function EditQuestionPage({ params }: any) {
   const handleSaveQuestion = async () => {
     try {
       const response = await axios.patch(
-        `${apiUrl}/question/${questionId}`,
+        `${process.env.API_URL}/question/${questionId}`,
         questionData,
         getBearerHeader(localStorage.getItem('token')!)
       )

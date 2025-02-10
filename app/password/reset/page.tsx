@@ -15,7 +15,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState<string>('')
@@ -23,9 +22,12 @@ export default function ResetPasswordPage() {
 
   const handleResetPassword = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/auth/reset-password`, {
-        email: email,
-      })
+      const response = await axios.post(
+        `${process.env.API_URL}/auth/reset-password`,
+        {
+          email: email,
+        }
+      )
 
       if (response.status == 200) {
         toast.success(response.data.message)
