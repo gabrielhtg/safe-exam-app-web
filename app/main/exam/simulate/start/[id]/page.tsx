@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { Button } from '@/components/ui/button'
 import dynamic from 'next/dynamic'
 import parse from 'html-react-parser'
@@ -61,7 +60,7 @@ export default function ExamSimulationStart({ params }: any) {
 
   const getExamData = async () => {
     const response = await axios.get(
-      `${apiUrl}/exam/${id}`,
+      `${process.env.API_URL}/exam/${id}`,
       getBearerHeader(localStorage.getItem('token')!)
     )
 
@@ -83,7 +82,7 @@ export default function ExamSimulationStart({ params }: any) {
   ) => {
     try {
       const response = await axios.get(
-        `${apiUrl}/question${shuffledOptions ? '/shuffled' : ''}`,
+        `${process.env.API_URL}/question${shuffledOptions ? '/shuffled' : ''}`,
         {
           params: {
             exam: id,
@@ -105,7 +104,7 @@ export default function ExamSimulationStart({ params }: any) {
   const handleSubmitExam = async () => {
     try {
       const submitData = await axios.post(
-        `${apiUrl}/exam/submit`,
+        `${process.env.API_URL}/exam/submit`,
         {
           username: userUsername,
           exam: examData,

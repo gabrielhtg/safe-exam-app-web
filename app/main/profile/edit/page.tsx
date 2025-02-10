@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import { getUserInitials } from '@/app/_services/getUserInitials.service'
-import { apiUrl, compressOptions } from '@/lib/env'
+import { compressOptions } from '@/lib/env'
 import { formatProfileDate } from '@/app/_services/formatProfileDate.service'
 import { Input } from '@/components/ui/input'
 import { ArrowLeft, CircleCheck, CircleX, Save } from 'lucide-react'
@@ -26,7 +26,6 @@ import {
 import { Card } from '@/components/ui/card'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import imageCompression from 'browser-image-compression'
-import { includes } from 'lodash'
 
 export default function EditProfilePage() {
   const router = useRouter()
@@ -36,7 +35,7 @@ export default function EditProfilePage() {
   const [oldUsername] = useState(currentUser.username)
   const [email, setEmail] = useState(currentUser.email)
   const [profilePict, setProfilePict] = useState(
-    `${apiUrl}/${currentUser.profile_pict}`
+    `${process.env.API_URL}/${currentUser.profile_pict}`
   )
   const [fotoProfil, setFotoProfil] = useState<File | undefined>()
   const [emailErr, setEmailErr] = useState('')
@@ -62,7 +61,7 @@ export default function EditProfilePage() {
 
     try {
       const updateResponse = await axios.put(
-        `${apiUrl}/users`,
+        `${process.env.API_URL}/users`,
         formData,
         getBearerHeader(localStorage.getItem('token')!)
       )

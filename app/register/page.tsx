@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import axios from 'axios'
-import { apiUrl, compressOptions } from '@/lib/env'
+import { compressOptions } from '@/lib/env'
 import { useState } from 'react'
 import { ImagePlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -56,7 +56,10 @@ export default function RegisterPage() {
 
     try {
       if (password == rePassword) {
-        const response = await axios.post(`${apiUrl}/users/`, formData)
+        const response = await axios.post(
+          `${process.env.API_URL}/users/`,
+          formData
+        )
 
         if (response.status === 200) {
           toast.success(response.data.message, {

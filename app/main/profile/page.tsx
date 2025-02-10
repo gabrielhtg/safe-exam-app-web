@@ -9,7 +9,6 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
 import { getUserInitials } from '@/app/_services/getUserInitials.service'
-import { apiUrl } from '@/lib/env'
 import { formatProfileDate } from '@/app/_services/formatProfileDate.service'
 import { Card } from '@/components/ui/card'
 import { ContentLayout } from '@/components/admin-panel/content-layout'
@@ -45,7 +44,7 @@ export default function ProfilePage() {
   const handleChangePassword = async () => {
     try {
       const response = await axios.patch(
-        `${apiUrl}/users/password`,
+        `${process.env.API_URL}/users/password`,
         {
           old_password: oldPassword,
           new_password: newPassword,
@@ -99,7 +98,7 @@ export default function ProfilePage() {
           {currentUser.profile_pict ? (
             <AvatarImage
               className={'object-cover'}
-              src={`${apiUrl}/${currentUser.profile_pict}`}
+              src={`${process.env.API_URL}/${currentUser.profile_pict}`}
             />
           ) : (
             ''

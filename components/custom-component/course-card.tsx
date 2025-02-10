@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import Image from 'next/image'
-import { apiUrl } from '@/lib/env'
 import React from 'react'
 import Link from 'next/link'
 import TextTruncate from 'react-text-truncate'
@@ -33,7 +32,7 @@ export default function CourseCard(props: any) {
           {props.props.image ? (
             <Image
               className={'object-cover h-40 rounded-lg'}
-              src={`${apiUrl}/${props.props.image}`}
+              src={`${process.env.API_URL}/${props.props.image}`}
               width={500}
               height={500}
               alt={'course-image'}

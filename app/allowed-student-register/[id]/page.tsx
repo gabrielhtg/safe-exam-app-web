@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 
 export default function AllowedUserRegisterPage({ params }: any) {
@@ -19,9 +18,12 @@ export default function AllowedUserRegisterPage({ params }: any) {
 
   const getCourse = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/course/${courseId}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/course/${courseId}`,
+        {
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setCourseData(response.data.data)
     } catch (e: any) {
@@ -50,7 +52,7 @@ export default function AllowedUserRegisterPage({ params }: any) {
 
         try {
           const response = await axios.post(
-            `${apiUrl}/allowed-student`,
+            `${process.env.API_URL}/allowed-student`,
             tempCredential,
             getBearerHeader(localStorage.getItem('token')!)
           )

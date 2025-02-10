@@ -14,7 +14,6 @@ import Autoplay from 'embla-carousel-autoplay'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { useSelector } from 'react-redux'
 import { selectUser } from '@/lib/_slices/userSlice'
@@ -33,7 +32,7 @@ export default function CourseGroup() {
   useEffect(() => {
     const getRecentCourse = async () => {
       try {
-        const getResponse = await axios.get(`${apiUrl}/course`, {
+        const getResponse = await axios.get(`${process.env.API_URL}/course`, {
           params: {
             sortBy: 'last_access',
             order: 'desc',

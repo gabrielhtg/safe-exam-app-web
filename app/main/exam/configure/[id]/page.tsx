@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { Button } from '@/components/ui/button'
 import {
   ArrowLeft,
@@ -102,7 +101,7 @@ export default function ExamConfigPage({ params }: any) {
 
   const getExamData = async () => {
     const response = await axios.get(
-      `${apiUrl}/exam/${id}`,
+      `${process.env.API_URL}/exam/${id}`,
       getBearerHeader(localStorage.getItem('token')!)
     )
 
@@ -138,7 +137,7 @@ export default function ExamConfigPage({ params }: any) {
 
     try {
       const saveResponse = await axios.patch(
-        `${apiUrl}/exam/${id}`,
+        `${process.env.API_URL}/exam/${id}`,
         {
           sequential: isSequential,
           shuffle_options: shuffleOptions,

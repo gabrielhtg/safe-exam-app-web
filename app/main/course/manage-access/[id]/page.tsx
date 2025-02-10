@@ -22,7 +22,6 @@ import {
   Trash2,
 } from 'lucide-react'
 import axios from 'axios'
-import { apiUrl, feUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
@@ -39,9 +38,12 @@ export default function ManageAccess({ params }: any) {
 
   const getCourse = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/course/${courseId}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/course/${courseId}`,
+        {
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setCourseData(response.data.data)
     } catch (e: any) {
@@ -51,12 +53,15 @@ export default function ManageAccess({ params }: any) {
 
   const getAllowedStudent = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/allowed-student`, {
-        params: {
-          course_id: courseId,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/allowed-student`,
+        {
+          params: {
+            course_id: courseId,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setAllowedStudentData(response.data.data)
     } catch (e: any) {
@@ -67,7 +72,7 @@ export default function ManageAccess({ params }: any) {
   const generateNewToken = async () => {
     try {
       const response = await axios.post(
-        `${apiUrl}/course/generate-new-token`,
+        `${process.env.API_URL}/course/generate-new-token`,
         {
           id: courseData.id,
         },
@@ -82,9 +87,12 @@ export default function ManageAccess({ params }: any) {
 
   const handleDeleteAllowedStudentData = async (id: any) => {
     try {
-      const response = await axios.delete(`${apiUrl}/allowed-student/${id}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.delete(
+        `${process.env.API_URL}/allowed-student/${id}`,
+        {
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       getAllowedStudent().then()
 
@@ -104,13 +112,16 @@ export default function ManageAccess({ params }: any) {
 
   const searchAllowedUser = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/allowed-student`, {
-        params: {
-          course_id: courseId,
-          search: searchKeywords,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/allowed-student`,
+        {
+          params: {
+            course_id: courseId,
+            search: searchKeywords,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setAllowedStudentData(response.data.data)
     } catch (e: any) {
@@ -166,14 +177,14 @@ export default function ManageAccess({ params }: any) {
           <Label className={'font-semibold mb-2'}>Enroll Link</Label>
           <div className={'flex gap-3'}>
             <div className={'border rounded-lg py-2 px-5 font-mono'}>
-              {`${feUrl}/allowed-student-register/${courseId}`}
+              {`${process.env.FE_URL}/allowed-student-register/${courseId}`}
             </div>
             <div>
               <Button
                 variant={'secondary'}
                 onClick={() => {
                   handleCopy(
-                    `${feUrl}/allowed-student-register/${courseId}`
+                    `${process.env.FE_URL}/allowed-student-register/${courseId}`
                   ).then()
                   toast.success('Register link copied')
                 }}

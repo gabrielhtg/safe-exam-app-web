@@ -12,7 +12,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { toast } from 'sonner'
 import Image from 'next/image'
@@ -31,7 +30,7 @@ export default function ProctoringLog({ params }: any) {
   const getExamResult = async () => {
     try {
       const requestResult = await axios.get(
-        `${apiUrl}/exam-result/${examResultId}`,
+        `${process.env.API_URL}/exam-result/${examResultId}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 
@@ -82,12 +81,15 @@ export default function ProctoringLog({ params }: any) {
 
   const getAllowedStudent = async (courseId: string) => {
     try {
-      const response = await axios.get(`${apiUrl}/allowed-student`, {
-        params: {
-          course_id: courseId,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/allowed-student`,
+        {
+          params: {
+            course_id: courseId,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setAllowedStudentData(response.data.data)
     } catch (e: any) {
@@ -173,7 +175,7 @@ export default function ProctoringLog({ params }: any) {
                           'No user image'
                         ) : (
                           <Image
-                            src={`${apiUrl}/${data.user_image}`}
+                            src={`${process.env.API_URL}/${data.user_image}`}
                             alt={'user-image'}
                             width={500}
                             height={500}
@@ -185,7 +187,7 @@ export default function ProctoringLog({ params }: any) {
                         <Dialog>
                           <DialogTrigger>
                             <Image
-                              src={`${apiUrl}/${data.screen_image}`}
+                              src={`${process.env.API_URL}/${data.screen_image}`}
                               alt={'user-image'}
                               width={500}
                               height={500}
@@ -198,7 +200,7 @@ export default function ProctoringLog({ params }: any) {
                             }
                           >
                             <Image
-                              src={`${apiUrl}/${data.screen_image}`}
+                              src={`${process.env.API_URL}/${data.screen_image}`}
                               className={'border rounded-lg w-10/12'}
                               alt={'user-image'}
                               width={2000}

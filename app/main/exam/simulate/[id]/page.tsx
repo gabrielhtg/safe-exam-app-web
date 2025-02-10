@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { Button } from '@/components/ui/button'
 import parse from 'html-react-parser'
 import { format } from 'date-fns'
@@ -61,7 +60,7 @@ export default function SimulatePage({ params }: any) {
   const getExamData = async () => {
     try {
       const response = await axios.get(
-        `${apiUrl}/exam/${id}`,
+        `${process.env.API_URL}/exam/${id}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 
@@ -99,18 +98,21 @@ export default function SimulatePage({ params }: any) {
         )
       }
 
-      const examResultResponse = await axios.get(`${apiUrl}/exam-result`, {
-        params: {
-          username: currentUsername,
-          exam: response.data.data.id,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const examResultResponse = await axios.get(
+        `${process.env.API_URL}/exam-result`,
+        {
+          params: {
+            username: currentUsername,
+            exam: response.data.data.id,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setExamResultData(examResultResponse.data.data)
 
       const getQuestionResponse = await axios.get(
-        `${apiUrl}/question${response.data.data.shuffle_questions ? '/shuffled' : ''}`,
+        `${process.env.API_URL}/question${response.data.data.shuffle_questions ? '/shuffled' : ''}`,
         {
           params: {
             exam: id,
@@ -127,7 +129,7 @@ export default function SimulatePage({ params }: any) {
 
   const handleResetAttempt = async () => {
     try {
-      await axios.delete(`${apiUrl}/exam-result/reset`, {
+      await axios.delete(`${process.env.API_URL}/exam-result/reset`, {
         params: {
           username: currentUsername,
           exam_id: examData.id,
@@ -135,13 +137,16 @@ export default function SimulatePage({ params }: any) {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
-      const examResultResponse = await axios.get(`${apiUrl}/exam-result`, {
-        params: {
-          username: currentUsername,
-          exam: examData.id,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const examResultResponse = await axios.get(
+        `${process.env.API_URL}/exam-result`,
+        {
+          params: {
+            username: currentUsername,
+            exam: examData.id,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setExamResultData(examResultResponse.data.data)
     } catch (e: any) {

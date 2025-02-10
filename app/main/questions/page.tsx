@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { ContentLayout } from '@/components/admin-panel/content-layout'
 import { Card } from '@/components/ui/card'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { DataTable } from '@/app/main/questions/(components)/data-table'
 import { ColumnDef } from '@tanstack/react-table'
@@ -33,7 +32,7 @@ export default function QuestionsPage() {
 
   const getAllQuestion = async () => {
     try {
-      const data = await axios.get(`${apiUrl}/question`, {
+      const data = await axios.get(`${process.env.API_URL}/question`, {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
@@ -139,7 +138,7 @@ export default function QuestionsPage() {
         const handleDeleteQuestion = async () => {
           try {
             const response = await axios.delete(
-              `${apiUrl}/question/${question.id}`,
+              `${process.env.API_URL}/question/${question.id}`,
               getBearerHeader(localStorage.getItem('token')!)
             )
 

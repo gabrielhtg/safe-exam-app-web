@@ -17,7 +17,6 @@ import {
 import logoutService from '@/app/_services/logout.service'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import Link from 'next/link'
 
@@ -38,7 +37,7 @@ export function Menu({ isOpen }: MenuProps) {
   const handleGetUser = async () => {
     try {
       const response = await axios.get(
-        `${apiUrl}/users/${localStorage.getItem('username')}`,
+        `${process.env.API_URL}/users/${localStorage.getItem('username')}`,
         getBearerHeader(localStorage.getItem('token')!)
       )
 

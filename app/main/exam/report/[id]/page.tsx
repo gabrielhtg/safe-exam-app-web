@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card'
 import { ContentLayout } from '@/components/admin-panel/content-layout'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { apiUrl } from '@/lib/env'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { toast } from 'sonner'
 import { ReportDataTable } from '@/app/main/exam/report/(components)/report-data-table'
@@ -40,9 +39,12 @@ export default function ReportPage({ params }: any) {
 
   const getExam = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/exam/${examId}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/exam/${examId}`,
+        {
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setExamData(response.data.data)
       getAllowedStudent(response.data.data.course_id).then()
@@ -53,23 +55,25 @@ export default function ReportPage({ params }: any) {
 
   const getAllowedStudent = async (courseId: string) => {
     try {
-      const response = await axios.get(`${apiUrl}/allowed-student`, {
-        params: {
-          course_id: courseId,
-        },
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
+      const response = await axios.get(
+        `${process.env.API_URL}/allowed-student`,
+        {
+          params: {
+            course_id: courseId,
+          },
+          headers: getBearerHeader(localStorage.getItem('token')!).headers,
+        }
+      )
 
       setAllowedStudentData(response.data.data)
     } catch (e: any) {
       toast.error(e.response.data.message)
     }
   }
-  
 
   const getExamResult = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/exam-result`, {
+      const response = await axios.get(`${process.env.API_URL}/exam-result`, {
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
         params: {
           exam: examId,
@@ -78,7 +82,7 @@ export default function ReportPage({ params }: any) {
 
       if (response.status == 200) {
         setExamResultData(response.data.data)
-        console.log("updated exam",response.data.data)
+        console.log('updated exam', response.data.data)
       }
     } catch (e: any) {
       toast.error(e.response.message)
@@ -219,7 +223,7 @@ export default function ReportPage({ params }: any) {
         )
       },
       cell: ({ row }) => {
-        console.log("graded", row.original)
+        console.log('graded', row.original)
         if (row.getValue('graded')) {
           return <span className={'text-green-500'}>Has been graded</span>
         } else {
@@ -318,11 +322,11 @@ export default function ReportPage({ params }: any) {
     getExamResult().then()
     // updateGradingStatus().then()
     const interval = setInterval(() => {
-      getExamResult();
-    }, 5000); // Setiap 5 detik
-  
-    return () => clearInterval(interval);
-  }, []);
+      getExamResult()
+    }, 5000) // Setiap 5 detik
+
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <ContentLayout title="Exam">
