@@ -138,7 +138,10 @@ export default function ExamQuestionPage({ params }: any) {
       return
     }
 
-    if (!tempOptions.some((item) => item.isCorrect === true)) {
+    if (
+      !tempOptions.some((item) => item.isCorrect === true) &&
+      questionType !== 'essay'
+    ) {
       setTempContent('')
       setTempOptions([])
       setShowCorrectSwitch(true)
