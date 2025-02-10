@@ -150,81 +150,88 @@ export default function EditQuestionPage({ params }: any) {
                       formats={editorConfig.formats}
                     />
 
-                    {questionData?.options.length > 0 ? (
-                      <div className={'flex ms-5 flex-col mt-5 gap-3'}>
-                        {questionData?.options.map(
-                          (item: any, index: number) => (
-                            <div
-                              key={index}
-                              className={'flex items-center gap-3'}
-                            >
-                              <div>
-                                {questionType === 'multiple' ? (
-                                  <>{String.fromCharCode(97 + index)}.</>
-                                ) : (
-                                  ''
-                                )}
+                    {questionType !== 'essay' ? (
+                      questionData?.options.length > 0 ? (
+                        <div className={'flex ms-5 flex-col mt-5 gap-3'}>
+                          {questionData?.options.map(
+                            (item: any, index: number) => (
+                              <div
+                                key={index}
+                                className={'flex items-center gap-3'}
+                              >
+                                <div>
+                                  {questionType === 'multiple' ? (
+                                    <>{String.fromCharCode(97 + index)}.</>
+                                  ) : (
+                                    ''
+                                  )}
 
-                                {questionType === 'check-box' ? (
-                                  <div className="flex items-center space-x-2">
-                                    <Checkbox disabled={true} id={`${index}`} />
-                                  </div>
-                                ) : (
-                                  ''
-                                )}
-                              </div>
-                              <div>
-                                {questionType === 'multiple' ||
-                                questionType === 'check-box' ? (
-                                  <>
-                                    <ReactQuill
-                                      theme="snow"
-                                      value={item.option}
-                                      modules={editorConfig.modules}
-                                      formats={editorConfig.formats}
-                                    />
-                                  </>
-                                ) : (
-                                  ''
-                                )}
-                              </div>
+                                  {questionType === 'check-box' ? (
+                                    <div className="flex items-center space-x-2">
+                                      <Checkbox
+                                        disabled={true}
+                                        id={`${index}`}
+                                      />
+                                    </div>
+                                  ) : (
+                                    ''
+                                  )}
+                                </div>
+                                <div>
+                                  {questionType === 'multiple' ||
+                                  questionType === 'check-box' ? (
+                                    <>
+                                      <ReactQuill
+                                        theme="snow"
+                                        value={item.option}
+                                        modules={editorConfig.modules}
+                                        formats={editorConfig.formats}
+                                      />
+                                    </>
+                                  ) : (
+                                    ''
+                                  )}
+                                </div>
 
-                              <div className={'flex gap-2 items-center'}>
-                                <Switch
-                                  id={'correct-ans'}
-                                  checked={item.isCorrect}
-                                  onClick={() => {
-                                    setQuestionData((prev: any) => ({
-                                      ...prev,
-                                      options: questionData?.options.map(
-                                        (tempOption: any) =>
-                                          tempOption.id === item.id
-                                            ? {
-                                                ...tempOption,
-                                                isCorrect:
-                                                  !tempOption.isCorrect,
-                                              }
-                                            : questionType === 'multiple'
+                                <div className={'flex gap-2 items-center'}>
+                                  <Switch
+                                    id={'correct-ans'}
+                                    checked={item.isCorrect}
+                                    onClick={() => {
+                                      setQuestionData((prev: any) => ({
+                                        ...prev,
+                                        options: questionData?.options.map(
+                                          (tempOption: any) =>
+                                            tempOption.id === item.id
                                               ? {
                                                   ...tempOption,
-                                                  isCorrect: false,
+                                                  isCorrect:
+                                                    !tempOption.isCorrect,
                                                 }
-                                              : tempOption
-                                      ),
-                                    }))
-                                  }}
-                                />
-                                <Label
-                                  htmlFor="correct-ans"
-                                  className={'font-semibold'}
-                                >
-                                  Is Correct
-                                </Label>
+                                              : questionType === 'multiple'
+                                                ? {
+                                                    ...tempOption,
+                                                    isCorrect: false,
+                                                  }
+                                                : tempOption
+                                        ),
+                                      }))
+                                    }}
+                                  />
+                                  <Label
+                                    htmlFor="correct-ans"
+                                    className={'font-semibold'}
+                                  >
+                                    Is Correct
+                                  </Label>
+                                </div>
                               </div>
-                            </div>
-                          )
-                        )}
-                      </div>
+                            )
+                          )}
+                        </div>
+                      ) : (
+                        ''
+                      )
                     ) : (
                       ''
                     )}
@@ -238,8 +245,14 @@ export default function EditQuestionPage({ params }: any) {
 
                     <div>
                       <RadioGroup
-                        value={questionData?.type}
-                        onValueChange={(value) => setQuestionType(value)}
+                        value={questionType}
+                        onValueChange={(value) => {
+                          setQuestionType(value)
+                          setQuestionData((prevData: any) => ({
+                            ...prevData,
+                            type: value,
+                          }))
+                        }}
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="multiple" id="multiple" />
