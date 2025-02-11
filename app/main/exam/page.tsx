@@ -568,7 +568,7 @@ export default function ExamPage() {
               <TableBody>
                 {exams.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className={'text-center p-5'}>
+                    <TableCell colSpan={8} className={'text-center p-5'}>
                       There are no exams yet.
                     </TableCell>
                   </TableRow>
