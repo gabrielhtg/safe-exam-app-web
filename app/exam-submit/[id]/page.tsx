@@ -8,12 +8,14 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/sonner'
+import { Spinner } from '@/components/custom-component/Spinner'
 
 export default function ExamSubmitPage({ params }: any) {
   const examId = params.id
   const [resultFile, setResultFile] = useState<File | undefined>()
   const [resultFileErr, setResultFileErr] = useState('')
   const [examData, setExamData] = useState<any>()
+  const [showSubmitSpinner, setShowSubmitSpinner] = useState(false)
 
   const getExam = async () => {
     try {
@@ -24,7 +26,9 @@ export default function ExamSubmitPage({ params }: any) {
         }
       )
 
-      setExamData(response.data.data)
+      if (response.status === 200) {
+        setExamData(response.data.data)
+      }
     } catch (e: any) {
       toast.error(e.response.data.message)
     }
@@ -45,8 +49,12 @@ export default function ExamSubmitPage({ params }: any) {
         `${process.env.API_URL}/exam/submit`,
         formData
       )
-      toast.success(submitData.data.message)
+      if (submitData.status === 200) {
+        setShowSubmitSpinner(false)
+        toast.success(submitData.data.message)
+      }
     } catch (e: any) {
+      setShowSubmitSpinner(false)
       toast.error(e.response.data.message)
     }
   }
@@ -86,6 +94,7 @@ export default function ExamSubmitPage({ params }: any) {
           className={'mt-5'}
           onClick={() => {
             setResultFileErr('')
+            setShowSubmitSpinner(true)
             if (resultFile === undefined || resultFile === null) {
               setResultFileErr('Cannot be empty!')
             } else {
@@ -93,7 +102,11 @@ export default function ExamSubmitPage({ params }: any) {
             }
           }}
         >
-          Submit
+          Submit{' '}
+          <Spinner
+            show={showSubmitSpinner}
+            className={'text-primary-foreground'}
+          />
         </Button>
       </div>
       <Toaster richColors />
