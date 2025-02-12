@@ -111,7 +111,7 @@ export default function ExamConfigPage({ params }: any) {
     setReviewAnswer(response.data.data.enable_review)
     setReviewAnswer(response.data.data.enable_review)
     setShowExamGrade(response.data.data.show_grade)
-    setAllowedAttemps(response.data.data.allowed_attemps)
+    setAllowedAttemps(response.data.data.allowed_attempts)
     setCheatingLimit(response.data.data.cheating_limit)
     setPassingGrade(response.data.data.passing_grade)
     setIsSequential(response.data.data.sequential)
@@ -230,12 +230,14 @@ export default function ExamConfigPage({ params }: any) {
 
   useEffect(() => {
     if (timeLimit) {
-      setCheatingLimit(
-        (timeLimit.getHours() * 3600 +
-          timeLimit.getMinutes() * 60 +
-          timeLimit.getSeconds()) /
-          1200
-      )
+      if (!timeLimit === examData?.time_limit) {
+        setCheatingLimit(
+          (timeLimit.getHours() * 3600 +
+            timeLimit.getMinutes() * 60 +
+            timeLimit.getSeconds()) /
+            1200
+        )
+      }
     }
   }, [timeLimit])
 
