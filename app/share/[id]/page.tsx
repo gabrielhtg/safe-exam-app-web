@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
 import { Copy, FileCog } from 'lucide-react'
+import parse from 'html-react-parser'
 
 export default function ShareExam({ params }: any) {
   const examID = params.id
@@ -89,7 +90,7 @@ export default function ShareExam({ params }: any) {
       </h1>
 
       <div className={'flex flex-col items-center mb-5'}>
-        <p>{examData?.description}</p>
+        <div>{parse(examData?.description)}</div>
 
         <div className={'border rounded-lg mb-5'}>
           <Table className={'max-w-xl text-base'}>
