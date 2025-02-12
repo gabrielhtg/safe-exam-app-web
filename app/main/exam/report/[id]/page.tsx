@@ -209,7 +209,7 @@ export default function ReportPage({ params }: any) {
       sortingFn: (a: any, b: any) => a.getValue('grade') - b.getValue('grade'),
     },
     {
-      accessorKey: 'graded-status',
+      accessorKey: 'graded',
       header: ({ column }) => {
         return (
           <Button
@@ -223,11 +223,11 @@ export default function ReportPage({ params }: any) {
         )
       },
       cell: ({ row }) => {
-        console.log('graded', row.original)
+        console.log("ini value dari graded",row.getValue('graded'))
         if (row.getValue('graded')) {
-          return <span className={'text-green-500'}>Has been graded</span>
+          return <span className="text-green-500">Has been graded</span>;
         } else {
-          return <span className={'text-yellow-500'}>Has not been graded</span>
+          return <span className="text-yellow-500">Has not been graded</span>;
         }
       },
     },

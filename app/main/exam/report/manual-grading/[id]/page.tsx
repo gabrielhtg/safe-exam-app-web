@@ -103,6 +103,26 @@ export default function ProctoringLog({ params }: any) {
     const score = parseFloat(scoreStr)
     if (isNaN(score)) return toast.error('Invalid score')
 
+      const answer = essayAnswers.find((ans) => ans.id === answerId);
+      if (!answer) {
+        toast.error("Answer not found");
+        return;
+      }
+    
+      // Pastikan `answer.result` ada sebelum mengakses `expected_score`
+      if (!answer.result || answer.result.expected_score === undefined) {
+        toast.error("Expected score is missing");
+        return;
+      }
+    
+      const expectedScore = answer.result.expected_score;
+    
+      // Cek apakah score lebih besar dari expected_score
+      if (score > expectedScore) {
+        toast.error("Failed to submit, cannot be bigger than expected points");
+        return;
+      }
+
     try {
       await axios.patch(
         `${process.env.API_URL}/exam-result/${answerId}/grade`,
