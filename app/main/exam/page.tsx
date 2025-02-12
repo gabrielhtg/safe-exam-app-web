@@ -681,12 +681,12 @@ export default function ExamPage() {
                             <DropdownMenuItem
                               onClick={() => {
                                 handleCopy(
-                                  `${process.env.API_URL}/exam-config/${exam.id}`
+                                  `${process.env.FE_URL}/share/${exam.id}`
                                 ).then()
-                                toast.success('Download link copied!')
+                                toast.success('Share exam link copied!')
                               }}
                             >
-                              <Copy /> Copy Download Config Link
+                              <Copy /> Copy Share Exam Link
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {

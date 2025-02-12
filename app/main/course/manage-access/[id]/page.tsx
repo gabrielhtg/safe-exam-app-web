@@ -142,7 +142,7 @@ export default function ManageAccess({ params }: any) {
           'flex flex-col gap-3 md:gap-5 p-10 min-h-[calc(100vh-180px)] rounded-lg shadow'
         }
       >
-        <h1 className={'font-bold text-3xl'}>Allowed User</h1>
+        <h1 className={'font-bold text-3xl'}>Allowed Examinees</h1>
 
         <div className={'flex flex-col'}>
           <Label className={'font-semibold mb-2'}>Enroll Key</Label>
@@ -244,6 +244,8 @@ export default function ManageAccess({ params }: any) {
             <ArrowLeft /> Back
           </Button>
         </div>
+
+        <p>Total Examinee : {allowedStudentData.length}</p>
 
         <div className={'border rounded-lg'}>
           <Table>

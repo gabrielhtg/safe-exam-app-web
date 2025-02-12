@@ -267,22 +267,22 @@ export default function RecentExam() {
                         <DropdownMenuItem
                           onClick={() => {
                             handleCopy(
-                              `${process.env.API_URL}/exam-config/${exam.id}`
+                              `${process.env.API_URL}/share/${exam.id}`
                             ).then()
-                            toast.success('Download config link copied!')
+                            toast.success('Share exam link copied!')
                           }}
                         >
-                          <Copy /> Copy Download Config Link
+                          <Copy /> Copy Share Exam Link
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
                             handleCopy(
-                              `${process.env.FE_URL}/exam-submit/${exam.id}`
+                              `${process.env.FE_URL}/share/${exam.id}`
                             ).then()
-                            toast.success('Submit link copied!')
+                            toast.success('Share exam link copied!')
                           }}
                         >
-                          <Copy /> Copy Submit Link
+                          <Copy /> Copy Share Exam Link
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className={'text-red-500'}

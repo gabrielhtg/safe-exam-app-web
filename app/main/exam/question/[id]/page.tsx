@@ -76,6 +76,7 @@ export default function ExamQuestionPage({ params }: any) {
         params: {
           exam: id,
         },
+
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
@@ -521,7 +522,7 @@ export default function ExamQuestionPage({ params }: any) {
                                                           questionDataItem.content,
                                                           questionDataItem.type,
                                                           questionDataItem.options,
-                                                          questionDataItem.remarks
+                                                          questionDataItem.point
                                                         ).then()
                                                       }}
                                                     >
