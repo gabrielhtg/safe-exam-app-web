@@ -90,7 +90,7 @@ export default function ShareExam({ params }: any) {
       </h1>
 
       <div className={'flex flex-col items-center mb-5'}>
-        <div>{parse(examData?.description)}</div>
+        <div>{examData?.description ? parse(examData?.description) : ''}</div>
 
         <div className={'border rounded-lg mb-5'}>
           <Table className={'max-w-xl text-base'}>
