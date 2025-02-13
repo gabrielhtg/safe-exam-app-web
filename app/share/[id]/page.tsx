@@ -8,8 +8,8 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { formatExamDate } from '@/app/_services/format-exam-date'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
-import { Copy, FileCog } from 'lucide-react'
+// import { getBearerHeader } from '@/app/_services/getBearerHeader.service'
+import { Copy } from 'lucide-react'
 import parse from 'html-react-parser'
 
 export default function ShareExam({ params }: any) {
@@ -49,25 +49,25 @@ export default function ShareExam({ params }: any) {
     }
   }
 
-  const handleDownloadExamFile = async (examId: number) => {
-    try {
-      const response = await axios.get(
-        `${process.env.API_URL}/exam/generate-file`,
-        {
-          params: {
-            id: examId,
-          },
-          headers: getBearerHeader(localStorage.getItem('token')!).headers,
-        }
-      )
-
-      if (response.status == 200) {
-        window.location.href = `${process.env.API_URL}/${response.data.data}`
-      }
-    } catch (err: any) {
-      toast.error(err.response.data.message)
-    }
-  }
+  // const handleDownloadExamFile = async (examId: number) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.API_URL}/exam/generate-file`,
+  //       {
+  //         params: {
+  //           id: examId,
+  //         },
+  //         headers: getBearerHeader(localStorage.getItem('token')!).headers,
+  //       }
+  //     )
+  //
+  //     if (response.status == 200) {
+  //       window.location.href = `${process.env.API_URL}/${response.data.data}`
+  //     }
+  //   } catch (err: any) {
+  //     toast.error(err.response.data.message)
+  //   }
+  // }
 
   const handleCopy = async (text: string) => {
     try {
@@ -141,13 +141,13 @@ export default function ShareExam({ params }: any) {
           </Table>
         </div>
 
-        <Button
-          onClick={() => {
-            handleDownloadExamFile(examID)
-          }}
-        >
-          <FileCog /> Download Configuration File
-        </Button>
+        {/*<Button*/}
+        {/*  onClick={() => {*/}
+        {/*    handleDownloadExamFile(examID)*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  <FileCog /> Download Configuration File*/}
+        {/*</Button>*/}
       </div>
 
       <div>

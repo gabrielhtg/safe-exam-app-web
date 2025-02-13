@@ -570,7 +570,11 @@ export default function ExamQuestionPage({ params }: any) {
                         <div className={'flex gap-3'}>
                           <Button
                             onClick={() => {
-                              if (value !== '' && value !== '<p><br></p>') {
+                              if (
+                                value !== '' &&
+                                value !== '<p><br></p>' &&
+                                stripHtml(value).trim() !== ''
+                              ) {
                                 setTempOptions((prevOptions) => [
                                   ...prevOptions,
                                   {
