@@ -182,7 +182,8 @@ export default function ExamQuestionPage({ params }: any) {
     content: string,
     questionTypeParam: string,
     optionsParam: any,
-    remarksParam: any
+    remarksParam: any,
+    questionId: number
   ) => {
     try {
       const saveResponse = await axios.post(
@@ -195,6 +196,7 @@ export default function ExamQuestionPage({ params }: any) {
           course: examData.course_id,
           created_by: currentUsername,
           exam_id: id,
+          question_id: questionId,
         },
         getBearerHeader(localStorage.getItem('token')!)
       )
@@ -204,7 +206,7 @@ export default function ExamQuestionPage({ params }: any) {
         toast.success(saveResponse.data.message)
       }
     } catch (err: any) {
-      toast.success(err.response.message)
+      toast.error(err.response.data.message)
     }
   }
 
@@ -522,7 +524,8 @@ export default function ExamQuestionPage({ params }: any) {
                                                           questionDataItem.content,
                                                           questionDataItem.type,
                                                           questionDataItem.options,
-                                                          questionDataItem.point
+                                                          questionDataItem.point,
+                                                          questionDataItem.id
                                                         ).then()
                                                       }}
                                                     >

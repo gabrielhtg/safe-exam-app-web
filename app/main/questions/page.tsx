@@ -33,6 +33,9 @@ export default function QuestionsPage() {
   const getAllQuestion = async () => {
     try {
       const data = await axios.get(`${process.env.API_URL}/question`, {
+        params: {
+          created_by: localStorage.getItem('username')!,
+        },
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
 
