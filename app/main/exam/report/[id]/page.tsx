@@ -82,7 +82,6 @@ export default function ReportPage({ params }: any) {
 
       if (response.status == 200) {
         setExamResultData(response.data.data)
-        console.log('updated exam', response.data.data)
       }
     } catch (e: any) {
       toast.error(e.response.message)
@@ -223,11 +222,10 @@ export default function ReportPage({ params }: any) {
         )
       },
       cell: ({ row }) => {
-        console.log("ini value dari graded",row.getValue('graded'))
         if (row.getValue('graded')) {
-          return <span className="text-green-500">Has been graded</span>;
+          return <span className="text-green-500">Has been graded</span>
         } else {
-          return <span className="text-yellow-500">Has not been graded</span>;
+          return <span className="text-yellow-500">Has not been graded</span>
         }
       },
     },
@@ -258,7 +256,7 @@ export default function ReportPage({ params }: any) {
             className={'px-0 w-full justify-start'}
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Indicated Cheating
+            Cheating
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -336,7 +334,12 @@ export default function ReportPage({ params }: any) {
       >
         <h3 className={'font-bold mb-5'}>{examData?.title} Report</h3>
 
-        <ReportDataTable columns={columns} data={examResultData} />
+        <ReportDataTable
+          columns={columns}
+          allowedStudentData={allowedStudentData}
+          data={examResultData}
+          examData={examData}
+        />
       </Card>
     </ContentLayout>
   )
