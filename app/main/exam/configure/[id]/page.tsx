@@ -230,7 +230,12 @@ export default function ExamConfigPage({ params }: any) {
 
   useEffect(() => {
     if (timeLimit) {
-      if (!timeLimit === examData?.time_limit) {
+      const temp =
+        timeLimit.getHours() * 3600 +
+        timeLimit.getMinutes() * 60 +
+        timeLimit.getSeconds()
+
+      if (temp !== examData?.time_limit) {
         setCheatingLimit(
           (timeLimit.getHours() * 3600 +
             timeLimit.getMinutes() * 60 +
