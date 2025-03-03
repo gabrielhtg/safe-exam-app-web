@@ -272,7 +272,7 @@ export default function ExamQuestionPage({ params }: any) {
 
         <Button
           onClick={() => {
-            router.push('/main/exam')
+            router.back()
           }}
           className={'mb-3'}
         >
