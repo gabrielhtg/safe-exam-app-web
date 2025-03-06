@@ -18,6 +18,7 @@ export default function ProctoringLog({ params }: any) {
   const router = useRouter()
   const [examResultData, setExamResultData] = useState([])
   const examId = params.id
+  const [submittedAnswers, setSubmittedAnswers] = useState<number[]>([])
 
   const getExamResult = async () => {
     try {
@@ -30,7 +31,6 @@ export default function ProctoringLog({ params }: any) {
 
       if (response.status == 200) {
         setExamResultData(response.data.data)
-        console.log('updated exam', response.data.data)
       }
     } catch (e: any) {
       toast.error(e.response.message)
@@ -38,23 +38,30 @@ export default function ProctoringLog({ params }: any) {
   }
 
   const updateGradingStatus = async () => {
+    // Pastikan semua soal telah di-submit
+    const allSubmitted = essayAnswers.every(answer => submittedAnswers.includes(answer.id))
+  
+    if (!allSubmitted) {
+      toast.error('You must submit grades for all questions before saving.')
+      return
+    }
+  
     try {
       await axios.patch(
-        `${process.env.API_URL}/exam-result/${examResultId}/update-graded`, // Pastikan endpoint URL benar
-        { graded: true }, // Kirimkan nilai graded di body request
+        `${process.env.API_URL}/exam-result/${examResultId}/update-graded`,
+        { graded: true },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Pastikan token diambil dengan benar
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       )
-      // Optionally, Anda bisa menampilkan notifikasi sukses
       toast.success('Grading status updated successfully')
     } catch (e: any) {
-      toast.error(`Failed to update grading status. ${e.response.data.message}`)
+      toast.error(`Failed to update grading status. ${e.response?.data?.message || 'Unknown error'}`)
     }
   }
-
+    
   useEffect(() => {
     const fetchEssayAnswers = async () => {
       try {
@@ -71,83 +78,70 @@ export default function ProctoringLog({ params }: any) {
     }
 
     fetchEssayAnswers().then()
-    getExam().then()
     getExamResult().then()
   }, [examResultId])
 
-  // Handle perubahan nilai input
   const handleInputChange = (answerId: number, value: string) => {
-    if (!/^\d*\.?\d*$/.test(value)) return // Cegah karakter selain angka & titik
+    if (!/^[0-9]*\.?[0-9]*$/.test(value)) return
 
     setGrades((prev) => ({
       ...prev,
-      [answerId]: value, // Simpan sebagai string
+      [answerId]: value,
     }))
   }
 
-  const getExam = async () => {
-    try {
-      await axios.get(`${process.env.API_URL}/exam/${examId}`, {
-        headers: getBearerHeader(localStorage.getItem('token')!).headers,
-      })
-    } catch (err: any) {
-      toast.error(err.response.message)
-    }
-  }
-
-  // Handle submit & update langsung di UI
   const submitGrade = async (answerId: number) => {
-    const scoreStr = grades[answerId]
-    if (!scoreStr) return toast.error('Score is required')
+  const scoreStr = grades[answerId]
+  if (!scoreStr) return toast.error('Score is required')
 
-    const score = parseFloat(scoreStr)
-    if (isNaN(score)) return toast.error('Invalid score')
+  const score = parseFloat(scoreStr)
+  if (isNaN(score)) return toast.error('Invalid score')
 
-      const answer = essayAnswers.find((ans) => ans.id === answerId);
-      if (!answer) {
-        toast.error("Answer not found");
-        return;
-      }
-    
-      // Pastikan `answer.result` ada sebelum mengakses `expected_score`
-      if (!answer.result || answer.result.expected_score === undefined) {
-        toast.error("Expected score is missing");
-        return;
-      }
-    
-      const expectedScore = answer.result.expected_score;
-    
-      // Cek apakah score lebih besar dari expected_score
-      if (score > expectedScore) {
-        toast.error("Failed to submit, cannot be bigger than expected points");
-        return;
-      }
-
-    try {
-      await axios.patch(
-        `${process.env.API_URL}/exam-result/${answerId}/grade`,
-        { score },
-        getBearerHeader(localStorage.getItem('token')!)
-      )
-
-      toast.success('Grade submitted successfully')
-
-      // Langsung update nilai di UI tanpa fetch ulang
-      setEssayAnswers((prevAnswers) =>
-        prevAnswers.map((answer) =>
-          answer.id === answerId ? { ...answer, score } : answer
-        )
-      )
-
-      // Reset input setelah submit
-      setGrades((prev) => ({
-        ...prev,
-        [answerId]: '',
-      }))
-    } catch (e: any) {
-      toast.error(e.response?.data?.message || 'Failed to submit grade')
-    }
+  const answer = essayAnswers.find((ans) => ans.id === answerId)
+  if (!answer) {
+    toast.error("Answer not found")
+    return
   }
+
+  if (!answer.result || answer.result.expected_score === undefined) {
+    toast.error("Expected score is missing")
+    return
+  }
+
+  const expectedScore = answer.result.expected_score
+  if (score > expectedScore) {
+    toast.error("Failed to submit, cannot be bigger than expected points")
+    return
+  }
+
+  try {
+    await axios.patch(
+      `${process.env.API_URL}/exam-result/${answerId}/grade`,
+      { score },
+      getBearerHeader(localStorage.getItem('token')!)
+    )
+
+    toast.success('Grade submitted successfully')
+
+    // Tambahkan ID jawaban yang telah di-submit
+    setSubmittedAnswers((prev) => [...prev, answerId])
+
+    // Langsung update nilai di UI
+    setEssayAnswers((prevAnswers) =>
+      prevAnswers.map((answer) =>
+        answer.id === answerId ? { ...answer, score } : answer
+      )
+    )
+
+    // Reset input setelah submit
+    setGrades((prev) => ({
+      ...prev,
+      [answerId]: '',
+    }))
+  } catch (e: any) {
+    toast.error(e.response?.data?.message || 'Failed to submit grade')
+  }
+}
 
   return (
     <ContentLayout title="Exam">
@@ -172,7 +166,6 @@ export default function ProctoringLog({ params }: any) {
                     </div>
                   </div>
 
-                  {/* Input dan Submit Button */}
                   <div className="flex items-center gap-2 mt-3">
                     <input
                       type="text"
@@ -194,7 +187,6 @@ export default function ProctoringLog({ params }: any) {
                     </Button>
                   </div>
 
-                  {/* Tampilkan nilai setelah submit */}
                   <div className="w-[85px] flex flex-col gap-5">
                     <div className="w-[85px] border rounded-lg flex flex-col p-5 mt-3">
                       <p className="font-bold">Score</p>
