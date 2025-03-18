@@ -90,6 +90,13 @@ export default function ReportPage({ params }: any) {
 
   const columns: ColumnDef<any>[] = [
     {
+      id: 'no',
+      header: 'No',
+      cell: ({ row }) => {
+        return <>{row.index + 1}</>
+      },
+    },
+    {
       accessorKey: 'user_username',
       header: ({ column }) => {
         return (
