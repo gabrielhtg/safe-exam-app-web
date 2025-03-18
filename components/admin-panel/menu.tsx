@@ -137,7 +137,7 @@ export function Menu({ isOpen }: MenuProps) {
                         </div>
                       ) : (
                         <>
-                          {label !== 'Users' ? (
+                          {label !== 'Users' && label !== 'Honestest App' ? (
                             <div className="w-full" key={menuIndex}>
                               <TooltipProvider disableHoverableContent>
                                 <Tooltip delayDuration={100}>

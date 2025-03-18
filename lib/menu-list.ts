@@ -6,6 +6,7 @@ import {
   LucideIcon,
   Landmark,
   Users,
+  Code,
 } from 'lucide-react'
 
 type Submenu = {
@@ -67,6 +68,11 @@ export function getMenuList(pathname: string): Group[] {
           href: '/main/users',
           label: 'Users',
           icon: Users,
+        },
+        {
+          href: '/main/honestest-app',
+          label: 'Honestest App',
+          icon: Code,
         },
         {
           href: '/main/profile',
