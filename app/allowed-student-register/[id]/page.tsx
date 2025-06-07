@@ -87,6 +87,7 @@ export default function AllowedUserRegisterPage({ params }: any) {
           <Input
             type="password"
             id="enroll-key"
+            className={'uppercase'}
             placeholder={'Enroll Key'}
             value={enrollKey}
             onChange={(e: any) => {
