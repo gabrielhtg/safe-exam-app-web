@@ -156,6 +156,7 @@ export default function ExamConfigPage({ params }: any) {
           start_password: startPassword,
           course_id: courseId,
           end_password: endPassword,
+          title: examData.title,
           start_date: examStartDate,
           end_date: examEndDate,
           created_by: localStorage.getItem('username')!,
