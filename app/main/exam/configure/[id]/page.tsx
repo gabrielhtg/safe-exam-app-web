@@ -50,6 +50,7 @@ export default function ExamConfigPage({ params }: any) {
   const [dialogType, setDialogType] = useState(1)
   const [editorConfig, setEditorConfig] = useState<any>(null)
   const router = useRouter()
+  const [courseId, setCourseId] = useState<any>(null)
 
   // state untuk exam behaviour
   const [examDescription, setExamDescription] = useState('')
@@ -119,6 +120,7 @@ export default function ExamConfigPage({ params }: any) {
     setShuffleOptions(response.data.data.shuffle_options)
     setStartPassword(response.data.data.start_password)
     setEndPassword(response.data.data.end_password)
+    setCourseId(response.data.data.course_id)
     setExamStartDate(new Date(response.data.data.start_date))
     setExamEndDate(new Date(response.data.data.end_date))
 
@@ -152,6 +154,7 @@ export default function ExamConfigPage({ params }: any) {
           allowed_attemps: allowedAttemps,
           cheating_limit: cheatingLimit,
           start_password: startPassword,
+          course_id: courseId,
           end_password: endPassword,
           start_date: examStartDate,
           end_date: examEndDate,
