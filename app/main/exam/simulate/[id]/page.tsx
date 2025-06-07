@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/table'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -346,7 +347,9 @@ export default function SimulatePage({ params }: any) {
                       >
                         Start
                       </Button>
-                      <Button variant={'secondary'}>Cancel</Button>
+                      <DialogClose asChild>
+                        <Button variant={'secondary'}>Cancel</Button>
+                      </DialogClose>
                     </div>
                   </DialogDescription>
                 </DialogHeader>

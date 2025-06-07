@@ -518,6 +518,7 @@ export default function ExamPage() {
                         setExamStartDateErr(
                           'The start date cannot be earlier current date and time'
                         )
+                        return
                       }
 
                       if (examStartDate.getTime() > examEndDate!.getTime()) {

@@ -263,16 +263,16 @@ export default function ReportPage({ params }: any) {
             className={'px-0 w-full justify-start'}
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Cheating
+            Cheating Status
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => {
         if (row.getValue('indicated_cheating')) {
-          return <span className={'text-yellow-500'}>True</span>
+          return <span className={'text-yellow-500'}>Suspected</span>
         } else {
-          return <span className={'text-green-500'}>False</span>
+          return <span className={'text-green-500'}>Not Suspected</span>
         }
       },
     },

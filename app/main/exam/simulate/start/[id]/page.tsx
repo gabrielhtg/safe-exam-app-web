@@ -66,30 +66,22 @@ export default function ExamSimulationStart({ params }: any) {
 
     setExamData(response.data.data)
 
-    getAllQuestions(
-      response.data.data.shuffle_questions,
-      response.data.data.shuffle_options
-    ).then()
+    getAllQuestions(response.data.data.shuffle_questions).then()
 
     setHoursLimit(Math.floor(response.data.data.time_limit / 3600))
     setMinutesLimit(Math.floor((response.data.data.time_limit % 3600) / 60))
     setSecondsLimit(Math.floor((response.data.data.time_limit % 3600) % 60))
   }
 
-  const getAllQuestions = async (
-    shuffledQuestions: boolean,
-    shuffledOptions: boolean
-  ) => {
+  const getAllQuestions = async (shuffledQuestions: boolean) => {
     try {
-      const response = await axios.get(
-        `${process.env.API_URL}/question${shuffledOptions ? '/shuffled' : ''}`,
-        {
-          params: {
-            exam: id,
-          },
-          headers: getBearerHeader(localStorage.getItem('token')!).headers,
-        }
-      )
+      const response = await axios.get(`${process.env.API_URL}/question`, {
+        params: {
+          exam: id,
+        },
+
+        headers: getBearerHeader(localStorage.getItem('token')!).headers,
+      })
 
       if (shuffledQuestions) {
         setQuestions(_.shuffle(response.data.data))
@@ -437,28 +429,26 @@ export default function ExamSimulationStart({ params }: any) {
 
             <div className={'flex gap-3'}>
               <div>
-                <Button
-                  onClick={() => {
-                    if (submitState === 2) {
-                      handleSubmitExam().then()
-                    } else {
-                      setSubmitState(submitState + 1)
-                    }
-                  }}
-                >
-                  <Send />
-                  {submitState === 1 ? 'Submit' : ''}
-                  {submitState === 2 ? 'Submit & Finish' : ''}
-                </Button>
+                {submitState !== 2 ? (
+                  <Button
+                    onClick={() => {
+                      if (submitState === 2) {
+                        handleSubmitExam().then()
+                      } else {
+                        setSubmitState(submitState + 1)
+                      }
+                    }}
+                  >
+                    <Send />
+                    {submitState === 1 ? 'Submit' : ''}
+                  </Button>
+                ) : null}
               </div>
 
               <div>
                 <Button
                   onClick={() => {
-                    getAllQuestions(
-                      examData.shuffle_questions,
-                      examData.shuffle_options
-                    ).then()
+                    router.push(`/main/exam/question/${id}`)
                   }}
                 >
                   <RefreshCw />

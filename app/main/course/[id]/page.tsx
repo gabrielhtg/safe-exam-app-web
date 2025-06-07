@@ -235,6 +235,8 @@ export default function CourseDetail({ params }: any) {
       const response = await axios.get(`${process.env.API_URL}/exam`, {
         params: {
           search: searchKeywords,
+          course: course.id,
+          uploader: currentUsername,
         },
         headers: getBearerHeader(localStorage.getItem('token')!).headers,
       })
@@ -456,6 +458,7 @@ export default function CourseDetail({ params }: any) {
                       setExamStartDateErr(
                         'The start date cannot be earlier current date and time'
                       )
+                      return
                     }
 
                     if (examStartDate.getTime() > examEndDate!.getTime()) {

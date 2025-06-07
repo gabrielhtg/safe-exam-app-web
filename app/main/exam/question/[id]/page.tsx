@@ -284,76 +284,82 @@ export default function ExamQuestionPage({ params }: any) {
         </div>
 
         <div className={'flex flex-col gap-5'}>
-          {questions.map((e: any, index) => (
-            <div key={index} className={'flex gap-3 border rounded-lg p-5'}>
-              <div>{index + 1}.</div>
-              <div className={'w-full h-auto'}>
-                {parse(e.content)}
-                <div className={'flex ms-5 flex-col mt-2'}>
-                  {e.options.map((item: any, index: number) => (
-                    <div key={index} className={'flex items-center gap-3'}>
-                      <div>
-                        {e.type === 'multiple' ? (
-                          <>{String.fromCharCode(97 + index)}.</>
-                        ) : (
-                          ''
-                        )}
+          <div className={'flex flex-col gap-5 max-h-72 overflow-auto'}>
+            {questions.map((e: any, index) => (
+              <div key={index} className={'flex gap-3 border rounded-lg p-5'}>
+                <div>{index + 1}.</div>
+                <div className={'w-full h-auto'}>
+                  {parse(e.content)}
+                  <div className={'flex ms-5 flex-col mt-2'}>
+                    {e.options.map((item: any, index: number) => (
+                      <div key={index} className={'flex items-center gap-3'}>
+                        <div>
+                          {e.type === 'multiple' ? (
+                            <>{String.fromCharCode(97 + index)}.</>
+                          ) : (
+                            ''
+                          )}
 
-                        {e.type === 'check-box' ? (
-                          <div className="flex items-center space-x-2">
-                            <Checkbox disabled={true} id={`${index}`} />
-                          </div>
-                        ) : (
-                          ''
-                        )}
-                      </div>
-                      <div className={item.isCorrect ? 'bg-green-200' : ''}>
-                        {e.type === 'multiple' ? <>{parse(item.option)}</> : ''}
+                          {e.type === 'check-box' ? (
+                            <div className="flex items-center space-x-2">
+                              <Checkbox disabled={true} id={`${index}`} />
+                            </div>
+                          ) : (
+                            ''
+                          )}
+                        </div>
+                        <div className={item.isCorrect ? 'bg-green-200' : ''}>
+                          {e.type === 'multiple' ? (
+                            <>{parse(item.option)}</>
+                          ) : (
+                            ''
+                          )}
 
-                        {e.type === 'check-box' ? (
-                          <label
-                            htmlFor={`${index}`}
-                            className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {parse(item.option)}
-                          </label>
-                        ) : (
-                          ''
-                        )}
+                          {e.type === 'check-box' ? (
+                            <label
+                              htmlFor={`${index}`}
+                              className="peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {parse(item.option)}
+                            </label>
+                          ) : (
+                            ''
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant={'secondary'}>
+                      <EllipsisVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push(`/main/exam/question/edit/${e.id}`)
+                      }}
+                    >
+                      <Pen />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        handleDelete(e.id)
+                      }}
+                    >
+                      <Trash2 />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant={'secondary'}>
-                    <EllipsisVertical />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      router.push(`/main/exam/question/edit/${e.id}`)
-                    }}
-                  >
-                    <Pen />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      handleDelete(e.id)
-                    }}
-                  >
-                    <Trash2 />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          ))}
+            ))}
+          </div>
 
-          <div className={'flex gap-3 border rounded-lg p-5 '}>
+          <div className={'flex gap-3 border rounded-lg p-5'}>
             <div>{questions.length + 1}</div>
             <div className={'w-full'}>
               {tempContent ? (
