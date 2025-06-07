@@ -155,6 +155,7 @@ export default function ExamConfigPage({ params }: any) {
           end_password: endPassword,
           start_date: examStartDate,
           end_date: examEndDate,
+          created_by: localStorage.getItem('username')!,
           time_limit: timeLimit
             ? timeLimit.getHours() * 3600 +
               timeLimit.getMinutes() * 60 +
