@@ -211,12 +211,17 @@ export default function CourseDetail({ params }: any) {
     }
   }
 
-  const handleGenerateNewConfigPassword = async (examId: number) => {
+  const handleGenerateNewConfigPassword = async (
+    examId: number,
+    examTitle: string
+  ) => {
     try {
       const response = await axios.patch(
         `${process.env.API_URL}/exam/${examId}`,
         {
           config_password: 'new',
+          course_id: course.id,
+          title: examTitle,
         },
         getBearerHeader(localStorage.getItem('token')!)
       )
@@ -536,7 +541,10 @@ export default function CourseDetail({ params }: any) {
                         <Button
                           variant={'outline'}
                           onClick={() => {
-                            handleGenerateNewConfigPassword(exam.id).then()
+                            handleGenerateNewConfigPassword(
+                              exam.id,
+                              exam.title
+                            ).then()
                           }}
                         >
                           <RefreshCcw />

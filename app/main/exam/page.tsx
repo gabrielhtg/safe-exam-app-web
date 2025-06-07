@@ -123,12 +123,17 @@ export default function ExamPage() {
       toast.error(err.response.message)
     }
   }
-  const handleGenerateNewConfigPassword = async (examId: number) => {
+  const handleGenerateNewConfigPassword = async (
+    examId: number,
+    examTitle: string
+  ) => {
     try {
       const response = await axios.patch(
         `${process.env.API_URL}/exam/${examId}`,
         {
           config_password: 'new',
+          course_id: selectedCourseId,
+          title: examTitle,
         },
         getBearerHeader(localStorage.getItem('token')!)
       )
@@ -599,7 +604,10 @@ export default function ExamPage() {
                           <Button
                             variant={'outline'}
                             onClick={() => {
-                              handleGenerateNewConfigPassword(exam.id).then()
+                              handleGenerateNewConfigPassword(
+                                exam.id,
+                                exam.title
+                              ).then()
                             }}
                           >
                             <RefreshCcw />
