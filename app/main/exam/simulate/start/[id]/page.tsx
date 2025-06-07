@@ -445,16 +445,18 @@ export default function ExamSimulationStart({ params }: any) {
                 ) : null}
               </div>
 
-              <div>
-                <Button
-                  onClick={() => {
-                    router.push(`/main/exam/question/${id}`)
-                  }}
-                >
-                  <RefreshCw />
-                  Update Question
-                </Button>
-              </div>
+              {submitState !== 2 ? (
+                <div>
+                  <Button
+                    onClick={() => {
+                      router.push(`/main/exam/question/${id}`)
+                    }}
+                  >
+                    <RefreshCw />
+                    Update Question
+                  </Button>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
