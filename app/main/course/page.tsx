@@ -579,15 +579,53 @@ export default function CoursePage() {
                             <Label htmlFor="course-title-update">
                               Course Title
                             </Label>
-                            <Input
-                              type="text"
-                              id="course-title-update"
-                              value={courseTitle}
-                              className={'uppercase'}
-                              onChange={(e) => {
-                                setCourseTitle(e.target.value.toUpperCase())
-                              }}
-                            />
+                            <div className={'flex gap-2'}>
+                              <Input
+                                type="text"
+                                id="course-title-update"
+                                value={courseTitle}
+                                className={'uppercase'}
+                                onChange={(e) => {
+                                  setCourseTitle(e.target.value.toUpperCase())
+                                }}
+                              />
+
+                              {isCourseTitleValid === null ? (
+                                <Button
+                                  onClick={async () => {
+                                    setIsValidating(true)
+                                    await handleValidateCourseTitle().then()
+                                  }}
+                                  variant={'outline'}
+                                >
+                                  {!isValidating ? (
+                                    'Validate'
+                                  ) : (
+                                    <>
+                                      <Spinner />
+                                    </>
+                                  )}
+                                </Button>
+                              ) : null}
+
+                              {isCourseTitleValid ? (
+                                <Button
+                                  variant={'outline'}
+                                  className={'text-green-500 border-green-500'}
+                                >
+                                  <CircleCheck /> Valid
+                                </Button>
+                              ) : null}
+
+                              {isCourseTitleValid === false ? (
+                                <Button
+                                  variant={'outline'}
+                                  className={'text-red-500 border-red-500'}
+                                >
+                                  <CircleX /> Invalid
+                                </Button>
+                              ) : null}
+                            </div>
                             <span className={'text-sm text-red-500'}>
                               {courseTitleErr}
                             </span>
@@ -597,13 +635,33 @@ export default function CoursePage() {
                             <Label htmlFor="course-desc-update">
                               Course Description
                             </Label>
-                            <Textarea
-                              id="course-desc-update"
-                              value={courseDesc}
-                              onChange={(e) => {
-                                setCourseDesc(e.target.value)
-                              }}
-                            />
+                            <div className={'flex gap-2'}>
+                              <Textarea
+                                id="course-desc-update"
+                                value={courseDesc}
+                                onChange={(e) => {
+                                  setCourseDesc(e.target.value)
+                                }}
+                              />
+                              <Button
+                                variant={'outline'}
+                                onClick={async () => {
+                                  if (courseTitle.trim() === '') {
+                                    setCourseDescErr('Set course title first')
+                                    return
+                                  }
+
+                                  setIsDescriptionGenerating(true)
+                                  await handleGenerateCourseDesc().then()
+                                }}
+                              >
+                                {isDescriptionGenerating ? (
+                                  <Spinner />
+                                ) : (
+                                  <Brain />
+                                )}
+                              </Button>
+                            </div>
                             <span className={'text-sm text-red-500'}>
                               {courseDescErr}
                             </span>
@@ -666,13 +724,25 @@ export default function CoursePage() {
                         </AlertDialogCancel>
                         <Button
                           onClick={() => {
-                            if (courseTitle === '') {
+                            if (courseTitle.trim() === '') {
                               setCourseTitleErr('Cannot be blank!')
                               return
                             }
 
                             if (courseDesc === '') {
                               setCourseDescErr('Cannot be blank!')
+                              return
+                            }
+
+                            if (isCourseTitleValid === false) {
+                              setCourseTitleErr(
+                                'Make sure your course title is valid.'
+                              )
+                              return
+                            }
+
+                            if (isCourseTitleValid === null) {
+                              setCourseTitleErr('Validate course title first.')
                               return
                             }
 
