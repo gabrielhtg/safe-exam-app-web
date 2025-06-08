@@ -302,6 +302,7 @@ export default function CoursePage() {
                         onChange={(e) => {
                           setCourseTitle(e.target.value.toUpperCase())
                           setCourseTitleErr('')
+                          setCourseDescErr('')
                           setIsCourseTitleValid(null)
                         }}
                       />
@@ -362,6 +363,11 @@ export default function CoursePage() {
                       <Button
                         variant={'outline'}
                         onClick={async () => {
+                          if (courseTitle.trim() === '') {
+                            setCourseDescErr('Set course title first')
+                            return
+                          }
+
                           setIsDescriptionGenerating(true)
                           await handleGenerateCourseDesc().then()
                         }}
