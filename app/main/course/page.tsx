@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
+  Brain,
   CircleCheck,
   CircleX,
   Eye,
@@ -77,6 +78,7 @@ export default function CoursePage() {
   const [selectedCourse, setSelectedCourse] = useState(0)
   const [isCourseTitleValid, setIsCourseTitleValid] = useState<any>(null)
   const [isValidating, setIsValidating] = useState<any>(false)
+  const [isDescriptionGenerating, setIsDescriptionGenerating] = useState(false)
 
   const router = useRouter()
 
@@ -123,6 +125,7 @@ export default function CoursePage() {
 
   const handleAddCourse = async () => {
     setIsLoadingCreate(true)
+    setIsCourseTitleValid(null)
     setLoadingTitle('Creating New Course')
     const formData = new FormData()
     formData.append('title', courseTitle)
@@ -176,6 +179,18 @@ export default function CoursePage() {
     }
 
     setIsValidating(false)
+  }
+
+  const handleGenerateCourseDesc = async () => {
+    const response = await axios.post(
+      `${process.env.API_URL}/course/generate-course-description`,
+      { course_title: courseTitle },
+      getBearerHeader(localStorage.getItem('token')!)
+    )
+
+    setCourseDesc(response.data.data)
+
+    setIsDescriptionGenerating(false)
   }
 
   const handleEditCourse = async (id: number) => {
@@ -285,7 +300,7 @@ export default function CoursePage() {
                         value={courseTitle}
                         className={'uppercase'}
                         onChange={(e) => {
-                          setCourseTitle(e.target.value)
+                          setCourseTitle(e.target.value.toUpperCase())
                           setCourseTitleErr('')
                           setIsCourseTitleValid(null)
                         }}
@@ -311,9 +326,6 @@ export default function CoursePage() {
 
                       {isCourseTitleValid ? (
                         <Button
-                          onClick={async () => {
-                            await handleValidateCourseTitle().then()
-                          }}
                           variant={'outline'}
                           className={'text-green-500 border-green-500'}
                         >
@@ -323,9 +335,6 @@ export default function CoursePage() {
 
                       {isCourseTitleValid === false ? (
                         <Button
-                          onClick={async () => {
-                            await handleValidateCourseTitle().then()
-                          }}
                           variant={'outline'}
                           className={'text-red-500 border-red-500'}
                         >
@@ -340,14 +349,26 @@ export default function CoursePage() {
 
                   <div className="grid w-full items-center gap-1.5 ">
                     <Label htmlFor="course-desc">Course Description</Label>
-                    <Textarea
-                      value={courseDesc}
-                      id="course-desc"
-                      onChange={(e) => {
-                        setCourseDesc(e.target.value)
-                        setCourseDescErr('')
-                      }}
-                    />
+                    <div className={'flex gap-2'}>
+                      <Textarea
+                        value={courseDesc}
+                        id="course-desc"
+                        onChange={(e) => {
+                          setCourseDesc(e.target.value)
+                          setCourseDescErr('')
+                        }}
+                      />
+
+                      <Button
+                        variant={'outline'}
+                        onClick={async () => {
+                          setIsDescriptionGenerating(true)
+                          await handleGenerateCourseDesc().then()
+                        }}
+                      >
+                        {isDescriptionGenerating ? <Spinner /> : <Brain />}
+                      </Button>
+                    </div>
                     <span className={'text-sm text-red-500'}>
                       {courseDescErr}
                     </span>
@@ -380,7 +401,7 @@ export default function CoursePage() {
                       accept="image/jpeg, image/png"
                       onChange={(e) => {
                         setCourseImageErr('')
-                        const file = e.target.files?.[0] // Ambil file pertama yang diunggah
+                        const file = e.target.files?.[0]
                         if (file) {
                           if (
                             file.type === 'image/jpeg' ||
@@ -504,7 +525,9 @@ export default function CoursePage() {
                       }
                     >
                       <span
-                        className={'font-bold text-muted-foreground text-2xl'}
+                        className={
+                          'font-bold text-muted-foreground text-2xl text-center'
+                        }
                       >
                         {course.title}
                       </span>
@@ -554,8 +577,9 @@ export default function CoursePage() {
                               type="text"
                               id="course-title-update"
                               value={courseTitle}
+                              className={'uppercase'}
                               onChange={(e) => {
-                                setCourseTitle(e.target.value)
+                                setCourseTitle(e.target.value.toUpperCase())
                               }}
                             />
                             <span className={'text-sm text-red-500'}>

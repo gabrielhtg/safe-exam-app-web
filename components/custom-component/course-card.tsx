@@ -43,7 +43,11 @@ export default function CourseCard(props: any) {
                 'w-full h-40 flex items-center justify-center bg-muted rounded-lg'
               }
             >
-              <span className={'font-bold text-muted-foreground text-2xl'}>
+              <span
+                className={
+                  'font-bold text-muted-foreground text-2xl text-center'
+                }
+              >
                 {props.props.title}
               </span>
             </div>
