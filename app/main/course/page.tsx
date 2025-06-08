@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
+  CircleCheck,
   CircleX,
   Eye,
   ImagePlus,
@@ -71,9 +72,11 @@ export default function CoursePage() {
   const [courseList, setCourseList] = useState([])
   const [loadingTitle, setLoadingTitle] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
-  const [loadingSeeCourseDetail, setLoadingSeeCourseDetail] = useState(false)
+  // const [loadingSeeCourseDetail, setLoadingSeeCourseDetail] = useState(false)
   const [showEditCourse, setShowEditCourse] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState(0)
+  const [isCourseTitleValid, setIsCourseTitleValid] = useState<any>(null)
+  const [isValidating, setIsValidating] = useState<any>(false)
 
   const router = useRouter()
 
@@ -157,6 +160,22 @@ export default function CoursePage() {
     setAddDialog(false)
     setCourseTitle('')
     setCourseDesc('')
+  }
+
+  const handleValidateCourseTitle = async () => {
+    const response = await axios.post(
+      `${process.env.API_URL}/course/validate-course-title`,
+      { course_title: courseTitle },
+      getBearerHeader(localStorage.getItem('token')!)
+    )
+
+    if (response.data.data.trim() === 'true') {
+      setIsCourseTitleValid(true)
+    } else {
+      setIsCourseTitleValid(false)
+    }
+
+    setIsValidating(false)
   }
 
   const handleEditCourse = async (id: number) => {
@@ -259,15 +278,61 @@ export default function CoursePage() {
                 <AlertDialogDescription className={'flex flex-col gap-5 mt-3'}>
                   <div className="grid w-full items-center gap-1.5 mt-3">
                     <Label htmlFor="course-title">Course Title</Label>
-                    <Input
-                      type="text"
-                      id="course-title"
-                      value={courseTitle}
-                      onChange={(e) => {
-                        setCourseTitle(e.target.value)
-                        setCourseTitleErr('')
-                      }}
-                    />
+                    <div className={'flex gap-2'}>
+                      <Input
+                        type="text"
+                        id="course-title"
+                        value={courseTitle}
+                        className={'uppercase'}
+                        onChange={(e) => {
+                          setCourseTitle(e.target.value)
+                          setCourseTitleErr('')
+                          setIsCourseTitleValid(null)
+                        }}
+                      />
+
+                      {isCourseTitleValid === null ? (
+                        <Button
+                          onClick={async () => {
+                            setIsValidating(true)
+                            await handleValidateCourseTitle().then()
+                          }}
+                          variant={'outline'}
+                        >
+                          {!isValidating ? (
+                            'Validate'
+                          ) : (
+                            <>
+                              <Spinner />
+                            </>
+                          )}
+                        </Button>
+                      ) : null}
+
+                      {isCourseTitleValid ? (
+                        <Button
+                          onClick={async () => {
+                            await handleValidateCourseTitle().then()
+                          }}
+                          variant={'outline'}
+                          className={'text-green-500 border-green-500'}
+                        >
+                          <CircleCheck /> Valid
+                        </Button>
+                      ) : null}
+
+                      {isCourseTitleValid === false ? (
+                        <Button
+                          onClick={async () => {
+                            await handleValidateCourseTitle().then()
+                          }}
+                          variant={'outline'}
+                          className={'text-red-500 border-red-500'}
+                        >
+                          <CircleX /> Invalid
+                        </Button>
+                      ) : null}
+                    </div>
                     <span className={'text-sm text-red-500'}>
                       {courseTitleErr}
                     </span>
@@ -371,6 +436,16 @@ export default function CoursePage() {
                       return
                     }
 
+                    if (isCourseTitleValid === false) {
+                      setCourseTitleErr('Make sure your course title is valid.')
+                      return
+                    }
+
+                    if (isCourseTitleValid === null) {
+                      setCourseTitleErr('Validate course title first.')
+                      return
+                    }
+
                     handleAddCourse().then()
                   }}
                 >
@@ -439,15 +514,15 @@ export default function CoursePage() {
                 <CardFooter className={'flex gap-2'}>
                   <Button
                     onClick={() => {
-                      setLoadingSeeCourseDetail(true)
+                      // setLoadingSeeCourseDetail(true)
                       router.push(`/main/course/${course.id}`)
                     }}
                   >
-                    {loadingSeeCourseDetail ? (
-                      <Spinner className={'text-primary-foreground'} />
-                    ) : (
-                      <Eye />
-                    )}
+                    {/*{loadingSeeCourseDetail ? (*/}
+                    {/*  <Spinner className={'text-primary-foreground'} />*/}
+                    {/*) : (*/}
+                    <Eye />
+                    {/*)}*/}
                   </Button>
 
                   {/*Bagian Edit Dialog*/}
