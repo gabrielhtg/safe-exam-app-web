@@ -634,6 +634,7 @@ export default function ExamConfigPage({ params }: any) {
             variant={'outline'}
             onClick={() => {
               router.back()
+              router.refresh()
             }}
           >
             <ArrowLeft /> Back
