@@ -232,6 +232,7 @@ export default function CoursePage() {
     setCourseImageFile(undefined)
     setCourseTitle('')
     setCourseDesc('')
+    setIsCourseTitleValid(null)
   }
 
   return (
@@ -298,7 +299,6 @@ export default function CoursePage() {
                         type="text"
                         id="course-title"
                         value={courseTitle}
-                        className={'uppercase'}
                         onChange={(e) => {
                           setCourseTitle(e.target.value.toUpperCase())
                           setCourseTitleErr('')
@@ -440,6 +440,7 @@ export default function CoursePage() {
                     setCourseTitle('')
                     setCourseImage('')
                     setCourseImageFile(undefined)
+                    setIsCourseTitleValid(null)
                   }}
                 >
                   Cancel
@@ -584,7 +585,6 @@ export default function CoursePage() {
                                 type="text"
                                 id="course-title-update"
                                 value={courseTitle}
-                                className={'uppercase'}
                                 onChange={(e) => {
                                   setCourseTitle(e.target.value.toUpperCase())
                                 }}
@@ -718,6 +718,7 @@ export default function CoursePage() {
                             setCourseImage('')
                             setCourseImageFile(undefined)
                             setShowEditCourse(false)
+                            setIsCourseTitleValid(null)
                           }}
                         >
                           Cancel
