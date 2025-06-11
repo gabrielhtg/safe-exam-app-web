@@ -35,6 +35,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Spinner } from '@/components/custom-component/Spinner'
+import Markdown from 'react-markdown'
 
 export default function ReportPage({ params }: any) {
   const examId = params.id
@@ -298,7 +299,7 @@ export default function ReportPage({ params }: any) {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Cheating Status Summary</AlertDialogTitle>
+                    {/*<AlertDialogTitle>Cheating Status Summary</AlertDialogTitle>*/}
                     <AlertDialogDescription>
                       {row.original.cheating_summary === null ? (
                         <div
@@ -313,7 +314,7 @@ export default function ReportPage({ params }: any) {
                           </span>
                         </div>
                       ) : (
-                        row.original.cheating_summary
+                        <Markdown>{row.original.cheating_summary}</Markdown>
                       )}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
