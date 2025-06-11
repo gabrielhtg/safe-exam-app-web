@@ -9,7 +9,13 @@ import { toast } from 'sonner'
 import { ReportDataTable } from '@/app/main/exam/report/(components)/report-data-table'
 import { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown, BookOpenCheck, EllipsisVertical, Eye } from 'lucide-react'
+import {
+  ArrowUpDown,
+  BookOpenCheck,
+  EllipsisVertical,
+  Eye,
+  Info,
+} from 'lucide-react'
 import { formatExamDate } from '@/app/_services/format-exam-date'
 import Link from 'next/link'
 import {
@@ -18,6 +24,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { Spinner } from '@/components/custom-component/Spinner'
 
 export default function ReportPage({ params }: any) {
   const examId = params.id
@@ -270,7 +287,43 @@ export default function ReportPage({ params }: any) {
       },
       cell: ({ row }) => {
         if (row.getValue('indicated_cheating')) {
-          return <span className={'text-yellow-500'}>Suspected</span>
+          return (
+            <div className={'flex gap-2 items-center'}>
+              <span className={'text-yellow-500'}>Suspected</span>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant={'outline'}>
+                    <Info />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Cheating Status Summary</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {row.original.cheating_summary === null ? (
+                        <div
+                          className={
+                            'flex items-center justify-center flex-col mt-5 mb-5'
+                          }
+                        >
+                          <Spinner />
+                          <span className={'mt-3'}>
+                            Please wait... We are trying to generate summary for
+                            you.
+                          </span>
+                        </div>
+                      ) : (
+                        row.original.cheating_summary
+                      )}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogAction>OK</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          )
         } else {
           return <span className={'text-green-500'}>Not Suspected</span>
         }
