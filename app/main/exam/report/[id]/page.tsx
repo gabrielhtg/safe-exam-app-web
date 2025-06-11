@@ -291,7 +291,7 @@ export default function ReportPage({ params }: any) {
             <div className={'flex gap-2 items-center'}>
               <span className={'text-yellow-500'}>Suspected</span>
               <AlertDialog>
-                <AlertDialogTrigger asChild>
+                <AlertDialogTrigger>
                   <Button variant={'outline'}>
                     <Info />
                   </Button>
@@ -340,7 +340,7 @@ export default function ReportPage({ params }: any) {
       },
       cell: ({ row }) => {
         return (
-          <DropdownMenu modal={false}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={'secondary'}>
                 <EllipsisVertical />
@@ -378,12 +378,6 @@ export default function ReportPage({ params }: any) {
   useEffect(() => {
     getExam().then()
     getExamResult().then()
-    // updateGradingStatus().then()
-    const interval = setInterval(() => {
-      getExamResult()
-    }, 5000) // Setiap 5 detik
-
-    return () => clearInterval(interval)
   }, [])
 
   return (
