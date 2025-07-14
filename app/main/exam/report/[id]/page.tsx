@@ -9,13 +9,7 @@ import { toast } from 'sonner'
 import { ReportDataTable } from '@/app/main/exam/report/(components)/report-data-table'
 import { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import {
-  ArrowUpDown,
-  BookOpenCheck,
-  EllipsisVertical,
-  Eye,
-  Info,
-} from 'lucide-react'
+import { ArrowUpDown, BookOpenCheck, EllipsisVertical, Eye } from 'lucide-react'
 import { formatExamDate } from '@/app/_services/format-exam-date'
 import Link from 'next/link'
 import {
@@ -24,18 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Spinner } from '@/components/custom-component/Spinner'
-import Markdown from 'react-markdown'
 
 export default function ReportPage({ params }: any) {
   const examId = params.id
