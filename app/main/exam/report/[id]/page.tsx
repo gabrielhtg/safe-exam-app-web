@@ -291,38 +291,38 @@ export default function ReportPage({ params }: any) {
           return (
             <div className={'flex gap-2 items-center'}>
               <span className={'text-yellow-500'}>Suspected</span>
-              <AlertDialog>
-                <AlertDialogTrigger>
-                  <Button variant={'outline'}>
-                    <Info />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    {/*<AlertDialogTitle>Cheating Status Summary</AlertDialogTitle>*/}
-                    <AlertDialogDescription>
-                      {row.original.cheating_summary === null ? (
-                        <div
-                          className={
-                            'flex items-center justify-center flex-col mt-5 mb-5'
-                          }
-                        >
-                          <Spinner />
-                          <span className={'mt-3'}>
-                            Please wait... We are trying to generate summary for
-                            you.
-                          </span>
-                        </div>
-                      ) : (
-                        <Markdown>{row.original.cheating_summary}</Markdown>
-                      )}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogAction>OK</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              {/*<AlertDialog>*/}
+              {/*  <AlertDialogTrigger>*/}
+              {/*    <Button variant={'outline'}>*/}
+              {/*      <Info />*/}
+              {/*    </Button>*/}
+              {/*  </AlertDialogTrigger>*/}
+              {/*  <AlertDialogContent>*/}
+              {/*    <AlertDialogHeader>*/}
+              {/*      /!*<AlertDialogTitle>Cheating Status Summary</AlertDialogTitle>*!/*/}
+              {/*      <AlertDialogDescription>*/}
+              {/*        {row.original.cheating_summary === null ? (*/}
+              {/*          <div*/}
+              {/*            className={*/}
+              {/*              'flex items-center justify-center flex-col mt-5 mb-5'*/}
+              {/*            }*/}
+              {/*          >*/}
+              {/*            <Spinner />*/}
+              {/*            <span className={'mt-3'}>*/}
+              {/*              Please wait... We are trying to generate summary for*/}
+              {/*              you.*/}
+              {/*            </span>*/}
+              {/*          </div>*/}
+              {/*        ) : (*/}
+              {/*          <Markdown>{row.original.cheating_summary}</Markdown>*/}
+              {/*        )}*/}
+              {/*      </AlertDialogDescription>*/}
+              {/*    </AlertDialogHeader>*/}
+              {/*    <AlertDialogFooter>*/}
+              {/*      <AlertDialogAction>OK</AlertDialogAction>*/}
+              {/*    </AlertDialogFooter>*/}
+              {/*  </AlertDialogContent>*/}
+              {/*</AlertDialog>*/}
             </div>
           )
         } else {
